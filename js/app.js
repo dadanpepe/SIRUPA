@@ -741,3 +741,60 @@ function showToast(message, type = 'success') {
         toast.classList.add('translate-y-24', 'opacity-0');
     }, 3500);
 }
+// Urutan siklus status yang diinginkan
+const statusSequence = ['Pending', 'Diproses', 'Selesai', 'Ditolak'];
+
+// Fungsi untuk memutar/recycle status dalam sekali klik
+function handleRecycleStatus(itemId) {
+    const statusElement = document.getElementById(`status-${itemId}`);
+    if (!statusElement) return;
+
+    // Ambil status saat ini
+    let currentStatus = statusElement.getAttribute('data-status') || statusElement.innerText.trim();
+    
+    // Cari posisi indeks saat ini, lalu pindah ke status berikutnya (jika mentok, kembali ke awal)
+    let currentIndex = statusSequence.indexOf(currentStatus);
+    let nextIndex = (currentIndex + 1) % statusSequence.length;
+    let nextStatus = statusSequence[nextIndex];
+
+    // Perbarui tampilan pada elemen DOM
+    statusElement.setAttribute('data-status', nextStatus);
+    statusElement.innerText = nextStatus;
+
+    // Perbarui warna badge status secara dinamis (opsional sesuai tema Anda)
+    updateStatusBadgeStyle(statusElement, nextStatus);
+
+    // Simpan perubahan ke penyimpanan/database lokal
+    saveStatusChange(itemId, nextStatus);
+}
+
+// Fungsi pembantu untuk styling badge berdasarkan status
+function updateStatusBadgeStyle(element, status) {
+    // Hapus kelas warna lama
+    element.className = "px-3 py-1 rounded-full text-xs font-semibold transition-all duration-200 cursor-pointer ";
+    
+    // Tambahkan kelas warna baru berdasarkan status
+    switch (status) {
+        case 'Pending':
+            element.className += "bg-yellow-100 text-yellow-800 border border-yellow-300";
+            break;
+        case 'Diproses':
+            element.className += "bg-blue-100 text-blue-800 border border-blue-300";
+            break;
+        case 'Selesai':
+            element.className += "bg-green-100 text-green-800 border border-green-300";
+            break;
+        case 'Ditolak':
+            element.className += "bg-red-100 text-red-800 border border-red-300";
+            break;
+        default:
+            element.className += "bg-gray-100 text-gray-800";
+    }
+}
+
+// Fungsi simulasi penyimpanan data (bisa disesuaikan dengan backend/localStorage Anda)
+function saveStatusChange(itemId, newStatus) {
+    console.log(`Item ${itemId} berhasil diperbarui menjadi: ${newStatus}`);
+    // Contoh jika menggunakan localStorage:
+    // localStorage.setItem(`status_${itemId}`, newStatus);
+}
