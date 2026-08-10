@@ -319,6 +319,69 @@
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Bidang / Unit Kerja</label>
+                        <input type="text" id="input-unit" required placeholder="Contoh: Bagian Umum" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Kategori Kegiatan</label>
+                        <select id="input-category" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue">
+                            <option value="Rapat Dinas">Rapat Dinas</option>
+                            <option value="Seminar / Sosialisasi">Seminar / Sosialisasi</option>
+                            <option value="Pelatihan / Diklat">Pelatihan / Diklat</option>
+                            <option value="Audiensi / Tamu">Audiensi / Tamu</option>
+                            <option value="Lainnya">Lainnya</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Kegiatan / Acara</label>
+                    <input type="text" id="input-kegiatan" required placeholder="Contoh: Rapat Koordinasi Program Kerja Triwulan" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Pilihan Ruangan</label>
+                    <select id="input-room" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue">
+                        <!-- Dinamis via JS -->
+                    </select>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Tanggal Pelaksanaan</label>
+                        <input type="date" id="input-date" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Jam Pelaksanaan</label>
+                        <input type="text" id="input-time" required placeholder="Contoh: 08:00 - 12:00 WIB" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Perkiraan Jumlah Peserta</label>
+                    <input type="number" id="input-attendees" min="1" required placeholder="Contoh: 25" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Catatan / Permintaan Khusus (Opsional)</label>
+                    <textarea id="input-catatan" rows="2" placeholder="Contoh: Butuh tambahan konsumsi dan mic wireless..." class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue"></textarea>
+                </div>
+                <div class="flex justify-end gap-3 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeBookingModal()" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition">
+                        Batal
+                    </button>
+                    <button type="submit" id="btn-submit-booking" class="px-5 py-2.5 rounded-xl bg-brand-blue hover:bg-brand-darkBlue text-white font-bold text-xs transition shadow-sm flex items-center gap-2">
+                        <i class="fa-solid fa-paper-plane"></i> Kirim Pengajuan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast-notification" class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-xl transform translate-y-24 opacity-0 transition-all duration-300 flex items-center gap-3 border border-slate-800">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+        <div>
+            <h5 class="text-xs font-bold" id="toast-title">Notifikasi Sistem</h5>
+            <p class="text-[11px] text-slate-300" id="toast-message">Pesan notifikasi...</p>
+        </div>
+    </div>
+
     <!-- Include QR Code Generator Library (QRCode.js) & OTP Library (otplib/jsSHA for TOTP) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsSHA/3.3.1/sha.js"></script>
@@ -333,58 +396,6 @@
         let pendingAdminUser = null;
         let bookingsCache = [];
         let pollingInterval = null;
-
-        // Implementasi TOTP sederhana (RFC 6238) menggunakan jsSHA
-        function base32toHex(base32) {
-            const base32chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-            let bits = "";
-            let hex = "";
-            for (let i = 0; i < base32.length; i++) {
-                const val = base32chars.indexOf(base32.toUpperCase().charAt(i));
-                if (val >= 0) {
-                    bits += val.toString(2).padStart(5, '0');
-                }
-            }
-            for (let i = 0; i + 4 <= bits.length; i += 4) {
-                const chunk = bits.substr(i, 4);
-                hex += parseInt(chunk, 2).toString(16);
-            }
-            return hex;
-        }
-
-        function generateTOTP(secret, windowOffset = 0) {
-            try {
-                const keyHex = base32toHex(secret);
-                const epoch = Math.round(new Date().getTime() / 1000.0);
-                const timeStep = 30;
-                const timeVal = Math.floor(epoch / timeStep) + windowOffset;
-                
-                let timeHex = timeVal.toString(16).padStart(16, '0');
-                
-                const shaObj = new jsSHA("SHA-1", "HEX");
-                shaObj.setHMACKey(keyHex, "HEX");
-                shaObj.update(timeHex);
-                const hmacHex = shaObj.getHMAC("HEX");
-                
-                const offset = parseInt(hmacHex.substr(hmacHex.length - 1, 1), 16);
-                const binary = ((parseInt(hmacHex.substr(offset * 2, 8), 16) & 0x7fffffff));
-                const otp = (binary % 1000000).toString().padStart(6, '0');
-                return otp;
-            } catch(e) {
-                console.error("TOTP Error:", e);
-                return "000000";
-            }
-        }
-
-        function verifyTOTP(secret, token) {
-            for (let errorWindow = -1; errorWindow <= 1; errorWindow++) {
-                if (generateTOTP(secret, errorWindow) === token) {
-                    return true;
-                }
-            }
-            if (token === "123456") return true;
-            return false;
-        }
 
         const rooms = [
             {
@@ -461,12 +472,98 @@
             });
         }, 4000);
 
-        window.onload = function() {
+        // Cek sesi login admin yang tersimpan di localStorage saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedRooms = localStorage.getItem('pintar_rooms_data');
+            if (savedRooms) {
+                try {
+                    const parsedRooms = JSON.parse(savedRooms);
+                    if (Array.isArray(parsedRooms) && parsedRooms.length === rooms.length) {
+                        parsedRooms.forEach((pr, i) => {
+                            if (pr.status) rooms[i].status = pr.status;
+                        });
+                    }
+                } catch(e) {
+                    console.error("Gagal memuat status ruangan:", e);
+                }
+            }
+
+            const savedAdmin = localStorage.getItem('pintar_admin_session');
+            if (savedAdmin) {
+                try {
+                    const adminData = JSON.parse(savedAdmin);
+                    if (adminData && adminData.username) {
+                        isAdminLoggedIn = true;
+                        pendingAdminUser = adminData;
+                        const loginCard = document.getElementById('admin-login-card');
+                        const adminPanel = document.getElementById('admin-panel-content');
+                        if (loginCard && adminPanel) {
+                            loginCard.classList.add('hidden');
+                            adminPanel.classList.remove('hidden');
+                        }
+                    }
+                } catch(e) {
+                    console.error("Gagal memuat sesi admin:", e);
+                    localStorage.removeItem('pintar_admin_session');
+                }
+            }
             renderRoomsCatalog();
             populateRoomDropdown();
             fetchBookingsData();
             pollingInterval = setInterval(fetchBookingsData, 5000);
-        };
+        });
+
+        // Implementasi TOTP sederhana (RFC 6238) menggunakan jsSHA
+        function base32toHex(base32) {
+            const base32chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+            let bits = "";
+            let hex = "";
+            for (let i = 0; i < base32.length; i++) {
+                const val = base32chars.indexOf(base32.toUpperCase().charAt(i));
+                if (val >= 0) {
+                    bits += val.toString(2).padStart(5, '0');
+                }
+            }
+            for (let i = 0; i + 4 <= bits.length; i += 4) {
+                const chunk = bits.substr(i, 4);
+                hex += parseInt(chunk, 2).toString(16);
+            }
+            return hex;
+        }
+
+        function generateTOTP(secret, windowOffset = 0) {
+            try {
+                const keyHex = base32toHex(secret);
+                const epoch = Math.round(new Date().getTime() / 1000.0);
+                const timeStep = 30;
+                const timeVal = Math.floor(epoch / timeStep) + windowOffset;
+                
+                let timeHex = timeVal.toString(16).padStart(16, '0');
+                
+                const shaObj = new jsSHA("SHA-1", "HEX");
+                shaObj.setHMACKey(keyHex, "HEX");
+                shaObj.update(timeHex);
+                const hmacHex = shaObj.getHMAC("HEX");
+                
+                const offset = parseInt(hmacHex.substr(hmacHex.length - 1, 1), 16);
+                const binary = ((parseInt(hmacHex.substr(offset * 2, 8), 16) & 0x7fffffff));
+                const otp = (binary % 1000000).toString().padStart(6, '0');
+                return otp;
+            } catch(e) {
+                console.error("TOTP Error:", e);
+                return "000000";
+            }
+        }
+
+        function verifyTOTP(secret, token) {
+            for (let errorWindow = -1; errorWindow <= 1; errorWindow++) {
+                if (generateTOTP(secret, errorWindow) === token) {
+                    return true;
+                }
+            }
+            if (token === "123456") return true;
+            return false;
+        }
 
         function switchAppMode(mode) {
             currentMode = mode;
@@ -797,7 +894,7 @@
 
             if (btn) {
                 btn.disabled = false;
-                btn.innerHTML = `<i class="fa-solid fa-arrow-right"></i> Masuk`;
+                btn.innerHTML = `<i class="fa-solid fa-arrow-right"></i> Lanjutkan Verifikasi`;
             }
 
             if (userRecord && userRecord.password === p) {
@@ -842,6 +939,8 @@
 
             if (pendingAdminUser && verifyTOTP(pendingAdminUser.secret, otpVal)) {
                 isAdminLoggedIn = true;
+                localStorage.setItem('pintar_admin_session', JSON.stringify(pendingAdminUser));
+
                 document.getElementById('admin-login-card').classList.add('hidden');
                 document.getElementById('admin-panel-content').classList.remove('hidden');
                 renderAdminTable();
@@ -855,6 +954,8 @@
         function handleAdminLogout() {
             isAdminLoggedIn = false;
             pendingAdminUser = null;
+            localStorage.removeItem('pintar_admin_session');
+
             document.getElementById('admin-login-card').classList.remove('hidden');
             document.getElementById('admin-panel-content').classList.add('hidden');
             document.getElementById('form-admin-otp').classList.add('hidden');
@@ -886,22 +987,19 @@
                 item.innerHTML = `
                     <div>
                         <h5 class="text-xs font-bold text-slate-900">${room.name}</h5>
-                        <span class="text-[10px] text-slate-500">Kapasitas: ${room.capacity} orang</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-[10px] font-semibold px-2.5 py-1 rounded-full ${badgeColor} inline-flex items-center gap-1">
-                            <i class="fa-solid ${statusIcon}"></i> ${room.status}
+                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded-md inline-block mt-1 ${badgeColor}">
+                            <i class="fa-solid ${statusIcon} mr-1"></i>${room.status}
                         </span>
-                        <button type="button" onclick="toggleRoomStatusNext(${idx})" class="w-8 h-8 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 flex items-center justify-center transition shadow-xs" title="Ganti Status Otomatis">
-                            <i class="fa-solid fa-rotate text-xs"></i>
-                        </button>
                     </div>
+                    <button type="button" onclick="toggleRoomStatusNext(${idx})" class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-[11px] font-semibold px-3 py-1.5 rounded-lg transition shadow-xs">
+                        Ubah Status
+                    </button>
                 `;
                 container.appendChild(item);
             });
         }
 
-        function toggleRoomStatusNext(roomIdx) {
+        async function toggleRoomStatusNext(roomIdx) {
             const current = rooms[roomIdx].status;
             let nextStatus = "Tersedia";
             if (current === "Tersedia") {
@@ -913,10 +1011,30 @@
             }
 
             rooms[roomIdx].status = nextStatus;
+            
+            localStorage.setItem('pintar_rooms_data', JSON.stringify(rooms));
+
+            if (GOOGLE_SHEETS_URL) {
+                try {
+                    await fetch(GOOGLE_SHEETS_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            action: 'updateRoomStatus', 
+                            roomName: rooms[roomIdx].name, 
+                            newStatus: nextStatus 
+                        })
+                    });
+                } catch (err) {
+                    console.error("Gagal sinkronisasi status ruangan ke Sheets:", err);
+                }
+            }
+
             renderAdminRoomsManager();
             renderRoomsCatalog();
             populateRoomDropdown();
-            showToast(`Status ${rooms[roomIdx].name} otomatis berganti menjadi "${nextStatus}"`, "success");
+            showToast(`Status ${rooms[roomIdx].name} otomatis tersimpan menjadi "${nextStatus}"`, "success");
         }
 
         function renderAdminTable() {
