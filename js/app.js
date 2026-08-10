@@ -560,23 +560,30 @@ function handleAdminLogout() {
     pendingAdminUser = null;
     localStorage.removeItem('pintar_admin_session');
 
-    document.getElementById('admin-login-card').classList.remove('hidden');
-    document.getElementById('admin-panel-content').classList.add('hidden');
-    document.getElementById('form-admin-otp').classList.add('hidden');
-    document.getElementById('form-admin-login').classList.remove('hidden');
-    document.getElementById('form-admin-login').reset();
-    document.getElementById('form-admin-otp').reset();
+    // Sembunyikan panel admin dan tampilkan kembali kartu login kredensial
+    const loginCard = document.getElementById('admin-login-card');
+    const adminPanel = document.getElementById('admin-panel-content');
+    const formLogin = document.getElementById('form-admin-login');
+    const formOtp = document.getElementById('form-admin-otp');
+
+    if (loginCard) loginCard.classList.remove('hidden');
+    if (adminPanel) adminPanel.classList.add('hidden');
+    if (formOtp) formOtp.classList.add('hidden');
+    if (formLogin) {
+        formLogin.classList.remove('hidden');
+        formLogin.reset();
+    }
+    
+    const otpInput = document.getElementById('admin-otp-code');
+    if (otpInput) otpInput.value = "";
+
+    // Kembalikan tampilan aplikasi utama ke Dashboard/User mode
+    switchAppMode('user');
+    
     showToast("Anda telah keluar dari panel admin.", "success");
 }
 
-function renderAdminRoomsManager() {
-    const container = document.getElementById('admin-rooms-manager-list');
-    if (!container) return;
-    container.innerHTML = "";
-
-    rooms.forEach((room, idx) => {
-        const item = document.createElement('div');
-        item.className = "bg-slate-50 p-4 rounded-xl border border-slate-200 flex items-center justify-between gap-3";
+function renderRoomsManager() {
         
         let badgeColor = "bg-emerald-50 text-emerald-700 border border-emerald-200";
         let statusIcon = "fa-circle-check";
