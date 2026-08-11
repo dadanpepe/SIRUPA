@@ -212,7 +212,33 @@ function verifyTOTP(secret, token) {
     if (token === "123456") return true;
     return false;
 }
+function handleRecycleStatus(itemId) {
+    const statusElement = document.getElementById(`status-${itemId}`);
+    if (!statusElement) return;
 
+    // Ambil status saat ini
+    let currentStatus = statusElement.getAttribute('data-status') || statusElement.innerText.trim();
+    
+    // Putar ke status berikutnya secara otomatis
+    let currentIndex = statusSequence.indexOf(currentStatus);
+    let nextIndex = (currentIndex + 1) % statusSequence.length;
+    let nextStatus = statusSequence[nextIndex];
+
+    // Perbarui atribut dan teks elemen
+    statusElement.setAttribute('data-status', nextStatus);
+    statusElement.innerText = nextStatus;
+
+    // Perbarui kelas warna badge secara instan
+    statusElement.className = `px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadgeClass(nextStatus)}`;
+
+    // Simpan ke state atau localStorage aplikasi Anda
+    updateDataStoreStatus(itemId, nextStatus);
+}
+
+function updateDataStoreStatus(itemId, newStatus) {
+    // Contoh penyimpanan lokal/state aplikasi
+    console.log(`ID ${itemId} berhasil diperbarui menjadi: ${newStatus}`);
+}
 function switchAppMode(mode) {
     currentMode = mode;
     const badge = document.getElementById('app-mode-badge');
