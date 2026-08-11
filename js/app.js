@@ -94,7 +94,50 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error("Gagal memuat status ruangan:", e);
         }
     }
+// Urutan siklus status
+const statusSequence = ['Pending', 'Diproses', 'Selesai', 'Ditolak'];
 
+// Fungsi untuk merender baris tabel admin secara dinamis
+function renderAdminTable(dataList) {
+    const tbody = document.getElementById('admin-table-body');
+    if (!tbody) return;
+
+    tbody.innerHTML = dataList.map(item => `
+        <tr class="border-b hover:bg-gray-50 transition-colors">
+            <td class="px-4 py-3 text-sm text-gray-700">${item.id}</td>
+            <td class="px-4 py-3 text-sm text-gray-900 font-medium">${item.title || item.name}</td>
+            <td class="px-4 py-3">
+                <span id="status-${item.id}" data-status="${item.status || 'Pending'}" class="px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadgeClass(item.status || 'Pending')}">
+                    ${item.status || 'Pending'}
+                </span>
+            </td>
+            <td class="px-4 py-3">
+                <button onclick="handleRecycleStatus('${item.id}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium rounded-lg shadow-sm transition-all">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    Ubah Status
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// Fungsi pengubah gaya badge berdasarkan status aktif
+function getStatusBadgeClass(status) {
+    switch (status) {
+        case 'Pending':
+            return 'bg-yellow-100 text-yellow-800 border border-yellow-300';
+        case 'Diproses':
+            return 'bg-blue-100 text-blue-800 border border-blue-300';
+        case 'Selesai':
+            return 'bg-green-100 text-green-800 border border-green-300';
+        case 'Ditolak':
+            return 'bg-red-100 text-red-800 border border-red-300';
+        default:
+            return 'bg-gray-100 text-gray-800';
+    }
+}
     const savedAdmin = localStorage.getItem('pintar_admin_session');
     if (savedAdmin) {
         try {
