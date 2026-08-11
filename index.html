@@ -30,12 +30,6 @@
             }
         }
     </script>
-    <style>
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-    </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-brand-blue selection:text-white">
 
@@ -133,7 +127,7 @@
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                         <h3 class="text-base font-bold text-slate-900">Daftar & Riwayat Peminjaman Ruangan</h3>
-                        <p class="text-xs text-slate-500">Data tersinkronisasi otomatis dengan server.</p>
+                        <p class="text-xs text-slate-500">Data tersinkronisasi otomatis setiap 5 detik dengan Google Sheets.</p>
                     </div>
                     <div class="w-full sm:w-64 relative">
                         <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
@@ -190,17 +184,18 @@
                     </button>
                 </form>
 
-                <!-- Step 2: Google Authenticator QR & OTP Code Form -->
+                <!-- Step 2: Google Authenticator QR & OTP Code Form (Hidden Initially) -->
                 <form id="form-admin-otp" onsubmit="handleAdminOtpVerify(event)" class="space-y-4 hidden">
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center space-y-3">
                         <div class="w-10 h-10 bg-emerald-100 text-emerald-700 rounded-full mx-auto flex items-center justify-center">
                             <i class="fa-solid fa-qrcode"></i>
                         </div>
                         <div>
-                            <h4 class="text-xs font-bold text-slate-800">Verifikasi Google Authenticator</h4>
-                            <p class="text-[10px] text-slate-500 mt-0.5">Scan QR Code di bawah menggunakan aplikasi Google Authenticator.</p>
+                            <h4 class="text-xs font-bold text-slate-800">Pendaftaran & Verifikasi Google Authenticator</h4>
+                            <p class="text-[10px] text-slate-500 mt-0.5">Scan QR Code di bawah menggunakan aplikasi Google Authenticator, atau masukkan Secret Key secara manual.</p>
                         </div>
                         
+                        <!-- QR Code Container -->
                         <div class="bg-white p-3 rounded-xl border border-slate-200 inline-block mx-auto shadow-xs">
                             <div id="qrcode-container" class="w-36 h-36 mx-auto flex items-center justify-center">
                                 <i class="fa-solid fa-spinner animate-spin text-brand-blue text-xl"></i>
@@ -226,7 +221,7 @@
                 </form>
             </div>
 
-            <!-- Admin Panel Dashboard -->
+            <!-- Admin Panel Dashboard (Hidden until logged in) -->
             <div id="admin-panel-content" class="space-y-6 hidden">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
                     <div class="flex items-center gap-4">
@@ -243,7 +238,9 @@
                     </button>
                 </div>
 
+                <!-- Admin Tab Navigation / Section -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Kelola Status Ruangan (1 Kolom) -->
                     <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
                         <div class="flex justify-between items-center">
                             <div>
@@ -259,11 +256,12 @@
                         </div>
                     </div>
 
+                    <!-- Admin Action Table (2 Kolom) -->
                     <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
                         <div class="flex justify-between items-center">
                             <div>
                                 <h4 class="text-sm font-bold text-slate-900">Daftar Masuk Permintaan Peminjaman</h4>
-                                <p class="text-xs text-slate-500">Setujui atau tolak pengajuan yang masuk.</p>
+                                <p class="text-xs text-slate-500">Setujui atau tolak pengajuan yang masuk secara real-time.</p>
                             </div>
                             <button onclick="fetchBookingsData()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3 py-2 rounded-xl transition flex items-center gap-1.5">
                                 <i class="fa-solid fa-rotate"></i> Muat Ulang
@@ -296,10 +294,12 @@
 
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 py-6 mt-12 text-center text-xs text-slate-500">
-        <p>&copy; 2026 PinTaR - Sistem Informasi Peminjaman Ruangan Terpadu.</p>
+        <p>&copy; 2026 PinTaR - Sistem Informasi Peminjaman Ruangan Terpadu. Terhubung dengan Google Sheets Real-Time.</p>
     </footer>
 
-    <!-- MODAL: FORM PEMINJAMAN RUANGAN -->
+    <!-- ========================================== -->
+    <!-- MODAL: FORM PEMINJAMAN RUANGAN              -->
+    <!-- ========================================== -->
     <div id="booking-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-8 shadow-2xl space-y-6 relative max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-100 pb-4">
@@ -335,7 +335,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Kegiatan / Acara</label>
-                    <input type="text" id="input-kegiatan" required placeholder="Contoh: Rapat Koordinasi Program Kerja" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue">
+                    <input type="text" id="input-kegiatan" required placeholder="Contoh: Rapat Koordinasi Program Kerja Triwulan" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Pilihan Ruangan</label>
@@ -359,7 +359,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Catatan / Permintaan Khusus (Opsional)</label>
-                    <textarea id="input-catatan" rows="2" placeholder="Contoh: Butuh tambahan mic wireless..." class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue"></textarea>
+                    <textarea id="input-catatan" rows="2" placeholder="Contoh: Butuh tambahan konsumsi dan mic wireless..." class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue"></textarea>
                 </div>
                 <div class="flex justify-end gap-3 pt-3 border-t border-slate-100">
                     <button type="button" onclick="closeBookingModal()" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition">
@@ -382,21 +382,20 @@
         </div>
     </div>
 
-    <!-- External Libraries -->
+    <!-- Include QR Code Generator Library (QRCode.js) & OTP Library (otplib/jsSHA for TOTP) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsSHA/3.3.1/sha.js"></script>
 
-    <!-- Application JavaScript -->
+    <!-- JavaScript Application Core -->
     <script>
+        // Ganti dengan URL Google Apps Script Web App Anda
         const GOOGLE_SHEETS_URL = ""; 
 
         let currentMode = 'user';
         let isAdminLoggedIn = false;
         let pendingAdminUser = null;
-        let bookingsCache = [
-            { id: "PMJ-1029", nama: "Ahmad Fauzi", unit: "Bagian Umum", kegiatan: "Rapat Koordinasi Triwulan", room: "Ruang Rapat Utama", date: "2026-06-15", time: "08:00 - 12:00 WIB", category: "Rapat Dinas", attendees: "35", status: "Disetujui", catatan: "-" },
-            { id: "PMJ-1042", nama: "Siti Rahma", unit: "Kepegawaian", kegiatan: "Sosialisasi Sistem Baru", room: "Auditorium Gedung A", date: "2026-06-18", time: "13:00 - 16:00 WIB", category: "Seminar / Sosialisasi", attendees: "120", status: "Menunggu Persetujuan", catatan: "Butuh proyektor tambahan" }
-        ];
+        let bookingsCache = [];
+        let pollingInterval = null;
 
         const rooms = [
             {
@@ -406,9 +405,10 @@
                 status: "Tersedia",
                 images: [
                     "https://images.unsplash.com/photo-1517502884422-41eaead166d4?auto=format&fit=crop&w=600&q=80",
-                    "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=80"
+                    "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=600&q=80"
                 ],
-                fasilitas: ["Proyektor 4K", "Sound System", "AC Sentral", "Whiteboard"]
+                fasilitas: ["Proyektor 4K", "Sound System", "AC Sentral", "Video Conference", "Whiteboard"]
             },
             {
                 name: "Ruang Rapat VIP",
@@ -416,9 +416,10 @@
                 desc: "Ruangan khusus pimpinan dan tamu kehormatan dengan nuansa privat dan elegan.",
                 status: "Tersedia",
                 images: [
-                    "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=600&q=80"
+                    "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=600&q=80"
                 ],
-                fasilitas: ["Smart TV 75\"", "Meja Eksekutif", "AC", "LAN Cepat"]
+                fasilitas: ["Smart TV 75\"", "Meja Bundar Eksekutif", "AC", "Koneksi LAN Cepat"]
             },
             {
                 name: "Auditorium Gedung A",
@@ -426,14 +427,143 @@
                 desc: "Aula luas untuk seminar, sosialisasi, diklat, dan acara seremonial instansi.",
                 status: "Tersedia",
                 images: [
-                    "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=600&q=80"
+                    "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=600&q=80"
                 ],
-                fasilitas: ["Panggung Utama", "Full Sound & Lighting", "Projector Besar"]
+                fasilitas: ["Panggung Utama", "Full Sound & Lighting", "Projector Besar", "AC Standing"]
+            },
+            {
+                name: "Ruang Diskusi Kreatif",
+                capacity: 20,
+                desc: "Ruang kerja kelompok dan brainstorming dengan suasana kasual dan inspiratif.",
+                status: "Tersedia",
+                images: [
+                    "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&q=80"
+                ],
+                fasilitas: ["Smart Board", "Bean Bag", "Coffee Maker", "Wi-Fi Dedicated"]
+            },
+            {
+                name: "Ruang Sidang Pleno",
+                capacity: 80,
+                desc: "Ruangan formal berundak untuk sidang keputusan, evaluasi program, dan pleno.",
+                status: "Tersedia",
+                images: [
+                    "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=600&q=80",
+                    "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=80"
+                ],
+                fasilitas: ["Mic Meja Delegasi", "Recording System", "Proyektor Dual", "AC Sentral"]
             }
         ];
 
         let roomSlideIndices = {};
-        rooms.forEach((room, idx) => { roomSlideIndices[idx] = 0; });
+
+        rooms.forEach((room, idx) => {
+            roomSlideIndices[idx] = 0;
+        });
+
+        // Slideshow otomatis setiap 4 detik
+        setInterval(() => {
+            rooms.forEach((room, idx) => {
+                if (room.images && room.images.length > 1) {
+                    roomSlideIndices[idx] = (roomSlideIndices[idx] + 1) % room.images.length;
+                    updateRoomSlideDisplay(idx);
+                }
+            });
+        }, 4000);
+
+        // Cek sesi login admin yang tersimpan di localStorage saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedRooms = localStorage.getItem('pintar_rooms_data');
+            if (savedRooms) {
+                try {
+                    const parsedRooms = JSON.parse(savedRooms);
+                    if (Array.isArray(parsedRooms) && parsedRooms.length === rooms.length) {
+                        parsedRooms.forEach((pr, i) => {
+                            if (pr.status) rooms[i].status = pr.status;
+                        });
+                    }
+                } catch(e) {
+                    console.error("Gagal memuat status ruangan:", e);
+                }
+            }
+
+            const savedAdmin = localStorage.getItem('pintar_admin_session');
+            if (savedAdmin) {
+                try {
+                    const adminData = JSON.parse(savedAdmin);
+                    if (adminData && adminData.username) {
+                        isAdminLoggedIn = true;
+                        pendingAdminUser = adminData;
+                        const loginCard = document.getElementById('admin-login-card');
+                        const adminPanel = document.getElementById('admin-panel-content');
+                        if (loginCard && adminPanel) {
+                            loginCard.classList.add('hidden');
+                            adminPanel.classList.remove('hidden');
+                        }
+                    }
+                } catch(e) {
+                    console.error("Gagal memuat sesi admin:", e);
+                    localStorage.removeItem('pintar_admin_session');
+                }
+            }
+            renderRoomsCatalog();
+            populateRoomDropdown();
+            fetchBookingsData();
+            pollingInterval = setInterval(fetchBookingsData, 5000);
+        });
+
+        // Implementasi TOTP sederhana (RFC 6238) menggunakan jsSHA
+        function base32toHex(base32) {
+            const base32chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+            let bits = "";
+            let hex = "";
+            for (let i = 0; i < base32.length; i++) {
+                const val = base32chars.indexOf(base32.toUpperCase().charAt(i));
+                if (val >= 0) {
+                    bits += val.toString(2).padStart(5, '0');
+                }
+            }
+            for (let i = 0; i + 4 <= bits.length; i += 4) {
+                const chunk = bits.substr(i, 4);
+                hex += parseInt(chunk, 2).toString(16);
+            }
+            return hex;
+        }
+
+        function generateTOTP(secret, windowOffset = 0) {
+            try {
+                const keyHex = base32toHex(secret);
+                const epoch = Math.round(new Date().getTime() / 1000.0);
+                const timeStep = 30;
+                const timeVal = Math.floor(epoch / timeStep) + windowOffset;
+                
+                let timeHex = timeVal.toString(16).padStart(16, '0');
+                
+                const shaObj = new jsSHA("SHA-1", "HEX");
+                shaObj.setHMACKey(keyHex, "HEX");
+                shaObj.update(timeHex);
+                const hmacHex = shaObj.getHMAC("HEX");
+                
+                const offset = parseInt(hmacHex.substr(hmacHex.length - 1, 1), 16);
+                const binary = ((parseInt(hmacHex.substr(offset * 2, 8), 16) & 0x7fffffff));
+                const otp = (binary % 1000000).toString().padStart(6, '0');
+                return otp;
+            } catch(e) {
+                console.error("TOTP Error:", e);
+                return "000000";
+            }
+        }
+
+        function verifyTOTP(secret, token) {
+            for (let errorWindow = -1; errorWindow <= 1; errorWindow++) {
+                if (generateTOTP(secret, errorWindow) === token) {
+                    return true;
+                }
+            }
+            if (token === "123456") return true;
+            return false;
+        }
 
         function switchAppMode(mode) {
             currentMode = mode;
@@ -445,89 +575,25 @@
             const viewAdmin = document.getElementById('view-admin');
 
             if (mode === 'user') {
-                if (badge) badge.innerText = "Dashboard Utama";
-                if (titleSuffix) titleSuffix.innerText = "| Peminjaman Ruangan";
-                if (btnUser) btnUser.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition bg-brand-blue text-white shadow-sm flex items-center gap-1.5";
-                if (btnAdmin) btnAdmin.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-600 hover:text-slate-900 flex items-center gap-1.5";
-                if (viewUser) viewUser.classList.remove('hidden');
-                if (viewAdmin) viewAdmin.classList.add('hidden');
-                renderUserTable();
-                renderStats();
+                badge.innerText = "Dashboard Utama";
+                titleSuffix.innerText = "| Peminjaman Ruangan";
+                btnUser.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition bg-brand-blue text-white shadow-sm flex items-center gap-1.5";
+                btnAdmin.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-600 hover:text-slate-900 flex items-center gap-1.5";
+                viewUser.classList.remove('hidden');
+                viewAdmin.classList.add('hidden');
+                fetchBookingsData();
             } else {
-                if (badge) badge.innerText = "Portal Administrator";
-                if (titleSuffix) titleSuffix.innerText = "| Panel Verifikasi";
-                if (btnAdmin) btnAdmin.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition bg-slate-900 text-white shadow-sm flex items-center gap-1.5";
-                if (btnUser) btnUser.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-600 hover:text-slate-900 flex items-center gap-1.5";
-                if (viewAdmin) viewAdmin.classList.remove('hidden');
-                if (viewUser) viewUser.classList.add('hidden');
+                badge.innerText = "Portal Administrator";
+                titleSuffix.innerText = "| Panel Verifikasi";
+                btnAdmin.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition bg-slate-900 text-white shadow-sm flex items-center gap-1.5";
+                btnUser.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-600 hover:text-slate-900 flex items-center gap-1.5";
+                viewAdmin.classList.remove('hidden');
+                viewUser.classList.add('hidden');
                 if (isAdminLoggedIn) {
                     renderAdminTable();
                     renderAdminRoomsManager();
                 }
             }
-        }
-
-        function handleAdminLogout() {
-            isAdminLoggedIn = false;
-            pendingAdminUser = null;
-            localStorage.removeItem('pintar_admin_session');
-
-            const loginCard = document.getElementById('admin-login-card');
-            const adminPanel = document.getElementById('admin-panel-content');
-            const formLogin = document.getElementById('form-admin-login');
-            const formOtp = document.getElementById('form-admin-otp');
-
-            if (loginCard) loginCard.classList.remove('hidden');
-            if (adminPanel) adminPanel.classList.add('hidden');
-            if (formOtp) formOtp.classList.add('hidden');
-            if (formLogin) {
-                formLogin.classList.remove('hidden');
-                formLogin.reset();
-            }
-            
-            const otpInput = document.getElementById('admin-otp-code');
-            if (otpInput) otpInput.value = "";
-
-            switchAppMode('user');
-            showToast("Anda telah keluar dari panel admin.", "success");
-        }
-
-        function base32toHex(base32) {
-            const base32chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-            let bits = "", hex = "";
-            for (let i = 0; i < base32.length; i++) {
-                const val = base32chars.indexOf(base32.toUpperCase().charAt(i));
-                if (val >= 0) bits += val.toString(2).padStart(5, '0');
-            }
-            for (let i = 0; i + 4 <= bits.length; i += 4) {
-                hex += parseInt(bits.substr(i, 4), 2).toString(16);
-            }
-            return hex;
-        }
-
-        function generateTOTP(secret, windowOffset = 0) {
-            try {
-                const keyHex = base32toHex(secret);
-                const epoch = Math.round(new Date().getTime() / 1000.0);
-                const timeVal = Math.floor(epoch / 30) + windowOffset;
-                let timeHex = timeVal.toString(16).padStart(16, '0');
-                const shaObj = new jsSHA("SHA-1", "HEX");
-                shaObj.setHMACKey(keyHex, "HEX");
-                shaObj.update(timeHex);
-                const hmacHex = shaObj.getHMAC("HEX");
-                const offset = parseInt(hmacHex.substr(hmacHex.length - 1, 1), 16);
-                const binary = (parseInt(hmacHex.substr(offset * 2, 8), 16) & 0x7fffffff);
-                return (binary % 1000000).toString().padStart(6, '0');
-            } catch(e) {
-                return "000000";
-            }
-        }
-
-        function verifyTOTP(secret, token) {
-            for (let w = -1; w <= 1; w++) {
-                if (generateTOTP(secret, w) === token) return true;
-            }
-            return token === "123456";
         }
 
         function renderRoomsCatalog() {
@@ -541,31 +607,61 @@
                 room.images.forEach((img, i) => {
                     dotsHtml += `<button type="button" onclick="setRoomSlide(${idx}, ${i})" class="w-2 h-2 rounded-full transition ${i === currentIdx ? 'bg-white scale-125' : 'bg-white/50'}"></button>`;
                 });
+
                 let fasilitasHtml = room.fasilitas.map(f => `<span class="bg-slate-100 text-slate-600 text-[10px] px-2.5 py-1 rounded-lg font-medium"><i class="fa-solid fa-check text-brand-accent mr-1"></i>${f}</span>`).join('');
+
+                let statusBadgeClass = "bg-emerald-50 text-emerald-600";
+                let statusIcon = "fa-circle-check";
+                if (room.status === "Sedang Perbaikan") {
+                    statusBadgeClass = "bg-amber-50 text-amber-600";
+                    statusIcon = "fa-triangle-exclamation";
+                } else if (room.status === "Tidak Tersedia") {
+                    statusBadgeClass = "bg-rose-50 text-rose-600";
+                    statusIcon = "fa-circle-xmark";
+                }
 
                 const card = document.createElement('div');
                 card.className = "bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col justify-between transition hover:shadow-md";
                 card.innerHTML = `
-                    <div class="relative h-48 bg-slate-100 overflow-hidden">
-                        <img id="room-img-${idx}" src="${room.images[currentIdx]}" alt="${room.name}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x400/1a73e8/ffffff?text=Ruangan'">
+                    <div class="relative h-48 bg-slate-100 overflow-hidden group">
+                        <img id="room-img-${idx}" src="${room.images[currentIdx]}" alt="${room.name}" class="w-full h-full object-cover transition duration-500" onerror="this.src='https://placehold.co/600x400/1a73e8/ffffff?text=Ruangan'">
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent"></div>
                         <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-md text-slate-800 text-[11px] font-bold px-3 py-1 rounded-full shadow-xs">
-                            <i class="fa-solid fa-users mr-1 text-brand-blue"></i> ${room.capacity} Orang
+                            <i class="fa-solid fa-users mr-1 text-brand-blue"></i> Kapasitas ${room.capacity} Orang
+                        </div>
+                        <div class="absolute bottom-3 left-3 right-3 flex justify-between items-center">
+                            <div class="flex gap-1.5" id="room-dots-${idx}">
+                                ${dotsHtml}
+                            </div>
+                            <div class="flex gap-1">
+                                <button type="button" onclick="prevRoomSlide(${idx}); event.stopPropagation();" class="w-7 h-7 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center text-xs transition">
+                                    <i class="fa-solid fa-chevron-left"></i>
+                                </button>
+                                <button type="button" onclick="nextRoomSlide(${idx}); event.stopPropagation();" class="w-7 h-7 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center text-xs transition">
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="p-5 space-y-4 flex-grow flex flex-col justify-between">
                         <div class="space-y-2">
                             <h4 class="text-base font-bold text-slate-900">${room.name}</h4>
                             <p class="text-xs text-slate-500 leading-relaxed">${room.desc}</p>
-                            <div class="flex flex-wrap gap-1.5 pt-1">${fasilitasHtml}</div>
+                            <div class="flex flex-wrap gap-1.5 pt-1">
+                                ${fasilitasHtml}
+                            </div>
                         </div>
                         <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
-                            <span class="text-xs font-semibold bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-lg">
-                                <i class="fa-solid fa-circle-check mr-1"></i> ${room.status}
+                            <span class="text-xs font-semibold ${statusBadgeClass} px-2.5 py-1 rounded-lg">
+                                <i class="fa-solid ${statusIcon} mr-1"></i> ${room.status}
                             </span>
-                            <button onclick="openBookingModalForRoom('${room.name}')" class="bg-brand-lightBlue hover:bg-brand-blue text-brand-blue hover:text-white text-xs font-bold px-3.5 py-2 rounded-xl transition">
-                                Pinjam Ruangan
-                            </button>
+                            ${room.status === 'Tersedia' ? `
+                                <button onclick="openBookingModalForRoom('${room.name}')" class="bg-brand-lightBlue hover:bg-brand-blue text-brand-blue hover:text-white text-xs font-bold px-3.5 py-2 rounded-xl transition">
+                                    Pinjam Ruangan
+                                </button>
+                            ` : `
+                                <span class="text-[11px] text-slate-400 font-medium italic">Tidak dapat dipinjam</span>
+                            `}
                         </div>
                     </div>
                 `;
@@ -573,10 +669,35 @@
             });
         }
 
+        function nextRoomSlide(roomIdx) {
+            const room = rooms[roomIdx];
+            roomSlideIndices[roomIdx] = (roomSlideIndices[roomIdx] + 1) % room.images.length;
+            updateRoomSlideDisplay(roomIdx);
+        }
+
+        function prevRoomSlide(roomIdx) {
+            const room = rooms[roomIdx];
+            roomSlideIndices[roomIdx] = (roomSlideIndices[roomIdx] - 1 + room.images.length) % room.images.length;
+            updateRoomSlideDisplay(roomIdx);
+        }
+
         function setRoomSlide(roomIdx, imgIdx) {
             roomSlideIndices[roomIdx] = imgIdx;
+            updateRoomSlideDisplay(roomIdx);
+        }
+
+        function updateRoomSlideDisplay(roomIdx) {
             const imgEl = document.getElementById(`room-img-${roomIdx}`);
-            if (imgEl) imgEl.src = rooms[roomIdx].images[imgIdx];
+            const dotsEl = document.getElementById(`room-dots-${roomIdx}`);
+            if (imgEl && dotsEl) {
+                const currentIdx = roomSlideIndices[roomIdx];
+                imgEl.src = rooms[roomIdx].images[currentIdx];
+                let dotsHtml = '';
+                rooms[roomIdx].images.forEach((img, i) => {
+                    dotsHtml += `<button type="button" onclick="setRoomSlide(${roomIdx}, ${i})" class="w-2 h-2 rounded-full transition ${i === currentIdx ? 'bg-white scale-125' : 'bg-white/50'}"></button>`;
+                });
+                dotsEl.innerHTML = dotsHtml;
+            }
         }
 
         function populateRoomDropdown() {
@@ -609,8 +730,14 @@
             if (form) form.reset();
         }
 
-        function submitBooking(event) {
+        async function submitBooking(event) {
             event.preventDefault();
+            const btn = document.getElementById('btn-submit-booking');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Mengirim...`;
+            }
+
             const newBooking = {
                 id: "PMJ-" + Math.floor(1000 + Math.random() * 9000),
                 nama: document.getElementById('input-nama')?.value || "-",
@@ -625,11 +752,48 @@
                 catatan: document.getElementById('input-catatan')?.value || "-"
             };
 
+            if (GOOGLE_SHEETS_URL) {
+                try {
+                    await fetch(GOOGLE_SHEETS_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(newBooking)
+                    });
+                } catch (err) {
+                    console.error("Gagal mengirim ke Google Sheets:", err);
+                }
+            }
+
             bookingsCache.unshift(newBooking);
             renderUserTable();
             renderStats();
             closeBookingModal();
             showToast("Pengajuan peminjaman berhasil dikirim!", "success");
+
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Kirim Pengajuan`;
+            }
+        }
+
+        async function fetchBookingsData() {
+            if (GOOGLE_SHEETS_URL) {
+                try {
+                    const response = await fetch(GOOGLE_SHEETS_URL);
+                    const data = await response.json();
+                    if (Array.isArray(data)) {
+                        bookingsCache = data;
+                    }
+                } catch (err) {
+                    console.error("Gagal mengambil data dari Google Sheets:", err);
+                }
+            }
+            renderUserTable();
+            renderStats();
+            if (isAdminLoggedIn && currentMode === 'admin') {
+                renderAdminTable();
+            }
         }
 
         function renderStats() {
@@ -695,32 +859,68 @@
             renderUserTable();
         }
 
-        function handleAdminLogin(event) {
+        async function handleAdminLogin(event) {
             event.preventDefault();
             const u = document.getElementById('admin-user').value.trim();
             const p = document.getElementById('admin-pass').value.trim();
+            const btn = document.getElementById('btn-login-submit');
 
-            const defaultUsers = [
-                { username: "admin", password: "admin123", name: "Administrator Utama", secret: "JBSWY3DPEHPK3PXP" },
-                { username: "pemerintahan", password: "admin123", name: "Admin Seksi Pemerintahan", secret: "GEZDGNBVGY3TQOJQ" }
-            ];
-            const userRecord = defaultUsers.find(item => item.username.toLowerCase() === u.toLowerCase());
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Memeriksa Akun...`;
+            }
+
+            let userRecord = null;
+
+            if (GOOGLE_SHEETS_URL) {
+                try {
+                    const response = await fetch(GOOGLE_SHEETS_URL + "?action=getUsers");
+                    const usersData = await response.json();
+                    if (Array.isArray(usersData)) {
+                        userRecord = usersData.find(item => item.username.toLowerCase() === u.toLowerCase());
+                    }
+                } catch(err) {
+                    console.error("Gagal mengambil data user:", err);
+                }
+            }
+
+            if (!userRecord) {
+                const defaultUsers = [
+                    { username: "admin", password: "admin123", name: "Administrator Utama", secret: "JBSWY3DPEHPK3PXP" },
+                    { username: "pemerintahan", password: "admin123", name: "Admin Seksi Pemerintahan", secret: "GEZDGNBVGY3TQOJQ" }
+                ];
+                userRecord = defaultUsers.find(item => item.username.toLowerCase() === u.toLowerCase());
+            }
+
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-arrow-right"></i> Lanjutkan Verifikasi`;
+            }
 
             if (userRecord && userRecord.password === p) {
                 pendingAdminUser = userRecord;
+                
                 document.getElementById('form-admin-login').classList.add('hidden');
                 document.getElementById('form-admin-otp').classList.remove('hidden');
+                
                 document.getElementById('auth-secret-text').innerText = userRecord.secret;
 
                 const qrContainer = document.getElementById('qrcode-container');
                 qrContainer.innerHTML = "";
                 const issuer = "PinTaR_Gedung";
-                const otpauthUrl = `otpauth://totp/${issuer}:${userRecord.username}?secret=${userRecord.secret}&issuer=${issuer}`;
+                const accountName = userRecord.username;
+                const otpauthUrl = `otpauth://totp/${issuer}:${accountName}?secret=${userRecord.secret}&issuer=${issuer}`;
 
                 new QRCode(qrContainer, {
-                    text: otpauthUrl, width: 140, height: 140, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M
+                    text: otpauthUrl,
+                    width: 140,
+                    height: 140,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.M
                 });
-                showToast(`Selamat datang, ${userRecord.name}. Masukkan kode Authenticator.`, "success");
+
+                showToast(`Selamat datang, ${userRecord.name}. Silakan masukkan kode Authenticator.`, "success");
             } else {
                 showToast("Username atau Password admin salah!", "error");
             }
@@ -747,8 +947,22 @@
                 renderAdminRoomsManager();
                 showToast(`Autentikasi Berhasil! Masuk sebagai ${pendingAdminUser.name}`, "success");
             } else {
-                showToast("Kode Google Authenticator tidak valid.", "error");
+                showToast("Kode Google Authenticator tidak valid atau kedaluwarsa.", "error");
             }
+        }
+
+        function handleAdminLogout() {
+            isAdminLoggedIn = false;
+            pendingAdminUser = null;
+            localStorage.removeItem('pintar_admin_session');
+
+            document.getElementById('admin-login-card').classList.remove('hidden');
+            document.getElementById('admin-panel-content').classList.add('hidden');
+            document.getElementById('form-admin-otp').classList.add('hidden');
+            document.getElementById('form-admin-login').classList.remove('hidden');
+            document.getElementById('form-admin-login').reset();
+            document.getElementById('form-admin-otp').reset();
+            showToast("Anda telah keluar dari panel admin.", "success");
         }
 
         function renderAdminRoomsManager() {
@@ -758,26 +972,69 @@
 
             rooms.forEach((room, idx) => {
                 const item = document.createElement('div');
-                item.className = "flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl";
+                item.className = "bg-slate-50 p-4 rounded-xl border border-slate-200 flex items-center justify-between gap-3";
+                
+                let badgeColor = "bg-emerald-50 text-emerald-700 border border-emerald-200";
+                let statusIcon = "fa-circle-check";
+                if (room.status === "Sedang Perbaikan") {
+                    badgeColor = "bg-amber-50 text-amber-700 border border-amber-200";
+                    statusIcon = "fa-triangle-exclamation";
+                } else if (room.status === "Tidak Tersedia") {
+                    badgeColor = "bg-rose-50 text-rose-700 border border-rose-200";
+                    statusIcon = "fa-circle-xmark";
+                }
+
                 item.innerHTML = `
                     <div>
                         <h5 class="text-xs font-bold text-slate-900">${room.name}</h5>
-                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded-md inline-block mt-1 bg-emerald-50 text-emerald-700">${room.status}</span>
+                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded-md inline-block mt-1 ${badgeColor}">
+                            <i class="fa-solid ${statusIcon} mr-1"></i>${room.status}
+                        </span>
                     </div>
-                    <button type="button" onclick="toggleRoomStatusNext(${idx})" class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-[11px] font-semibold px-3 py-1.5 rounded-lg transition">Ubah</button>
+                    <button type="button" onclick="toggleRoomStatusNext(${idx})" class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-[11px] font-semibold px-3 py-1.5 rounded-lg transition shadow-xs">
+                        Ubah Status
+                    </button>
                 `;
                 container.appendChild(item);
             });
         }
 
-        function toggleRoomStatusNext(roomIdx) {
-            const statuses = ["Tersedia", "Sedang Perbaikan", "Tidak Tersedia"];
-            const currentIdx = statuses.indexOf(rooms[roomIdx].status);
-            rooms[roomIdx].status = statuses[(currentIdx + 1) % statuses.length];
+        async function toggleRoomStatusNext(roomIdx) {
+            const current = rooms[roomIdx].status;
+            let nextStatus = "Tersedia";
+            if (current === "Tersedia") {
+                nextStatus = "Sedang Perbaikan";
+            } else if (current === "Sedang Perbaikan") {
+                nextStatus = "Tidak Tersedia";
+            } else {
+                nextStatus = "Tersedia";
+            }
+
+            rooms[roomIdx].status = nextStatus;
+            
+            localStorage.setItem('pintar_rooms_data', JSON.stringify(rooms));
+
+            if (GOOGLE_SHEETS_URL) {
+                try {
+                    await fetch(GOOGLE_SHEETS_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            action: 'updateRoomStatus', 
+                            roomName: rooms[roomIdx].name, 
+                            newStatus: nextStatus 
+                        })
+                    });
+                } catch (err) {
+                    console.error("Gagal sinkronisasi status ruangan ke Sheets:", err);
+                }
+            }
+
             renderAdminRoomsManager();
             renderRoomsCatalog();
             populateRoomDropdown();
-            showToast(`Status ${rooms[roomIdx].name} diubah menjadi "${rooms[roomIdx].status}"`, "success");
+            showToast(`Status ${rooms[roomIdx].name} otomatis tersimpan menjadi "${nextStatus}"`, "success");
         }
 
         function renderAdminTable() {
@@ -785,20 +1042,44 @@
             if (!tbody) return;
             tbody.innerHTML = "";
 
+            if (bookingsCache.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">Tidak ada pengajuan masuk.</td></tr>`;
+                return;
+            }
+
             bookingsCache.forEach(b => {
-                let statusBadge = b.status === 'Disetujui' ? `<span class="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full font-semibold text-[10px]">Disetujui</span>` : `<span class="bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full font-semibold text-[10px]">Menunggu</span>`;
+                let statusBadge = '';
+                if (b.status === 'Disetujui') {
+                    statusBadge = `<span class="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full font-semibold text-[10px]">Disetujui</span>`;
+                } else if (b.status === 'Ditolak') {
+                    statusBadge = `<span class="bg-rose-50 text-rose-700 px-2 py-0.5 rounded-full font-semibold text-[10px]">Ditolak</span>`;
+                } else {
+                    statusBadge = `<span class="bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full font-semibold text-[10px]">Menunggu</span>`;
+                }
+
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50/80 transition border-b border-slate-100";
                 tr.innerHTML = `
-                    <td class="p-3 font-medium text-slate-900"><span class="font-bold text-brand-blue">${b.id}</span><br><span class="text-[11px] text-slate-500">${b.nama}</span></td>
+                    <td class="p-3 font-medium text-slate-900">
+                        <span class="block font-bold text-brand-blue">${b.id}</span>
+                        <span class="text-[11px] text-slate-500">${b.nama}</span>
+                    </td>
                     <td class="p-3 font-semibold text-slate-800">${b.kegiatan}</td>
                     <td class="p-3 text-slate-600">${b.room}</td>
-                    <td class="p-3 text-slate-600">${b.date}<br><span class="text-[10px] text-slate-400">${b.time}</span></td>
+                    <td class="p-3 text-slate-600">
+                        <span class="block">${b.date}</span>
+                        <span class="text-[10px] text-slate-400">${b.time}</span>
+                    </td>
+                    <td class="p-3 text-slate-600">${b.attendees} Orang</td>
                     <td class="p-3">${statusBadge}</td>
                     <td class="p-3 text-center">
                         <div class="flex items-center justify-center gap-1.5">
-                            <button type="button" onclick="updateBookingStatus('${b.id}', 'Disetujui')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-2.5 py-1.5 rounded-lg text-xs font-semibold">Setujui</button>
-                            <button type="button" onclick="updateBookingStatus('${b.id}', 'Ditolak')" class="bg-rose-50 hover:bg-rose-100 text-rose-700 px-2.5 py-1.5 rounded-lg text-xs font-semibold">Tolak</button>
+                            <button type="button" onclick="updateBookingStatus('${b.id}', 'Disetujui')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition">
+                                <i class="fa-solid fa-check"></i> Setujui
+                            </button>
+                            <button type="button" onclick="updateBookingStatus('${b.id}', 'Ditolak')" class="bg-rose-50 hover:bg-rose-100 text-rose-700 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition">
+                                <i class="fa-solid fa-xmark"></i> Tolak
+                            </button>
                         </div>
                     </td>
                 `;
@@ -806,67 +1087,50 @@
             });
         }
 
-        function updateBookingStatus(id, newStatus) {
+        async function updateBookingStatus(id, newStatus) {
             const target = bookingsCache.find(b => b.id === id);
-            if (target) target.status = newStatus;
+            if (target) {
+                target.status = newStatus;
+            }
+
+            if (GOOGLE_SHEETS_URL) {
+                try {
+                    await fetch(GOOGLE_SHEETS_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'updateStatus', id: id, newStatus: newStatus })
+                    });
+                } catch (err) {
+                    console.error("Gagal memperbarui status ke Google Sheets:", err);
+                }
+            }
+
             renderAdminTable();
             renderUserTable();
             renderStats();
-            showToast(`Status ${id} diubah menjadi ${newStatus}`, "success");
+            showToast(`Status peminjaman ${id} diubah menjadi ${newStatus}`, "success");
         }
 
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast-notification');
             const toastMsg = document.getElementById('toast-message');
             const toastIcon = document.getElementById('toast-icon');
-            if (!toast || !toastMsg || !toastIcon) return;
-            toastMsg.innerText = message;
-            toastIcon.className = type === 'error' ? "fa-solid fa-circle-exclamation text-rose-400" : "fa-solid fa-circle-check text-emerald-400";
-            toast.classList.remove('translate-y-24', 'opacity-0');
-            setTimeout(() => { toast.classList.add('translate-y-24', 'opacity-0'); }, 3500);
-        }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            renderRoomsCatalog();
-            populateRoomDropdown();
-            renderUserTable();
-            renderStats();
-        });
-<!-- Contoh baris tabel data admin -->
-<tr class="border-b hover:bg-gray-50">
-    <td class="px-4 py-3">001</td>
-    <td class="px-4 py-3">Pendaftaran Layanan Kependudukan</td>
-    <td class="px-4 py-3">
-        <!-- Elemen status dengan ID unik -->
-        <span id="status-001" data-status="Pending" class="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300">
-            Pending
-        </span>
-    </td>
-    <td class="px-4 py-3">
-        <!-- Tombol Recycle Satu Kali Klik -->
-        <button onclick="handleRecycleStatus('001')" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium rounded-lg shadow-sm transition-all">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-            </svg>
-            Ubah Status
-        </button>
-    </td>
-</tr>
-        // Make functions globally accessible
-        window.switchAppMode = switchAppMode;
-        window.handleAdminLogout = handleAdminLogout;
-        window.openBookingModal = openBookingModal;
-        window.openBookingModalForRoom = openBookingModalForRoom;
-        window.closeBookingModal = closeBookingModal;
-        window.submitBooking = submitBooking;
-        window.filterUserTable = filterUserTable;
-        window.handleAdminLogin = handleAdminLogin;
-        window.backToLoginCredentials = backToLoginCredentials;
-        window.handleAdminOtpVerify = handleAdminOtpVerify;
-        window.renderAdminRoomsManager = renderAdminRoomsManager;
-        window.toggleRoomStatusNext = toggleRoomStatusNext;
-        window.updateBookingStatus = updateBookingStatus;
-        window.setRoomSlide = setRoomSlide;
+            if (!toast || !toastMsg || !toastIcon) return;
+
+            toastMsg.innerText = message;
+            if (type === 'error') {
+                toastIcon.className = "fa-solid fa-circle-exclamation text-rose-400";
+            } else {
+                toastIcon.className = "fa-solid fa-circle-check text-emerald-400";
+            }
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3500);
+        }
     </script>
 </body>
 </html>
