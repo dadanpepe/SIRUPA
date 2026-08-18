@@ -3,7 +3,7 @@
  */
 const apiService = {
   // Masukkan URL Web App Google Apps Script Anda di sini setelah di-Deploy (contoh: https://script.google.com/macros/s/.../exec)
-  appsScriptUrl: 'https://script.google.com/macros/s/AKfycbymzY6zWTCIWWr68d7We0kXCqmbVFHdnxeaScc9gbgE5-fLCUvmfWG1ku0pVXjnm5-j/exec',
+  appsScriptUrl: 'https://script.google.com/macros/s/AKfycbxgoERM0siL8vmQ8uRJjORazYS-YOONDG1ZBqsD9m7I00NkyYtEQEOkCbiggJ3UG5sh/exec',
 
   async fetchBookings() {
     if (this.appsScriptUrl.includes('AKfycbz...')) return null;
