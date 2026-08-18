@@ -31,15 +31,17 @@ const apiService = {
 
   async adminLogin(username, password) {
     if (this.appsScriptUrl.includes('AKfycbz...')) {
-      // Fallback lokal jika URL belum di-set
-      if (username === 'superadmin' && password === 'super123') {
-        return { success: true, user: { username: 'superadmin', name: 'Super Admin', unit: 'Semua Dinas', isSuper: true } };
+      // Fallback lokal jika URL Apps Script belum diganti
+      const found = appState.adminAccounts.find(a => a.username === username && a.pass === password);
+      if (found) {
+        return { success: true, user: found };
       }
-      return { success: false, message: 'URL Apps Script belum dikonfigurasi.' };
+      return { success: false, message: 'Username atau Password salah' };
     }
     try {
       const response = await fetch(this.appsScriptUrl, {
         method: 'POST',
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({ action: 'adminLogin', username, password })
       });
       return await response.json();
@@ -53,6 +55,7 @@ const apiService = {
     try {
       const response = await fetch(this.appsScriptUrl, {
         method: 'POST',
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({ action: 'addAdmin', ...adminData })
       });
       return await response.json();
