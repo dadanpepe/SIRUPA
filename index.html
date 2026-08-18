@@ -377,22 +377,29 @@
             </div>
           </div>
 
-          <button onclick="adminLogout()" class="inline-flex items-center px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-xs transition border border-rose-200 cursor-pointer">
-            <i class="fa-solid fa-right-from-bracket mr-2"></i> Keluar Admin
-          </button>
+          <div class="flex items-center space-x-3">
+            <button onclick="openAddRoomModal()" class="inline-flex items-center px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition shadow-sm cursor-pointer">
+              <i class="fa-solid fa-plus mr-1.5"></i> Tambah Ruangan Baru
+            </button>
+            <button onclick="adminLogout()" class="inline-flex items-center px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-xs transition border border-rose-200 cursor-pointer">
+              <i class="fa-solid fa-right-from-bracket mr-2"></i> Keluar
+            </button>
+          </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div class="lg:col-span-4 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
-            <div class="border-b border-slate-100 pb-3">
-              <h3 class="text-sm font-bold text-slate-900">Status Ketersediaan Ruangan</h3>
-              <p class="text-xs text-slate-400">Ubah status operasional ruangan.</p>
+          <div class="lg:col-span-5 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+            <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
+              <div>
+                <h3 class="text-sm font-bold text-slate-900">Kelola Ruangan & Fasilitas</h3>
+                <p class="text-xs text-slate-400">Atur kapasitas, fasilitas, foto, dan hapus ruang.</p>
+              </div>
             </div>
 
             <div id="adminRoomList" class="space-y-3 max-h-[500px] overflow-y-auto pr-1"></div>
           </div>
 
-          <div class="lg:col-span-8 bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden flex flex-col">
+          <div class="lg:col-span-7 bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden flex flex-col">
             <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h3 class="text-base font-bold text-slate-900">Daftar Masuk Permintaan Peminjaman</h3>
@@ -411,7 +418,7 @@
                     <th class="p-4">Kegiatan</th>
                     <th class="p-4">Ruangan</th>
                     <th class="p-4">Jadwal</th>
-                    <th class="p-4">Status Saat Ini</th>
+                    <th class="p-4">Status</th>
                     <th class="p-4 pr-5 text-center">Aksi</th>
                   </tr>
                 </thead>
@@ -430,87 +437,62 @@
     © 2026 PinTaR - Sistem Informasi Peminjaman Ruangan Terpadu. Terhubung dengan Google Spreadsheet & Google Drive API.
   </footer>
 
-  <!-- MODAL: BOOKING FORM -->
-  <div id="bookingModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-      <button onclick="closeBookingModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition">
+  <!-- MODAL: ADD / EDIT ROOM -->
+  <div id="roomModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeRoomModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition">
         <i class="fa-solid fa-xmark text-sm"></i>
       </button>
 
       <div class="mb-6 space-y-1">
-        <h3 class="text-lg font-black text-slate-900 tracking-tight">Formulir Peminjaman Ruangan</h3>
-        <p class="text-xs text-slate-500">Data otomatis tersimpan ke Google Spreadsheet & berkas diunggah ke Google Drive Folder.</p>
+        <h3 id="roomModalTitle" class="text-lg font-black text-slate-900 tracking-tight">Tambah Ruangan Baru</h3>
+        <p class="text-xs text-slate-500">Konfigurasi nama ruangan, kapasitas, fasilitas, dan upload foto.</p>
       </div>
 
-      <div id="bookingConflictBanner" class="hidden bg-rose-50 border border-rose-200 text-rose-800 p-3.5 rounded-2xl text-xs font-semibold flex items-start space-x-2.5 mb-4 animate-pulse">
-        <i class="fa-solid fa-triangle-exclamation text-rose-600 text-base shrink-0 mt-0.5"></i>
-        <div id="bookingConflictText">
-          Peringatan: Ruangan pada tanggal dan jam tersebut sudah ter-booking!
-        </div>
-      </div>
-
-      <form id="bookingForm" onsubmit="handleBookingSubmit(event)" class="space-y-4 text-xs">
+      <form id="roomForm" onsubmit="handleRoomFormSubmit(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="editRoomId">
+        
         <div>
-          <label class="block font-bold text-slate-700 mb-1.5">Nama Pemohon / Penanggung Jawab</label>
-          <input type="text" id="inputPemohon" required placeholder="Contoh: Ahmad Fauzi, S.T." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+          <label class="block font-bold text-slate-700 mb-1.5">Nama Ruangan</label>
+          <input type="text" id="inputRoomName" required placeholder="Contoh: Ruang Rapat Kartini" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 outline-none">
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block font-bold text-slate-700 mb-1.5">Bidang / Unit Kerja</label>
-            <input type="text" id="inputUnit" required placeholder="Contoh: Bagian Umum" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 outline-none">
-          </div>
-          <div>
-            <label class="block font-bold text-slate-700 mb-1.5">Kategori Kegiatan</label>
-            <select id="inputKategori" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer">
-              <option value="Rapat Dinas">Rapat Dinas</option>
-              <option value="Seminar / Sosialisasi">Seminar / Sosialisasi</option>
-              <option value="Workshop">Workshop</option>
-              <option value="Diklat / Pelatihan">Diklat / Pelatihan</option>
+            <label class="block font-bold text-slate-700 mb-1.5">Kategori</label>
+            <select id="inputRoomCategory" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer">
+              <option value="Rapat">Rapat</option>
+              <option value="VIP">VIP</option>
+              <option value="Auditorium">Auditorium</option>
+              <option value="Diskusi">Diskusi</option>
+              <option value="Sidang">Sidang</option>
             </select>
           </div>
-        </div>
-
-        <div>
-          <label class="block font-bold text-slate-700 mb-1.5">Nama Kegiatan / Acara</label>
-          <input type="text" id="inputKegiatan" required placeholder="Contoh: Rapat Koordinasi Program Kerja" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 outline-none">
-        </div>
-
-        <div>
-          <label class="block font-bold text-slate-700 mb-1.5">Pilihan Ruangan</label>
-          <select id="inputRuangan" onchange="checkBookingAvailability()" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"></select>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block font-bold text-slate-700 mb-1.5">Tanggal Pelaksanaan</label>
-            <input type="date" id="inputTanggal" onchange="checkBookingAvailability()" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer">
-          </div>
-          <div>
-            <label class="block font-bold text-slate-700 mb-1.5">Jam Pelaksanaan</label>
-            <input type="text" id="inputJam" oninput="checkBookingAvailability()" required placeholder="Contoh: 08:00 - 17:00 WIB" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+            <label class="block font-bold text-slate-700 mb-1.5">Jumlah Kapasitas</label>
+            <input type="text" id="inputRoomCapacity" required placeholder="Contoh: 40 Orang" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 outline-none">
           </div>
         </div>
 
         <div>
-          <label class="block font-bold text-slate-700 mb-1.5">Perkiraan Jumlah Peserta</label>
-          <input type="number" id="inputPeserta" min="1" required placeholder="Contoh: 25" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+          <label class="block font-bold text-slate-700 mb-1.5">Fasilitas <span class="text-slate-400 font-normal">(pisahkan dengan koma)</span></label>
+          <input type="text" id="inputRoomFeatures" required placeholder="Contoh: Proyektor 4K, Sound System, AC, Whiteboard" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 outline-none">
         </div>
 
         <div>
-          <label class="block font-bold text-slate-700 mb-1.5">Upload Berkas Pengajuan <span class="text-slate-400 font-normal">(PDF/DOC/JPG -> Google Drive)</span></label>
-          <input type="file" id="inputBerkas" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer">
+          <label class="block font-bold text-slate-700 mb-1.5">Deskripsi Ruangan</label>
+          <textarea id="inputRoomDesc" rows="2" required placeholder="Deskripsi singkat ruangan..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 outline-none resize-none"></textarea>
         </div>
 
         <div>
-          <label class="block font-bold text-slate-700 mb-1.5">Catatan / Permintaan Khusus (Opsional)</label>
-          <textarea id="inputCatatan" rows="2" placeholder="Contoh: Butuh tambahan mic wireless..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 outline-none resize-none"></textarea>
+          <label class="block font-bold text-slate-700 mb-1.5">Upload Foto Ruangan</label>
+          <input type="file" id="inputRoomPhoto" accept="image/*" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer">
         </div>
 
         <div class="flex items-center justify-end space-x-3 pt-4 border-t border-slate-100">
-          <button type="button" onclick="closeBookingModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition cursor-pointer">Batal</button>
-          <button type="submit" id="submitBookingBtn" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md shadow-blue-500/20 transition cursor-pointer flex items-center">
-            <i class="fa-solid fa-paper-plane mr-2"></i> Kirim Pengajuan
+          <button type="button" onclick="closeRoomModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition cursor-pointer">Batal</button>
+          <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition cursor-pointer flex items-center">
+            <i class="fa-solid fa-floppy-disk mr-2"></i> Simpan Ruangan
           </button>
         </div>
       </form>
@@ -1076,46 +1058,146 @@
       if (!container) return;
       container.innerHTML = '';
 
+      if (appState.rooms.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Belum ada ruangan terdaftar.</p>`;
+        return;
+      }
+
       appState.rooms.forEach(room => {
         container.innerHTML += `
-          <div class="bg-slate-50 border border-slate-200/90 rounded-2xl p-3.5 flex items-center justify-between">
-            <div class="space-y-1">
-              <h4 class="font-bold text-xs text-slate-900">${room.name}</h4>
+          <div class="bg-slate-50 border border-slate-200/90 rounded-2xl p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <h4 class="font-bold text-xs text-slate-900">${room.name}</h4>
+                <p class="text-[10px] text-slate-500">Kapasitas: ${room.capacity} | ${room.category}</p>
+              </div>
               <span class="inline-flex items-center text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${room.badgeClass}">
                 <i class="fa-solid ${room.icon} mr-1"></i> ${room.statusText}
               </span>
             </div>
-            <button onclick="cycleRoomStatus('${room.id}')" class="px-3.5 py-2 bg-white border border-slate-300 hover:bg-slate-100 rounded-xl text-xs font-bold text-slate-700 transition cursor-pointer shadow-2xs flex items-center space-x-1.5" title="Ubah Status">
-              <i class="fa-solid fa-arrows-rotate text-blue-600 text-xs"></i>
-              <span>Ubah Status</span>
-            </button>
+            
+            <div class="text-[11px] text-slate-600 bg-white p-2.5 rounded-xl border border-slate-200/80 space-y-1">
+              <div><strong>Fasilitas:</strong> ${room.features.join(', ')}</div>
+            </div>
+
+            <div class="flex items-center justify-end space-x-2 pt-1">
+              <button onclick="cycleRoomStatus('${room.id}')" class="px-3 py-1.5 bg-white border border-slate-300 hover:bg-slate-100 rounded-xl text-[11px] font-bold text-slate-700 transition cursor-pointer shadow-2xs">
+                <i class="fa-solid fa-arrows-rotate text-blue-600 mr-1"></i> Status
+              </button>
+              <button onclick="openEditRoomModal('${room.id}')" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl text-[11px] font-bold transition cursor-pointer border border-blue-200">
+                <i class="fa-solid fa-pen-to-square mr-1"></i> Edit
+              </button>
+              <button onclick="deleteRoom('${room.id}')" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-xl text-[11px] font-bold transition cursor-pointer border border-rose-200">
+                <i class="fa-solid fa-trash mr-1"></i> Hapus
+              </button>
+            </div>
           </div>
         `;
       });
     }
 
-    function cycleRoomStatus(roomId) {
+    function openAddRoomModal() {
+      const modal = document.getElementById('roomModal');
+      const title = document.getElementById('roomModalTitle');
+      const form = document.getElementById('roomForm');
+      if (modal && title && form) {
+        form.reset();
+        document.getElementById('editRoomId').value = '';
+        title.innerText = 'Tambah Ruangan Baru';
+        modal.classList.remove('hidden');
+      }
+    }
+
+    function openEditRoomModal(roomId) {
       const room = appState.rooms.find(r => r.id === roomId);
-      if (room) {
-        if (room.statusText === 'Tersedia') {
-          room.statusText = 'Sedang Perbaikan';
-          room.badgeClass = 'bg-amber-50 text-amber-700 border-amber-200';
-          room.icon = 'fa-triangle-exclamation';
-          room.available = false;
-        } else if (room.statusText === 'Sedang Perbaikan') {
-          room.statusText = 'Tidak Tersedia';
-          room.badgeClass = 'bg-rose-50 text-rose-700 border-rose-200';
-          room.icon = 'fa-circle-xmark';
-          room.available = false;
-        } else {
-          room.statusText = 'Tersedia';
-          room.badgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-200';
-          room.icon = 'fa-circle-check';
-          room.available = true;
+      if (!room) return;
+
+      const modal = document.getElementById('roomModal');
+      const title = document.getElementById('roomModalTitle');
+      if (modal && title) {
+        document.getElementById('editRoomId').value = room.id;
+        document.getElementById('inputRoomName').value = room.name;
+        document.getElementById('inputRoomCategory').value = room.category;
+        document.getElementById('inputRoomCapacity').value = room.capacity;
+        document.getElementById('inputRoomFeatures').value = room.features.join(', ');
+        document.getElementById('inputRoomDesc').value = room.description;
+        title.innerText = 'Edit Ruangan';
+        modal.classList.remove('hidden');
+      }
+    }
+
+    function closeRoomModal() {
+      const modal = document.getElementById('roomModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function handleRoomFormSubmit(e) {
+      e.preventDefault();
+      const editId = document.getElementById('editRoomId').value;
+      const name = document.getElementById('inputRoomName').value.trim();
+      const category = document.getElementById('inputRoomCategory').value;
+      const capacity = document.getElementById('inputRoomCapacity').value.trim();
+      const featuresStr = document.getElementById('inputRoomFeatures').value;
+      const features = featuresStr.split(',').map(f => f.trim()).filter(Boolean);
+      const description = document.getElementById('inputRoomDesc').value.trim();
+      const photoInput = document.getElementById('inputRoomPhoto');
+
+      let photoUrl = 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80';
+      if (photoInput && photoInput.files[0]) {
+        photoUrl = URL.createObjectURL(photoInput.files[0]);
+      }
+
+      if (editId) {
+        const room = appState.rooms.find(r => r.id === editId);
+        if (room) {
+          room.name = name;
+          room.category = category;
+          room.capacity = capacity;
+          room.features = features;
+          room.description = description;
+          if (photoInput && photoInput.files[0]) {
+            room.images[0] = photoUrl;
+          }
+          showToast(`Ruangan "${name}" berhasil diperbarui!`, 'success');
         }
+      } else {
+        const newRoomId = 'room-' + (appState.rooms.length + 1);
+        const newRoom = {
+          id: newRoomId,
+          name,
+          category,
+          capacity,
+          available: true,
+          statusText: 'Tersedia',
+          badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+          icon: 'fa-circle-check',
+          description,
+          features,
+          images: [photoUrl],
+          currentImageIdx: 0
+        };
+        appState.rooms.push(newRoom);
+        showToast(`Ruangan baru "${name}" berhasil ditambahkan!`, 'success');
+      }
+
+      closeRoomModal();
+      renderAdminRoomList();
+      renderRoomCards();
+      populateRoomOptions();
+      initAnalyticsCharts();
+    }
+
+    function deleteRoom(roomId) {
+      const roomIndex = appState.rooms.findIndex(r => r.id === roomId);
+      if (roomIndex !== -1) {
+        const roomName = appState.rooms[roomIndex].name;
+        appState.rooms.splice(roomIndex, 1);
         renderAdminRoomList();
         renderRoomCards();
-        showToast(`Status ${room.name} diubah menjadi: ${room.statusText}`, 'info');
+        populateRoomOptions();
+        updateDashboardCounts();
+        initAnalyticsCharts();
+        showToast(`Ruangan "${roomName}" berhasil dihapus dari sistem.`, 'info');
       }
     }
 
