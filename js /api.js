@@ -1,6 +1,6 @@
 const apiService = {
   // Ganti URL di bawah ini dengan URL Web App Google Apps Script Anda
-  appsScriptUrl: 'https://script.google.com/macros/s/AKfycbz.../exec',
+  appsScriptUrl: 'https://script.google.com/macros/s/AKfycbymzY6zWTCIWWr68d7We0kXCqmbVFHdnxeaScc9gbgE5-fLCUvmfWG1ku0pVXjnm5-j/exec',
 
   async fetchBookings() {
     if (this.appsScriptUrl.includes('AKfycbz...')) return null;
