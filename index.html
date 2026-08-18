@@ -294,7 +294,12 @@
 
               <div>
                 <label class="block font-bold text-slate-700 mb-1.5">Password</label>
-                <input type="password" id="adminPassword" required placeholder="••••••••" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-slate-900 outline-none">
+                <div class="relative">
+                  <input type="password" id="adminPassword" required placeholder="••••••••" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 pr-10 text-slate-800 font-medium focus:ring-2 focus:ring-slate-900 outline-none">
+                  <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer">
+                    <i id="eyeIcon" class="fa-solid fa-eye text-xs"></i>
+                  </button>
+                </div>
               </div>
 
               <div id="credentialsError" class="hidden bg-rose-50 border border-rose-200 text-rose-700 p-3 rounded-xl text-xs font-semibold flex items-center space-x-2">
@@ -1665,6 +1670,20 @@
       appState.currentAdmin = null;
       showToast('Anda telah keluar dari sesi Admin.', 'info');
       switchView('admin');
+    }
+
+    function togglePasswordVisibility() {
+      const passwordInput = document.getElementById('adminPassword');
+      const eyeIcon = document.getElementById('eyeIcon');
+      if (!passwordInput || !eyeIcon) return;
+
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.className = 'fa-solid fa-eye-slash text-xs';
+      } else {
+        passwordInput.type = 'password';
+        eyeIcon.className = 'fa-solid fa-eye text-xs';
+      }
     }
 
     function openBookingModal() {
