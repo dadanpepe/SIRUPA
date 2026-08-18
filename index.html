@@ -773,7 +773,64 @@
       startTotpCountdown();
       renderCalendar();
       switchView('dashboard');
+      loadCloudDataFromSpreadsheet();
     };
+
+    async function loadCloudDataFromSpreadsheet() {
+      // 1. Ambil data peminjaman
+      if (typeof apiService !== 'undefined' && apiService.fetchBookings) {
+        const bookingsData = await apiService.fetchBookings();
+        if (Array.isArray(bookingsData) && bookingsData.length > 0) {
+          appState.bookings = bookingsData;
+        }
+      }
+
+      // 2. Ambil data akun admin dari tab "Admins" Google Spreadsheet
+      if (typeof apiService !== 'undefined' && apiService.fetchAdmins) {
+        const adminsData = await apiService.fetchAdmins();
+        if (Array.isArray(adminsData) && adminsData.length > 0) {
+          appState.adminAccounts = adminsData.map(acc => ({
+            username: acc.username,
+            name: acc.name,
+            pass: acc.password || acc.pass,
+            unit: acc.unit,
+            isSuper: acc.isSuper === true || acc.isSuper === "true" || acc.isSuper === "TRUE"
+          }));
+          renderAdminAccountsList();
+        }
+      }
+
+      // 3. Ambil data ruangan dari tab "Rooms" Google Spreadsheet
+      if (typeof apiService !== 'undefined' && apiService.fetchRooms) {
+        const roomsData = await apiService.fetchRooms();
+        if (Array.isArray(roomsData) && roomsData.length > 0) {
+          appState.rooms = roomsData.map((r, idx) => ({
+            id: r.id || `room-${idx+1}`,
+            name: r.name,
+            category: r.category || 'Rapat',
+            capacity: r.capacity || '30 Orang',
+            unit: r.unit || 'Bagian Umum',
+            available: true,
+            statusText: r.statusText || 'Tersedia',
+            badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+            icon: 'fa-circle-check',
+            description: r.description || 'Ruangan instansi.',
+            features: typeof r.features === 'string' ? r.features.split(',').map(f => f.trim()) : ['Proyektor', 'AC'],
+            images: ['https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80'],
+            currentImageIdx: 0
+          }));
+          populateRoomOptions();
+          renderRoomCards();
+          renderAdminRoomList();
+        }
+      }
+
+      renderBookingTable();
+      updateDashboardCounts();
+      renderAdminPendingTable();
+      renderCalendar();
+      initAnalyticsCharts();
+    }
 
     function initClock() {
       setInterval(() => {
