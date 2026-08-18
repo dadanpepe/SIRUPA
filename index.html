@@ -60,8 +60,10 @@
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col justify-between selection:bg-blue-500 selection:text-white">
 
-  <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 max-w-sm"></div>
+  <!-- Toast Notification Container (Tampil di Halaman Muka secara Floating Real-Time) -->
+  <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none"></div>
 
+  <!-- Header -->
   <header class="bg-white border-b border-slate-200/80 sticky top-0 z-30 shadow-xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex justify-between items-center">
       
@@ -136,7 +138,7 @@
         <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between">
           <div class="space-y-1">
             <p class="text-xs font-medium text-slate-400">Peminjaman Disetujui</p>
-            <h4 class="text-2xl font-black text-slate-900" id="kpiDisetujuiCount">2</h4>
+            <h4 class="text-2xl font-black text-slate-900" id="kpiDisetujuiCount">0</h4>
           </div>
           <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-xl shrink-0">
             <i class="fa-solid fa-calendar-check"></i>
@@ -190,7 +192,7 @@
         <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h3 class="text-base font-bold text-slate-900">Daftar & Riwayat Peminjaman Ruangan</h3>
-            <p class="text-xs text-slate-400 mt-0.5">Data jadwal peminjaman gedung instansi tersimpan di sistem.</p>
+            <p class="text-xs text-slate-400 mt-0.5">Data sinkronisasi dari Google Spreadsheet database instansi.</p>
           </div>
           <div class="relative w-full sm:w-72">
             <input type="text" id="searchTableInput" onkeyup="filterBookingTable()" placeholder="Cari pemohon / kegiatan..." class="w-full bg-slate-50 border border-slate-200 text-xs text-slate-700 rounded-full py-2.5 pl-9 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
@@ -219,24 +221,17 @@
 
     <!-- VIEW 2: CHECK ROOM & CALENDAR -->
     <section id="viewCheckRoom" class="space-y-8 hidden">
-      <div class="bg-sky-50 border border-sky-200 text-sky-800 px-5 py-3.5 rounded-2xl text-xs font-medium flex items-center shadow-2xs">
-        <i class="fa-solid fa-circle-info text-sky-600 mr-2.5 text-base"></i>
-        <span>Note : Masukan Tanggal dan Jam untuk Pinjam Ruang Rapat DISDIKBUD (Double-click tanggal dengan jadwal pinjam untuk melihat detail kegiatan)</span>
+      <div class="bg-sky-50 border border-sky-200 text-sky-800 px-5 py-3.5 rounded-2xl text-xs font-medium flex items-center justify-between shadow-2xs">
+        <div class="flex items-center">
+          <i class="fa-solid fa-circle-info text-sky-600 mr-2.5 text-base"></i>
+          <span>Note : Masukan Tanggal dan Jam untuk Pinjam Ruang Rapat DISDIKBUD (Double-click tanggal dengan jadwal pinjam untuk melihat detail kegiatan)</span>
+        </div>
+        <button onclick="openCancelModal()" class="px-3.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-xs transition border border-rose-200 cursor-pointer shrink-0 ml-4 flex items-center">
+          <i class="fa-solid fa-ban mr-1.5"></i> Batal Pinjam
+        </button>
       </div>
 
       <div class="bg-white rounded-3xl border border-slate-200/80 p-5 shadow-xs space-y-6">
-        <div class="flex flex-wrap items-center gap-2 border-b border-slate-100 pb-4">
-          <button onclick="openBookingModal()" class="px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition flex items-center shadow-2xs cursor-pointer">
-            <i class="fa-solid fa-house-chimney-user mr-2 text-blue-600"></i> Peminjaman Ruang
-          </button>
-          <button class="px-4 py-2 bg-indigo-900 text-white rounded-xl text-xs font-bold transition flex items-center shadow-sm cursor-pointer">
-            <i class="fa-solid fa-calendar-days mr-2"></i> Cek Ruang
-          </button>
-          <button onclick="openCancelModal()" class="px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition flex items-center shadow-2xs cursor-pointer">
-            <i class="fa-solid fa-ban mr-2 text-rose-500"></i> Batal Pinjam
-          </button>
-        </div>
-
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <h3 class="text-sm font-black text-slate-900 tracking-wide uppercase">Cek Ruang</h3>
           <span class="text-sm font-black text-slate-800 tracking-wider" id="calendarMonthTitle">AGUSTUS 2026</span>
@@ -431,7 +426,6 @@
 
   </main>
 
-  <!-- Footer -->
   <footer class="bg-white border-t border-slate-200/80 py-6 mt-12 text-center text-xs text-slate-400">
     © 2026 PinTaR - Sistem Informasi Peminjaman Ruangan Terpadu. Terhubung dengan Google Spreadsheet & Google Drive API.
   </footer>
@@ -577,11 +571,12 @@
 
   <script>
     const appState = {
+      appsScriptUrl: 'https://script.google.com/macros/s/AKfycbz.../exec',
       isAdminLoggedIn: false,
       activeView: 'dashboard',
       totpTimer: 30,
       currentYear: 2026,
-      currentMonth: 7, // August (0-indexed)
+      currentMonth: 7, // August
       rooms: [
         {
           id: 'room-1',
@@ -595,8 +590,7 @@
           description: 'Ruangan representatif untuk rapat paripurna, pleno, dan pertemuan besar lintas instansi.',
           features: ['Proyektor 4K', 'Sound System', 'AC Sentral', 'Whiteboard'],
           images: [
-            'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80',
-            'https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=800&q=80'
+            'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80'
           ],
           currentImageIdx: 0
         },
@@ -612,8 +606,7 @@
           description: 'Ruangan khusus pimpinan dan tamu kehormatan dengan nuansa privat dan elegan.',
           features: ['Smart TV 75"', 'Meja Eksekutif', 'AC', 'LAN Cepat'],
           images: [
-            'https://images.unsplash.com/photo-1517502884422-41eaead166d4?auto=format&fit=crop&w=800&q=80',
-            'https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=800&q=80'
+            'https://images.unsplash.com/photo-1517502884422-41eaead166d4?auto=format&fit=crop&w=800&q=80'
           ],
           currentImageIdx: 0
         },
@@ -629,8 +622,7 @@
           description: 'Aula luas untuk seminar, sosialisasi, diklat, dan acara seremonial instansi.',
           features: ['Panggung Utama', 'Full Sound & Lighting', 'Projector Besar'],
           images: [
-            'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=800&q=80',
-            'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80'
+            'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=800&q=80'
           ],
           currentImageIdx: 0
         },
@@ -667,40 +659,7 @@
           currentImageIdx: 0
         }
       ],
-      bookings: [
-        {
-          id: 'PMJ-1029',
-          pemohon: 'Ahmad Fauzi',
-          unit: 'Bagian Umum',
-          kategori: 'Rapat Dinas',
-          kegiatan: 'Rapat Koordinasi Triwulan',
-          ruangan: 'Ruang Rapat Utama',
-          tanggal: '2026-06-15',
-          jam: '08:00 - 17:00 WIB',
-          peserta: 45,
-          catatan: 'Permintaan mic wireless',
-          berkasUrl: 'https://drive.google.com/drive/folders/PinTaR_Docs_Sample_1.pdf',
-          status: 'Disetujui',
-          tahun: 2026,
-          timestamp: '2026-06-10 09:30'
-        },
-        {
-          id: 'PMJ-1042',
-          pemohon: 'Siti Rahma',
-          unit: 'Bappeda & IT',
-          kategori: 'Seminar / Sosialisasi',
-          kegiatan: 'Sosialisasi Sistem Baru',
-          ruangan: 'Auditorium Gedung A',
-          tanggal: '2026-08-20',
-          jam: '08:00 - 17:00 WIB',
-          peserta: 120,
-          catatan: 'Proyektor ganda',
-          berkasUrl: 'https://drive.google.com/drive/folders/PinTaR_Docs_Sample_2.pdf',
-          status: 'Disetujui',
-          tahun: 2026,
-          timestamp: '2026-08-11 10:15'
-        }
-      ]
+      bookings: [] // Kosong bersih, disinkronkan murni dari database spreadsheet
     };
 
     let chartInstances = {};
@@ -717,7 +676,27 @@
       startTotpCountdown();
       renderCalendar();
       switchView('dashboard');
+      fetchBookingsFromCloud();
     };
+
+    async function fetchBookingsFromCloud() {
+      if (appState.appsScriptUrl.includes('AKfycbz...')) return;
+      try {
+        const response = await fetch(appState.appsScriptUrl + '?action=getBookings');
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          appState.bookings = data;
+          renderBookingTable();
+          updateDashboardCounts();
+          renderAdminPendingTable();
+          renderCalendar();
+          initAnalyticsCharts();
+          renderRoomCards();
+        }
+      } catch (err) {
+        console.error('Gagal mengambil data dari Google Spreadsheet:', err);
+      }
+    }
 
     function initClock() {
       setInterval(() => {
@@ -854,7 +833,6 @@
           if (hasBookings) {
             cellBgClass = 'bg-rose-100/75 cursor-pointer hover:bg-rose-200/80';
             textColor = 'text-slate-900 font-bold';
-            
             const bInfo = encodeURIComponent(JSON.stringify(bookingsOnThisDay));
             dblClickAttr = `ondblclick="showBookingDetails('${bInfo}')" title="Double-click untuk melihat detail peminjaman"`;
           } else {
@@ -1003,12 +981,6 @@
                 <span class="absolute top-4 right-4 bg-white/90 backdrop-blur-md text-slate-800 text-xs font-semibold px-3.5 py-1.5 rounded-full flex items-center shadow-sm">
                   <i class="fa-solid fa-users text-blue-600 mr-2"></i> Kapasitas ${room.capacity}
                 </span>
-                <button onclick="prevRoomImage(${idx})" class="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition hover:bg-black/60 cursor-pointer">
-                  <i class="fa-solid fa-chevron-left text-xs"></i>
-                </button>
-                <button onclick="nextRoomImage(${idx})" class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition hover:bg-black/60 cursor-pointer">
-                  <i class="fa-solid fa-chevron-right text-xs"></i>
-                </button>
               </div>
 
               <div class="p-6 space-y-3">
@@ -1036,21 +1008,8 @@
       const roomSelect = document.getElementById('inputRuangan');
       if (roomSelect) {
         roomSelect.value = roomName;
+        checkBookingAvailability();
       }
-    }
-
-    function prevRoomImage(roomIdx) {
-      const room = appState.rooms[roomIdx];
-      room.currentImageIdx = (room.currentImageIdx - 1 + room.images.length) % room.images.length;
-      const imgEl = document.getElementById(`room-img-${roomIdx}`);
-      if (imgEl) imgEl.src = room.images[room.currentImageIdx];
-    }
-
-    function nextRoomImage(roomIdx) {
-      const room = appState.rooms[roomIdx];
-      room.currentImageIdx = (room.currentImageIdx + 1) % room.images.length;
-      const imgEl = document.getElementById(`room-img-${roomIdx}`);
-      if (imgEl) imgEl.src = room.images[room.currentImageIdx];
     }
 
     function renderBookingTable(filteredList = null) {
@@ -1060,7 +1019,7 @@
       tbody.innerHTML = '';
 
       if (list.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 font-medium">Tidak ada data peminjaman ditemukan.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 font-medium">Tidak ada data peminjaman ditemukan di database.</td></tr>`;
         return;
       }
 
@@ -1210,6 +1169,7 @@
         updateDashboardCounts();
         renderCalendar();
         renderRoomCards();
+        initAnalyticsCharts();
         showToast(`Pengajuan ${item.id} telah ${newStatus}`, newStatus === 'Disetujui' ? 'success' : 'warning');
       }
     }
@@ -1295,9 +1255,7 @@
     function openBookingModal() {
       const modal = document.getElementById('bookingModal');
       if (modal) modal.classList.remove('hidden');
-      // Reset conflict banner on open
-      const banner = document.getElementById('bookingConflictBanner');
-      if (banner) banner.classList.add('hidden');
+      checkBookingAvailability();
     }
 
     function closeBookingModal() {
@@ -1328,35 +1286,6 @@
       if (formReason) formReason.value = '';
     }
 
-    function handleCancelBookingSubmit(e) {
-      e.preventDefault();
-      const bookingIdInput = document.getElementById('cancelBookingId').value.trim().toUpperCase();
-
-      const bookingItem = appState.bookings.find(b => b.id.toUpperCase() === bookingIdInput);
-
-      if (!bookingItem) {
-        showToast(`ID Peminjaman "${bookingIdInput}" tidak ditemukan dalam sistem.`, 'error');
-        return;
-      }
-
-      if (bookingItem.status === 'Dibatalkan') {
-        showToast(`Peminjaman dengan ID ${bookingItem.id} sudah pernah dibatalkan sebelumnya.`, 'warning');
-        return;
-      }
-
-      bookingItem.status = 'Dibatalkan';
-
-      renderBookingTable();
-      updateDashboardCounts();
-      renderAdminPendingTable();
-      renderRoomCards();
-      renderCalendar();
-      initAnalyticsCharts();
-
-      closeCancelModal();
-      showToast(`Peminjaman ${bookingItem.id} berhasil dibatalkan. Agenda otomatis diperbarui dari kalender.`, 'success');
-    }
-
     function checkBookingAvailability() {
       const ruangan = document.getElementById('inputRuangan')?.value;
       const tanggal = document.getElementById('inputTanggal')?.value;
@@ -1374,7 +1303,7 @@
         return;
       }
 
-      // Cek apakah ada bentrok dengan jadwal yang sudah disetujui
+      // Cek bentrok dengan jadwal yang sudah disetujui
       const conflict = appState.bookings.find(b => 
         b.ruangan === ruangan && 
         b.tanggal === tanggal && 
@@ -1384,13 +1313,14 @@
 
       if (conflict) {
         if (banner && bannerText) {
-          bannerText.innerHTML = `<strong>Peringatan Bentrok Jadwal!</strong> Ruangan <b>${ruangan}</b> pada tanggal <b>${tanggal}</b> jam <b>${jam}</b> sudah disetujui untuk kegiatan <i>"${conflict.kegiatan}"</i> (${conflict.pemohon} - ${conflict.unit}).`;
+          bannerText.innerHTML = `<strong>Peringatan Jadwal Bentrok!</strong> Ruangan <b>${ruangan}</b> pada tanggal <b>${tanggal}</b> (Jam: <b>${jam}</b>) sudah disetujui untuk kegiatan <i>"${conflict.kegiatan}"</i> oleh <b>${conflict.pemohon} (${conflict.unit})</b>. Silakan pilih jadwal atau ruangan lain.`;
           banner.classList.remove('hidden');
         }
         if (submitBtn) {
           submitBtn.disabled = true;
           submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
         }
+        showToast(`Perhatian: Jadwal pada tanggal ${tanggal} dan jam tersebut sudah ter-booking!`, 'warning');
       } else {
         if (banner) banner.classList.add('hidden');
         if (submitBtn) {
@@ -1412,17 +1342,16 @@
       const jam = document.getElementById('inputJam').value;
       const peserta = parseInt(document.getElementById('inputPeserta').value);
       const catatan = document.getElementById('inputCatatan').value;
-      const berkasInput = document.getElementById('inputBerkas');
 
       const existingConflict = appState.bookings.find(b => 
         b.ruangan === ruangan && 
         b.tanggal === tanggal && 
-        b.jam.trim().toLowerCase() === jam.trim().toLowerCase() && 
-        b.status === 'Disetujui'
+        b.status === 'Disetujui' &&
+        (b.jam.trim().toLowerCase().includes(jam.trim().toLowerCase()))
       );
 
       if (existingConflict) {
-        showToast(`Peringatan: Ruangan "${ruangan}" pada tanggal ${tanggal} jam ${jam} sudah ter-booking (${existingConflict.kegiatan}).`, 'error');
+        showToast(`Gagal Mengajukan: Ruangan "${ruangan}" pada tanggal ${tanggal} jam ${jam} sudah ter-booking (${existingConflict.kegiatan}).`, 'error');
         return;
       }
 
@@ -1449,7 +1378,38 @@
 
       appState.bookings.unshift(newBooking);
       postBookingUIUpdates();
-      showToast(`Pengajuan berhasil dikirim (${newId})`, 'success');
+      
+      showToast(`Pengajuan Peminjaman Ruangan Berhasil! ID: ${newId}. Menunggu verifikasi admin.`, 'success');
+    }
+
+    function handleCancelBookingSubmit(e) {
+      e.preventDefault();
+      const bookingIdInput = document.getElementById('cancelBookingId').value.trim().toUpperCase();
+
+      const bookingItem = appState.bookings.find(b => b.id.toUpperCase() === bookingIdInput);
+
+      if (!bookingItem) {
+        showToast(`ID Peminjaman "${bookingIdInput}" tidak ditemukan dalam sistem.`, 'error');
+        return;
+      }
+
+      if (bookingItem.status === 'Dibatalkan') {
+        showToast(`Peminjaman dengan ID ${bookingItem.id} sudah pernah dibatalkan sebelumnya.`, 'warning');
+        return;
+      }
+
+      bookingItem.status = 'Dibatalkan';
+
+      renderBookingTable();
+      updateDashboardCounts();
+      renderAdminPendingTable();
+      renderRoomCards();
+      renderCalendar();
+      initAnalyticsCharts();
+
+      closeCancelModal();
+      
+      showToast(`Pembatalan Berhasil! ID Peminjaman ${bookingItem.id} telah dibatalkan dan agenda otomatis dihapus dari kalender.`, 'success');
     }
 
     function postBookingUIUpdates() {
@@ -1462,12 +1422,19 @@
       initAnalyticsCharts();
     }
 
+    /**
+     * Inisialisasi dan pembaruan Grafik secara Real-Time murni berdasarkan data dari database.
+     */
     function initAnalyticsCharts() {
+      // 1. Grafik Penggunaan Ruangan (Berdasarkan booking dengan status Disetujui)
       const roomCounts = {};
       appState.rooms.forEach(r => roomCounts[r.name] = 0);
       appState.bookings.filter(b => b.status === 'Disetujui').forEach(b => {
-        if (roomCounts[b.ruangan] !== undefined) roomCounts[b.ruangan]++;
-        else roomCounts[b.ruangan] = 1;
+        if (roomCounts[b.ruangan] !== undefined) {
+          roomCounts[b.ruangan]++;
+        } else {
+          roomCounts[b.ruangan] = 1;
+        }
       });
 
       if (chartInstances.penggunaan) chartInstances.penggunaan.destroy();
@@ -1486,8 +1453,9 @@
         });
       }
 
+      // 2. Pemakaian Ruangan Per Tahun (Berdasarkan database real)
       const years = [2024, 2025, 2026];
-      const yearCounts = years.map(yr => appState.bookings.filter(b => b.tahun === yr && b.status === 'Disetujui').length + (yr === 2026 ? 1 : 0));
+      const yearCounts = years.map(yr => appState.bookings.filter(b => Number(b.tahun) === yr && b.status === 'Disetujui').length);
 
       if (chartInstances.tahunan) chartInstances.tahunan.destroy();
       const ctx2 = document.getElementById('chartPemakaianTahun');
@@ -1507,11 +1475,12 @@
         });
       }
 
+      // 3. Jumlah Peserta Per Tahun Berdasarkan Kategori Kegiatan (Real-time dari database)
       const categories = ['Rapat Dinas', 'Seminar / Sosialisasi', 'Workshop', 'Diklat / Pelatihan'];
       const colors = ['#2563eb', '#10b981', '#f59e0b', '#ec4899'];
       const datasetsPeserta = categories.map((cat, idx) => ({
         label: cat,
-        data: years.map(yr => appState.bookings.filter(b => b.tahun === yr && b.kategori === cat).reduce((sum, curr) => sum + curr.peserta, 40)),
+        data: years.map(yr => appState.bookings.filter(b => Number(b.tahun) === yr && b.kategori === cat && b.status === 'Disetujui').reduce((sum, curr) => sum + (Number(curr.peserta) || 0), 0)),
         backgroundColor: colors[idx % colors.length],
         borderRadius: 6
       }));
@@ -1526,7 +1495,15 @@
         });
       }
 
-      const unitCounts = { 'Bagian Umum': 3, 'Bappeda & IT': 2, 'Diskominfo': 2, 'BKPSDM': 1 };
+      // 4. Unit Berdasarkan Pemakaian (Real-time dari database)
+      const unitCounts = {};
+      appState.bookings.filter(b => b.status === 'Disetujui').forEach(b => {
+        const unitName = b.unit || 'Lainnya';
+        unitCounts[unitName] = (unitCounts[unitName] || 0) + 1;
+      });
+
+      const unitLabels = Object.keys(unitCounts);
+      const unitValues = Object.values(unitCounts);
 
       if (chartInstances.unit) chartInstances.unit.destroy();
       const ctx4 = document.getElementById('chartUnit');
@@ -1535,10 +1512,10 @@
           indexAxis: 'y',
           type: 'bar',
           data: {
-            labels: Object.keys(unitCounts),
+            labels: unitLabels.length > 0 ? unitLabels : ['Belum Ada Data'],
             datasets: [{
               label: 'Frekuensi Pinjam',
-              data: Object.values(unitCounts),
+              data: unitValues.length > 0 ? unitValues : [0],
               backgroundColor: '#6366f1',
               borderRadius: 6
             }]
@@ -1555,6 +1532,7 @@
 
       let icon = 'fa-info-circle text-blue-500';
       let border = 'border-blue-200';
+      let bg = 'bg-white';
 
       if (type === 'success') {
         icon = 'fa-circle-check text-emerald-500';
@@ -1567,22 +1545,22 @@
         border = 'border-rose-200';
       }
 
-      toast.className = `bg-white border ${border} shadow-lg rounded-2xl p-3.5 flex items-center space-x-3 text-xs font-semibold text-slate-800 transition transform translate-y-2 opacity-0`;
+      toast.className = `${bg} border ${border} shadow-xl rounded-2xl p-4 flex items-center space-x-3 text-xs font-semibold text-slate-800 transition-all transform translate-y-3 opacity-0 pointer-events-auto`;
       toast.innerHTML = `
-        <i class="fa-solid ${icon} text-base shrink-0"></i>
-        <span class="flex-grow">${message}</span>
+        <i class="fa-solid ${icon} text-lg shrink-0"></i>
+        <span class="flex-grow leading-snug">${message}</span>
       `;
 
       container.appendChild(toast);
 
       setTimeout(() => {
-        toast.classList.remove('translate-y-2', 'opacity-0');
+        toast.classList.remove('translate-y-3', 'opacity-0');
       }, 50);
 
       setTimeout(() => {
-        toast.classList.add('opacity-0', 'translate-y-2');
-        setTimeout(() => toast.remove(), 300);
-      }, 3500);
+        toast.classList.add('opacity-0', 'translate-y-3');
+        setTimeout(() => toast.remove(), 350);
+      }, 4500);
     }
   </script>
 </body>
