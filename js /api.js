@@ -3,7 +3,7 @@
  */
 const apiService = {
   // Masukkan URL Web App Google Apps Script Anda di sini setelah di-Deploy (contoh: https://script.google.com/macros/s/.../exec)
-  appsScriptUrl: 'https://script.google.com/macros/s/AKfycbzihA8WhiNjF-v-FcttL_9Voc6h-ZUW2PFUjqIYH5tLnnT_SsPj942CbSx9f7NRaZkx/exec',
+  appsScriptUrl: 'https://script.google.com/macros/s/AKfycbz.../exec',
 
   async fetchBookings() {
     if (this.appsScriptUrl.includes('AKfycbz...')) return null;
@@ -25,6 +25,18 @@ const apiService = {
       return Array.isArray(data) ? data : null;
     } catch (err) {
       console.error('Gagal mengambil data Ruangan:', err);
+      return null;
+    }
+  },
+
+  async fetchAdmins() {
+    if (this.appsScriptUrl.includes('AKfycbz...')) return null;
+    try {
+      const response = await fetch(this.appsScriptUrl + '?action=getAdmins');
+      const data = await response.json();
+      return Array.isArray(data) ? data : null;
+    } catch (err) {
+      console.error('Gagal mengambil data Admins dari Google Spreadsheet:', err);
       return null;
     }
   },
@@ -78,6 +90,7 @@ const apiService = {
       };
       const response = await fetch(this.appsScriptUrl, {
         method: 'POST',
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify(payload)
       });
       return await response.json();
@@ -92,6 +105,7 @@ const apiService = {
     try {
       await fetch(this.appsScriptUrl, {
         method: 'POST',
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({ action: 'updateStatus', id: bookingId, status: status })
       });
     } catch (e) {
@@ -104,6 +118,7 @@ const apiService = {
     try {
       const response = await fetch(this.appsScriptUrl, {
         method: 'POST',
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({ action: 'verifyTotp', code: code })
       });
       const res = await response.json();
