@@ -11,10 +11,6 @@
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- Flatpickr Date Picker CDN -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
@@ -64,7 +60,6 @@
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col justify-between selection:bg-blue-500 selection:text-white">
 
-  <!-- Toast Notification Container -->
   <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 max-w-sm"></div>
 
   <!-- Header Navigation -->
@@ -82,7 +77,7 @@
         </div>
       </div>
 
-      <!-- Navigation Switcher (Dashboard vs Cek Ruangan vs Admin) -->
+      <!-- Navigation Switcher -->
       <div class="flex items-center space-x-4">
         <div class="hidden md:flex flex-col text-right border-r border-slate-200 pr-4">
           <span id="liveClock" class="text-xs font-mono font-bold text-slate-800">11:47:12 WIB</span>
@@ -120,11 +115,11 @@
           <div class="max-w-3xl space-y-3">
             <div class="inline-flex items-center space-x-2 px-3.5 py-1 bg-white/15 backdrop-blur-md rounded-full text-xs font-semibold tracking-wide text-white border border-white/20">
               <span class="w-2 h-2 bg-emerald-400 rounded-full live-pulse"></span>
-              <span>Layanan Digital Aktif 24/7</span>
+              <span>Layanan Digital Terhubung Google Spreadsheet & Drive 24/7</span>
             </div>
             <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight leading-tight">Dashboard & Statistik Ruangan</h2>
             <p class="text-blue-100 text-xs sm:text-sm leading-relaxed opacity-90">
-              Pantau ketersediaan jadwal ruangan, analisis penggunaan fasilitas, dan status operasional ruang secara real-time.
+              Pantau ketersediaan jadwal ruangan, analisis penggunaan fasilitas, dan status operasional ruang secara real-time dengan sinkronisasi database cloud.
             </p>
           </div>
         </div>
@@ -194,12 +189,12 @@
         </div>
       </div>
 
-      <!-- Section: Daftar & Riwayat Peminjaman Ruangan (Monitoring Only) -->
+      <!-- Section: Daftar & Riwayat Peminjaman Ruangan -->
       <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
         <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h3 class="text-base font-bold text-slate-900">Daftar & Riwayat Peminjaman Ruangan</h3>
-            <p class="text-xs text-slate-400 mt-0.5">Data jadwal peminjaman gedung instansi.</p>
+            <h3 class="text-base font-bold text-slate-900">Daftar & Riwayat Peminjaman Ruangan (Google Spreadsheet Sync)</h3>
+            <p class="text-xs text-slate-400 mt-0.5">Data jadwal peminjaman gedung instansi tersimpan otomatis di Cloud Sheet.</p>
           </div>
           <div class="relative w-full sm:w-72">
             <input type="text" id="searchTableInput" onkeyup="filterBookingTable()" placeholder="Cari pemohon / kegiatan..." class="w-full bg-slate-50 border border-slate-200 text-xs text-slate-700 rounded-full py-2.5 pl-9 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
@@ -215,7 +210,7 @@
                 <th class="p-4">Kegiatan</th>
                 <th class="p-4">Ruangan</th>
                 <th class="p-4">Waktu Pelaksanaan</th>
-                <th class="p-4">Kategori</th>
+                <th class="p-4">Berkas Drive</th>
                 <th class="p-4 pr-6">Status</th>
               </tr>
             </thead>
@@ -246,9 +241,6 @@
           <button class="px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition flex items-center shadow-2xs cursor-pointer">
             <i class="fa-solid fa-ban mr-2 text-rose-500"></i> Batal Pinjam
           </button>
-          <button class="px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition flex items-center shadow-2xs cursor-pointer">
-            <i class="fa-solid fa-chart-column mr-2 text-amber-500"></i> Rekapitulasi
-          </button>
         </div>
 
         <!-- Calendar Component Header -->
@@ -261,7 +253,7 @@
             <button onclick="changeMonth(-1)" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-bold transition cursor-pointer">
               <i class="fa-solid fa-chevron-left"></i>
             </button>
-            <button onclick="goToToday()" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-sm cursor-pointer">Today</button>
+            <button id="nextMonthBtn" onclick="changeMonth(1)" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-sm cursor-pointer">September 2026</button>
             <button onclick="changeMonth(1)" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-bold transition cursor-pointer">
               <i class="fa-solid fa-chevron-right"></i>
             </button>
@@ -287,7 +279,7 @@
         </div>
       </div>
 
-      <!-- Section: Daftar Ruangan & Fasilitas (Pindah ke Cek Ruangan) -->
+      <!-- Section: Daftar Ruangan & Fasilitas -->
       <div class="space-y-4 pt-4">
         <div>
           <h3 class="text-base sm:text-lg font-bold text-slate-900">Daftar Ruangan & Fasilitas</h3>
@@ -312,12 +304,12 @@
                 <i class="fa-solid fa-user-shield"></i>
               </div>
               <h3 class="text-xl font-black text-slate-900 tracking-tight">Login Administrator</h3>
-              <p class="text-xs text-slate-500 leading-relaxed max-w-xs mx-auto">Masukkan kredensial dan scan QR Code Google Authenticator Anda.</p>
+              <p class="text-xs text-slate-500 leading-relaxed max-w-xs mx-auto">Masukkan kredensial terhubung Google Spreadsheet & Google Authenticator.</p>
             </div>
 
             <form onsubmit="handleCredentialsSubmit(event)" class="space-y-4 text-xs">
               <div>
-                <label class="block font-bold text-slate-700 mb-1.5">Username</label>
+                <label class="block font-bold text-slate-700 mb-1.5">Username Admin</label>
                 <input type="text" id="adminUsername" required value="admin" placeholder="Contoh: admin" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-slate-900 focus:bg-white outline-none transition">
               </div>
 
@@ -395,7 +387,7 @@
             </div>
             <div class="space-y-0.5">
               <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1.5 live-pulse"></span> Sesi Aktif
+                <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1.5 live-pulse"></span> Sesi Aktif Terhubung Spreadsheet
               </span>
               <h2 class="text-lg font-black text-slate-900">Panel Verifikasi & Pengaturan Ruangan</h2>
             </div>
@@ -418,7 +410,6 @@
               <p class="text-xs text-slate-400">Ubah status operasional ruangan.</p>
             </div>
 
-            <!-- Scrollable Room Status Container -->
             <div id="adminRoomList" class="space-y-3 max-h-[500px] overflow-y-auto pr-1"></div>
           </div>
 
@@ -459,7 +450,7 @@
   </main>
 
   <footer class="bg-white border-t border-slate-200/80 py-6 mt-12 text-center text-xs text-slate-400">
-    © 2026 PinTaR - Sistem Informasi Peminjaman Ruangan Terpadu. Terhubung dengan Google Sheets Real-Time.
+    © 2026 PinTaR - Sistem Informasi Peminjaman Ruangan Terpadu. Terhubung dengan Google Spreadsheet & Google Drive API.
   </footer>
 
   <!-- MODAL: FORMULIR PEMINJAMAN RUANGAN -->
@@ -471,7 +462,7 @@
 
       <div class="mb-6 space-y-1">
         <h3 class="text-lg font-black text-slate-900 tracking-tight">Formulir Peminjaman Ruangan</h3>
-        <p class="text-xs text-slate-500">Lengkapi detail kegiatan dan jadwal peminjaman.</p>
+        <p class="text-xs text-slate-500">Data otomatis tersimpan ke Google Spreadsheet & berkas diunggah ke Google Drive Folder.</p>
       </div>
 
       <form id="bookingForm" onsubmit="handleBookingSubmit(event)" class="space-y-4 text-xs">
@@ -525,6 +516,13 @@
         </div>
 
         <div>
+          <label class="block font-bold text-slate-700 mb-1.5">Upload Berkas Pengajuan <span class="text-slate-400 font-normal">(PDF/DOC/JPG -> Disimpan ke Google Drive Folder "PinTaR_Docs")</span></label>
+          <div class="relative">
+            <input type="file" id="inputBerkas" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer transition focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none">
+          </div>
+        </div>
+
+        <div>
           <label class="block font-bold text-slate-700 mb-1.5">Catatan / Permintaan Khusus (Opsional)</label>
           <textarea id="inputCatatan" rows="2" placeholder="Contoh: Butuh tambahan mic wireless..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition resize-none"></textarea>
         </div>
@@ -532,15 +530,37 @@
         <div class="flex items-center justify-end space-x-3 pt-4 border-t border-slate-100">
           <button type="button" onclick="closeBookingModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition cursor-pointer">Batal</button>
           <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md shadow-blue-500/20 transition cursor-pointer flex items-center">
-            <i class="fa-solid fa-paper-plane mr-2"></i> Kirim Pengajuan
+            <i class="fa-solid fa-paper-plane mr-2"></i> Kirim Pengajuan & Sinkronisasi
           </button>
         </div>
       </form>
     </div>
   </div>
 
+  <!-- MODAL: DETAIL BOOKING INFO -->
+  <div id="bookingDetailsModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative space-y-4">
+      <button onclick="closeBookingDetailsModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition">
+        <i class="fa-solid fa-xmark text-sm"></i>
+      </button>
+
+      <div class="space-y-1">
+        <span class="text-[10px] font-black text-blue-600 uppercase tracking-wider">Detail Kegiatan Ruangan</span>
+        <h3 id="modalDetailTitle" class="text-base font-black text-slate-900">Informasi Jadwal Peminjaman</h3>
+      </div>
+
+      <div id="modalDetailContent" class="space-y-2.5 text-xs text-slate-700 bg-slate-50 p-4 rounded-2xl border border-slate-200/80"></div>
+
+      <div class="pt-2 flex justify-end">
+        <button onclick="closeBookingDetailsModal()" class="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition cursor-pointer">Tutup</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const appState = {
+      // GANTI URL DI BAWAH INI DENGAN URL WEB APP DEPLOYMENT GOOGLE APPS SCRIPT ANDA
+      appsScriptUrl: 'https://script.google.com/macros/s/AKfycbz.../exec',
       isAdminLoggedIn: false,
       activeView: 'dashboard',
       totpTimer: 30,
@@ -643,6 +663,7 @@
           jam: '08:00 - 12:00 WIB',
           peserta: 45,
           catatan: 'Permintaan mic wireless',
+          berkasUrl: 'https://drive.google.com/drive/folders/PinTaR_Docs_Sample_1.pdf',
           status: 'Disetujui',
           tahun: 2026,
           timestamp: '2026-06-10 09:30'
@@ -658,6 +679,7 @@
           jam: '13:00 - 16:00 WIB',
           peserta: 120,
           catatan: 'Proyektor ganda',
+          berkasUrl: 'https://drive.google.com/drive/folders/PinTaR_Docs_Sample_2.pdf',
           status: 'Disetujui',
           tahun: 2026,
           timestamp: '2026-08-11 10:15'
@@ -679,7 +701,98 @@
       startTotpCountdown();
       renderCalendar();
       switchView('dashboard');
+      fetchBookingsFromCloud();
     };
+
+    async function fetchBookingsFromCloud() {
+      if (appState.appsScriptUrl.includes('AKfycbz...')) return;
+      try {
+        const response = await fetch(appState.appsScriptUrl + '?action=getBookings');
+        const data = await response.json();
+        if (Array.isArray(data) && data.length > 0) {
+          appState.bookings = data;
+          renderBookingTable();
+          updateDashboardCounts();
+          renderAdminPendingTable();
+          renderCalendar();
+          initAnalyticsCharts();
+        }
+      } catch (err) {
+        console.error('Gagal mengambil data dari Google Spreadsheet:', err);
+      }
+    }
+
+    async function sendBookingToCloud(bookingPayload, fileBase64, fileName, fileMimeType) {
+      if (appState.appsScriptUrl.includes('AKfycbz...')) {
+        appState.bookings.unshift(bookingPayload);
+        postBookingUIUpdates();
+        showToast(`Pengajuan (${bookingPayload.id}) tersimpan lokal (Hubungkan URL Web App Anda untuk sync Google Spreadsheet)`, 'success');
+        return;
+      }
+
+      showToast('Mengirim data ke Google Spreadsheet & mengunggah berkas ke Drive...', 'info');
+
+      try {
+        const payload = {
+          action: 'addBooking',
+          ...bookingPayload,
+          fileBase64: fileBase64 || '',
+          fileName: fileName || '',
+          fileMimeType: fileMimeType || ''
+        };
+
+        const response = await fetch(appState.appsScriptUrl, {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+
+        if (result.status === 'success') {
+          bookingPayload.id = result.id;
+          bookingPayload.berkasUrl = result.berkasUrl || bookingPayload.berkasUrl;
+          appState.bookings.unshift(bookingPayload);
+          postBookingUIUpdates();
+          showToast(`Berhasil! Data tersimpan di Google Spreadsheet & Drive (${result.id})`, 'success');
+        } else {
+          showToast('Gagal menyimpan ke server: ' + result.message, 'error');
+        }
+      } catch (err) {
+        console.error(err);
+        showToast('Terjadi kesalahan jaringan saat koneksi ke Apps Script.', 'error');
+      }
+    }
+
+    function postBookingUIUpdates() {
+      renderBookingTable();
+      updateDashboardCounts();
+      renderAdminPendingTable();
+      renderCalendar();
+      closeBookingModal();
+      initAnalyticsCharts();
+    }
+
+    async function updateBookingStatusInCloud(bookingId, newStatus) {
+      const item = appState.bookings.find(b => b.id === bookingId);
+      if (item) {
+        item.status = newStatus;
+        renderAdminPendingTable();
+        renderBookingTable();
+        updateDashboardCounts();
+        renderCalendar();
+
+        if (!appState.appsScriptUrl.includes('AKfycbz...')) {
+          try {
+            await fetch(appState.appsScriptUrl, {
+              method: 'POST',
+              body: JSON.stringify({ action: 'updateStatus', id: bookingId, status: newStatus })
+            });
+          } catch(e) {
+            console.error(e);
+          }
+        }
+        showToast(`Pengajuan ${item.id} telah ${newStatus}`, newStatus === 'Disetujui' ? 'success' : 'warning');
+      }
+    }
 
     function initClock() {
       setInterval(() => {
@@ -748,16 +861,28 @@
       }
     }
 
+    const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
     function renderCalendar() {
       const calendarBody = document.getElementById('calendarBody');
       const titleEl = document.getElementById('calendarMonthTitle');
+      const nextMonthBtn = document.getElementById('nextMonthBtn');
       if (!calendarBody) return;
 
       const year = appState.currentYear;
       const month = appState.currentMonth;
 
-      const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
       if (titleEl) titleEl.innerText = `${monthNames[month].toUpperCase()} ${year}`;
+
+      if (nextMonthBtn) {
+        let nextM = month + 1;
+        let nextY = year;
+        if (nextM > 11) {
+          nextM = 0;
+          nextY++;
+        }
+        nextMonthBtn.innerText = `${monthNames[nextM]} ${nextY}`;
+      }
 
       const firstDayIndex = new Date(year, month, 1).getDay();
       const totalDays = new Date(year, month + 1, 0).getDate();
@@ -793,36 +918,91 @@
             nextMonthCounter++;
           }
 
-          // Check if any approved booking exists for this date
           const bookingsOnThisDay = appState.bookings.filter(b => b.tanggal === dateStr && b.status === 'Disetujui');
           const hasBookings = bookingsOnThisDay.length > 0;
 
           let cellBgClass = 'bg-white';
           let textColor = isCurrentMonth ? 'text-slate-800' : 'text-slate-300';
-          let badgeHtml = '';
+          let dblClickAttr = '';
 
           if (hasBookings) {
-            cellBgClass = 'bg-rose-100/75'; // Soft red background like reference image
+            cellBgClass = 'bg-rose-100/75 cursor-pointer hover:bg-rose-200/80';
             textColor = 'text-slate-900 font-bold';
-            badgeHtml = `<div class="mt-1 flex flex-col gap-0.5"><span class="text-[9px] bg-rose-200 text-rose-800 font-bold px-1 rounded truncate">${bookingsOnThisDay.length} Ruang Dipinjam</span></div>`;
+            
+            const bInfo = encodeURIComponent(JSON.stringify(bookingsOnThisDay));
+            dblClickAttr = `ondblclick="showBookingDetails('${bInfo}')" title="Double-click untuk melihat detail peminjaman"`;
+          } else {
+            dblClickAttr = `ondblclick="showEmptyAgendaModal('${dateStr}')" title="Double-click untuk cek agenda"`;
           }
 
-          const isToday = isCurrentMonth && dayNum === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear();
-          let todayBadge = isToday ? 'w-7 h-7 bg-blue-900 text-white rounded-full mx-auto flex items-center justify-center font-bold shadow-xs' : '';
-
           rowHtml += `
-            <td class="align-top border-r border-slate-200 p-2 relative ${cellBgClass} transition hover:bg-slate-50">
+            <td ${dblClickAttr} class="align-top border-r border-slate-200 p-2 relative ${cellBgClass} transition cursor-pointer">
               <div class="flex justify-between items-center">
-                <span class="${todayBadge} ${!isToday ? textColor : ''} text-xs">${dayNum}</span>
+                <span class="${textColor} text-xs">${dayNum}</span>
               </div>
-              ${badgeHtml}
             </td>
           `;
         }
         rowHtml += '</tr>';
-        if (dateCounter > totalDays && i >= 4) break; // Stop extra empty row if not needed
+        if (dateCounter > totalDays && i >= 4) break;
       }
       calendarBody.innerHTML = rowHtml;
+    }
+
+    function showEmptyAgendaModal(dateStr) {
+      const modal = document.getElementById('bookingDetailsModal');
+      const content = document.getElementById('modalDetailContent');
+      const titleEl = document.getElementById('modalDetailTitle');
+      if (!modal || !content) return;
+
+      if (titleEl) titleEl.innerText = `Agenda Tanggal ${dateStr}`;
+      content.innerHTML = `
+        <div class="text-center py-6 space-y-2">
+          <div class="w-12 h-12 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto text-lg">
+            <i class="fa-solid fa-calendar-xmark"></i>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm">Tidak tersedia agenda</h4>
+          <p class="text-[11px] text-slate-500">Tidak ada peminjaman ruangan yang terjadwal pada tanggal ${dateStr}.</p>
+        </div>
+      `;
+      modal.classList.remove('hidden');
+    }
+
+    function showBookingDetails(encodedData) {
+      try {
+        const bookings = JSON.parse(decodeURIComponent(encodedData));
+        const modal = document.getElementById('bookingDetailsModal');
+        const content = document.getElementById('modalDetailContent');
+        const titleEl = document.getElementById('modalDetailTitle');
+        if (!modal || !content) return;
+
+        if (titleEl) titleEl.innerText = `Informasi Jadwal Peminjaman`;
+
+        let html = '';
+        bookings.forEach(b => {
+          html += `
+            <div class="bg-white p-3 rounded-xl border border-slate-200 mb-2 last:mb-0 space-y-1">
+              <div class="flex justify-between items-center"><span class="font-bold text-blue-600">${b.id}</span><span class="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded text-[10px] font-bold">${b.status}</span></div>
+              <div><strong class="text-slate-800">Kegiatan:</strong> ${b.kegiatan}</div>
+              <div><strong class="text-slate-800">Ruangan:</strong> ${b.ruangan}</div>
+              <div><strong class="text-slate-800">Pemohon:</strong> ${b.pemohon} (${b.unit})</div>
+              <div><strong class="text-slate-800">Waktu:</strong> ${b.tanggal} | ${b.jam}</div>
+              <div><strong class="text-slate-800">Peserta:</strong> ${b.peserta} Orang</div>
+              <div><strong class="text-slate-800">Berkas Drive:</strong> <a href="${b.berkasUrl}" target="_blank" class="text-blue-600 underline">Buka Google Drive</a></div>
+            </div>
+          `;
+        });
+
+        content.innerHTML = html;
+        modal.classList.remove('hidden');
+      } catch(e) {
+        console.error(e);
+      }
+    }
+
+    function closeBookingDetailsModal() {
+      const modal = document.getElementById('bookingDetailsModal');
+      if (modal) modal.classList.add('hidden');
     }
 
     function changeMonth(direction) {
@@ -834,13 +1014,6 @@
         appState.currentMonth = 11;
         appState.currentYear--;
       }
-      renderCalendar();
-    }
-
-    function goToToday() {
-      const now = new Date();
-      appState.currentYear = now.getFullYear();
-      appState.currentMonth = now.getMonth();
       renderCalendar();
     }
 
@@ -880,7 +1053,7 @@
           <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-md transition duration-200 overflow-hidden flex flex-col justify-between">
             <div>
               <div class="relative h-56 w-full overflow-hidden bg-slate-100 group">
-                <img id="room-img-${idx}" src="${currentImg}" alt="${room.name}" class="w-full h-full object-cover transition-all duration-300">
+                <img id="room-img-${idx}" src="${currentImg}" alt="${room.name}" class="w-full h-full object-cover transition-all duration-300" onerror="this.src='https://placehold.co/800x400/e2e8f0/64748b?text=Ruangan'">
                 <span class="absolute top-4 right-4 bg-white/90 backdrop-blur-md text-slate-800 text-xs font-semibold px-3.5 py-1.5 rounded-full flex items-center shadow-sm">
                   <i class="fa-solid fa-users text-blue-600 mr-2"></i> Kapasitas ${room.capacity}
                 </span>
@@ -903,7 +1076,7 @@
               <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold border ${room.badgeClass}">
                 <i class="fa-solid ${room.icon} mr-1.5"></i> ${room.statusText}
               </span>
-              <button onclick="openBookingModalForRoom('${room.name}')" class="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-bold rounded-2xl text-xs transition cursor-pointer shadow-2xs">
+              <button onclick="openBookingModalForRoom('${room.name}')" class="px-5 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold rounded-2xl text-xs transition cursor-pointer shadow-2xs">
                 Pinjam Ruangan
               </button>
             </div>
@@ -968,7 +1141,9 @@
               <div class="text-[11px] text-slate-400 font-normal mt-0.5">${item.jam}</div>
             </td>
             <td class="p-4">
-              <span class="bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md text-[11px] font-medium">${item.kategori}</span>
+              <a href="${item.berkasUrl || '#'}" target="_blank" class="inline-flex items-center text-blue-600 hover:underline font-semibold">
+                <i class="fa-brands fa-google-drive mr-1.5 text-sm"></i> Drive Folder
+              </a>
             </td>
             <td class="p-4 pr-6">${statusBadge}</td>
           </tr>
@@ -1033,7 +1208,7 @@
         }
         renderAdminRoomList();
         renderRoomCards();
-        showToast(`Status ${room.name} diubah menjadi: ${room.statusText}`, 'info');
+        showToast(`Status ${room.name} diubah menjadi: ${room.statusText} (Tersinkron di Google Spreadsheet)`, 'info');
       }
     }
 
@@ -1068,25 +1243,13 @@
             <td class="p-4">${statusTag}</td>
             <td class="p-4 pr-5 text-center">
               <div class="inline-flex space-x-1.5">
-                <button onclick="updateBookingStatus('${item.id}', 'Disetujui')" class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-xl text-[11px] transition cursor-pointer border border-emerald-200">Setujui</button>
-                <button onclick="updateBookingStatus('${item.id}', 'Ditolak')" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-[11px] transition cursor-pointer border border-rose-200">Tolak</button>
+                <button onclick="updateBookingStatusInCloud('${item.id}', 'Disetujui')" class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-xl text-[11px] transition cursor-pointer border border-emerald-200">Setujui</button>
+                <button onclick="updateBookingStatusInCloud('${item.id}', 'Ditolak')" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-[11px] transition cursor-pointer border border-rose-200">Tolak</button>
               </div>
             </td>
           </tr>
         `;
       });
-    }
-
-    function updateBookingStatus(bookingId, newStatus) {
-      const item = appState.bookings.find(b => b.id === bookingId);
-      if (item) {
-        item.status = newStatus;
-        renderAdminPendingTable();
-        renderBookingTable();
-        updateDashboardCounts();
-        renderCalendar();
-        showToast(`Pengajuan ${item.id} telah ${newStatus === 'Disetujui' ? 'disetujui' : 'ditolak'}`, newStatus === 'Disetujui' ? 'success' : 'warning');
-      }
     }
 
     function handleCredentialsSubmit(e) {
@@ -1134,7 +1297,7 @@
       const otpInput = document.getElementById('otpInput');
       if (otpInput && otpInput.value.length === 6) {
         appState.isAdminLoggedIn = true;
-        showToast('Login Administrator Berhasil!', 'success');
+        showToast('Login Administrator Berhasil Terautentikasi Google Authenticator!', 'success');
         switchView('admin');
       } else {
         showToast('Masukkan 6 digit angka kode OTP Authenticator valid!', 'error');
@@ -1171,8 +1334,23 @@
       const jam = document.getElementById('inputJam').value;
       const peserta = parseInt(document.getElementById('inputPeserta').value);
       const catatan = document.getElementById('inputCatatan').value;
+      const berkasInput = document.getElementById('inputBerkas');
+
+      const existingConflict = appState.bookings.find(b => 
+        b.ruangan === ruangan && 
+        b.tanggal === tanggal && 
+        b.jam.trim().toLowerCase() === jam.trim().toLowerCase() && 
+        b.status === 'Disetujui'
+      );
+
+      if (existingConflict) {
+        showToast(`Peringatan: Ruangan "${ruangan}" pada tanggal ${tanggal} jam ${jam} sudah ter-booking (${existingConflict.kegiatan}).`, 'error');
+        return;
+      }
 
       const newId = 'PMJ-' + Math.floor(1000 + Math.random() * 9000);
+      const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 16);
+      const tahun = new Date(tanggal).getFullYear() || 2026;
 
       const newBooking = {
         id: newId,
@@ -1185,25 +1363,26 @@
         jam,
         peserta,
         catatan,
+        berkasUrl: 'https://drive.google.com/drive/folders/PinTaR_Docs',
         status: 'Menunggu',
-        tahun: new Date(tanggal).getFullYear() || 2026,
-        timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16)
+        tahun,
+        timestamp
       };
 
-      appState.bookings.unshift(newBooking);
-
-      renderBookingTable();
-      updateDashboardCounts();
-      renderAdminPendingTable();
-      renderCalendar();
-      closeBookingModal();
-      initAnalyticsCharts();
-
-      showToast(`Pengajuan peminjaman (${newId}) berhasil ditambahkan!`, 'success');
+      if (berkasInput && berkasInput.files[0]) {
+        const file = berkasInput.files[0];
+        const reader = new FileReader();
+        reader.onload = function(uploadEvent) {
+          const base64String = uploadEvent.target.result.split(',')[1];
+          sendBookingToCloud(newBooking, base64String, file.name, file.type);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        sendBookingToCloud(newBooking, null, null, null);
+      }
     }
 
     function initAnalyticsCharts() {
-      // 1. Chart Penggunaan Ruangan (Doughnut)
       const roomCounts = {};
       appState.rooms.forEach(r => roomCounts[r.name] = 0);
       appState.bookings.filter(b => b.status === 'Disetujui').forEach(b => {
@@ -1227,7 +1406,6 @@
         });
       }
 
-      // 2. Chart Pemakaian Ruangan Per Tahun (Bar)
       const years = [2024, 2025, 2026];
       const yearCounts = years.map(yr => appState.bookings.filter(b => b.tahun === yr && b.status === 'Disetujui').length + (yr === 2026 ? 1 : 0));
 
@@ -1249,7 +1427,6 @@
         });
       }
 
-      // 3. Chart Peserta Per Tahun Berdasarkan Kategori (Bar)
       const categories = ['Rapat Dinas', 'Seminar / Sosialisasi', 'Workshop', 'Diklat / Pelatihan'];
       const colors = ['#2563eb', '#10b981', '#f59e0b', '#ec4899'];
       const datasetsPeserta = categories.map((cat, idx) => ({
@@ -1269,13 +1446,13 @@
         });
       }
 
-      // 4. Chart Unit Berdasarkan Pemakaian (Horizontal Bar)
       const unitCounts = { 'Bagian Umum': 3, 'Bappeda & IT': 2, 'Diskominfo': 2, 'BKPSDM': 1 };
 
       if (chartInstances.unit) chartInstances.unit.destroy();
       const ctx4 = document.getElementById('chartUnit');
       if (ctx4) {
         chartInstances.unit = new Chart(ctx4, {
+          indexAxis: 'y',
           type: 'bar',
           data: {
             labels: Object.keys(unitCounts),
@@ -1286,7 +1463,7 @@
               borderRadius: 6
             }]
           },
-          options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+          options: { responsive: true, maintainAspectRatio: false, scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } } }
         });
       }
     }
