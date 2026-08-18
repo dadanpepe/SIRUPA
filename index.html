@@ -1314,6 +1314,49 @@
       }
     }
 
+    function openCancelModal() {
+      const modal = document.getElementById('cancelBookingModal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeCancelModal() {
+      const modal = document.getElementById('cancelBookingModal');
+      if (modal) modal.classList.add('hidden');
+      const formId = document.getElementById('cancelBookingId');
+      const formReason = document.getElementById('cancelReason');
+      if (formId) formId.value = '';
+      if (formReason) formReason.value = '';
+    }
+
+    function handleCancelBookingSubmit(e) {
+      e.preventDefault();
+      const bookingIdInput = document.getElementById('cancelBookingId').value.trim().toUpperCase();
+
+      const bookingItem = appState.bookings.find(b => b.id.toUpperCase() === bookingIdInput);
+
+      if (!bookingItem) {
+        showToast(`ID Peminjaman "${bookingIdInput}" tidak ditemukan dalam sistem.`, 'error');
+        return;
+      }
+
+      if (bookingItem.status === 'Dibatalkan') {
+        showToast(`Peminjaman dengan ID ${bookingItem.id} sudah pernah dibatalkan sebelumnya.`, 'warning');
+        return;
+      }
+
+      bookingItem.status = 'Dibatalkan';
+
+      renderBookingTable();
+      updateDashboardCounts();
+      renderAdminPendingTable();
+      renderRoomCards();
+      renderCalendar();
+      initAnalyticsCharts();
+
+      closeCancelModal();
+      showToast(`Peminjaman ${bookingItem.id} berhasil dibatalkan. Agenda otomatis diperbarui dari kalender.`, 'success');
+    }
+
     function checkBookingAvailability() {
       const ruangan = document.getElementById('inputRuangan')?.value;
       const tanggal = document.getElementById('inputTanggal')?.value;
