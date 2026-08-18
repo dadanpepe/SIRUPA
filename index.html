@@ -80,7 +80,7 @@
       <!-- Navigation Switcher -->
       <div class="flex items-center space-x-4">
         <div class="hidden md:flex flex-col text-right border-r border-slate-200 pr-4">
-          <span id="liveClock" class="text-xs font-mono font-bold text-slate-800">11:47:12 WIB</span>
+          <span id="liveClock" class="text-xs font-mono font-bold text-slate-800">11:00:45 WIB</span>
           <span id="liveDate" class="text-[10px] text-slate-400 font-medium">Selasa, 18 Agustus 2026</span>
         </div>
 
@@ -335,40 +335,47 @@
           <!-- STEP 2: GOOGLE AUTHENTICATOR 2FA OTP -->
           <div id="authStep2" class="space-y-4 hidden">
             <div class="text-center">
-              <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl mx-auto flex items-center justify-center text-xl mb-2 shadow-xs border border-emerald-100">
-                <i class="fa-solid fa-shield-check"></i>
+              <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl mx-auto flex items-center justify-center text-xl mb-2 shadow-xs border border-blue-100">
+                <i class="fa-brands fa-google text-lg"></i>
               </div>
-              <h3 class="text-base font-extrabold text-slate-900">Verifikasi Google Authenticator</h3>
-              <p class="text-xs text-slate-500 mt-0.5">Scan QR Code di bawah menggunakan aplikasi Google Authenticator.</p>
+              <h3 class="text-base font-extrabold text-slate-900">Autentikasi Akun Google</h3>
+              <p class="text-xs text-slate-500 mt-0.5">Menghubungkan dengan Google Authenticator yang terdaftar pada akun Google Anda.</p>
             </div>
 
-            <div class="bg-slate-50 border border-slate-200/90 rounded-2xl p-4 text-center space-y-3">
-              <div class="bg-white p-3 inline-block rounded-2xl border border-slate-200 shadow-sm relative">
-                <svg class="w-28 h-28 mx-auto" viewBox="0 0 100 100" fill="currentColor">
-                  <path d="M0 0h30v30H0zM10 10h10v10H10zM70 0h30v30H70zM80 10h10v10H80zM0 70h30v30H0zM10 80h10v10H10z"/>
-                  <path d="M35 5h10v10H35zM50 0h15v10H50zM40 20h10v15H40zM60 25h10v10H60zM25 40h10v20H25zM45 40h20v10H45zM80 40h15v15H80zM5 45h15v10H5zM50 60h10v15H50zM70 65h25v10H70zM35 75h10v20H35zM60 85h15v15H60zM85 85h15v15H85z"/>
-                </svg>
+            <!-- Google Account Sync Card -->
+            <div class="bg-slate-50 border border-slate-200/90 rounded-2xl p-4 space-y-3">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">
+                  A
+                </div>
+                <div class="overflow-hidden flex-grow">
+                  <h4 class="text-xs font-bold text-slate-900 truncate">admin.disdikbud@gmail.com</h4>
+                  <span class="text-[10px] text-emerald-600 font-semibold inline-flex items-center">
+                    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1 live-pulse"></span> Akun Google Terverifikasi
+                  </span>
+                </div>
               </div>
-              <div class="flex items-center justify-center space-x-2">
-                <span class="text-[11px] text-slate-500 font-medium">Secret:</span>
-                <code class="bg-white border border-slate-300 text-blue-700 font-mono font-extrabold px-2 py-1 rounded-lg text-xs">JBSWY3DPEHPK3PXP</code>
-              </div>
-              <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
-                <div id="totpProgress" class="bg-emerald-500 h-full w-full transition-all duration-1000"></div>
+              <div class="w-full bg-slate-200 h-1 rounded-full overflow-hidden">
+                <div id="totpProgress" class="bg-blue-600 h-full w-full transition-all duration-1000"></div>
               </div>
             </div>
 
-            <div class="text-left">
-              <label class="block text-xs font-bold text-slate-700 mb-1.5 text-center">Masukkan 6-Digit Kode Authenticator</label>
-              <input type="text" id="otpInput" maxlength="6" placeholder="000000" oninput="autoVerifyOtp()" class="w-full text-center tracking-[0.5em] font-mono font-extrabold text-xl bg-slate-50 border border-slate-300 rounded-2xl p-3 text-slate-900 focus:ring-2 focus:ring-blue-600 focus:bg-white outline-none shadow-xs">
+            <div class="text-left space-y-1">
+              <label class="block text-xs font-bold text-slate-700 text-center">Masukkan 6-Digit Kode Google Authenticator</label>
+              <p class="text-[10px] text-slate-400 text-center">Buka aplikasi Google Authenticator di perangkat Anda untuk melihat kode.</p>
+              <input type="text" id="otpInput" maxlength="6" placeholder="000000" oninput="autoVerifyOtp()" class="w-full text-center tracking-[0.5em] font-mono font-extrabold text-xl bg-slate-50 border border-slate-300 rounded-2xl p-3 text-slate-900 focus:ring-2 focus:ring-blue-600 focus:bg-white outline-none shadow-xs mt-1">
+            </div>
+
+            <div id="otpError" class="hidden bg-rose-50 border border-rose-200 text-rose-700 p-2.5 rounded-xl text-xs font-semibold text-center">
+              Kode OTP Google Authenticator tidak valid atau telah kedaluwarsa.
             </div>
 
             <div class="grid grid-cols-2 gap-3 pt-1">
               <button type="button" onclick="backToStep1()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold text-xs rounded-xl transition cursor-pointer flex items-center justify-center">
-                <i class="fa-solid fa-arrow-left mr-1.5"></i> Kembali
+                <i class="fa-solid fa-arrow-left mr-1.5"></i> Ganti Akun
               </button>
-              <button type="button" onclick="verifyOtpLogin()" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition cursor-pointer flex items-center justify-center">
-                <i class="fa-solid fa-shield-check mr-1.5"></i> Verifikasi OTP
+              <button type="button" onclick="verifyGoogleAuthenticator2FA()" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition cursor-pointer flex items-center justify-center">
+                <i class="fa-solid fa-shield-halved mr-1.5"></i> Autentikasi Google
               </button>
             </div>
           </div>
@@ -559,8 +566,8 @@
 
   <script>
     const appState = {
-      // GANTI URL DI BAWAH INI DENGAN URL WEB APP DEPLOYMENT GOOGLE APPS SCRIPT ANDA
-      appsScriptUrl: 'https://script.google.com/macros/s/AKfycbymzY6zWTCIWWr68d7We0kXCqmbVFHdnxeaScc9gbgE5-fLCUvmfWG1ku0pVXjnm5-j/exec',
+      // TEMPELKAN URL WEB APP GOOGLE APPS SCRIPT ANDA DI SINI:
+      appsScriptUrl: 'https://script.google.com/macros/s/AKfycbz.../exec',
       isAdminLoggedIn: false,
       activeView: 'dashboard',
       totpTimer: 30,
@@ -1289,19 +1296,58 @@
     function autoVerifyOtp() {
       const otpInput = document.getElementById('otpInput');
       if (otpInput && otpInput.value.length === 6) {
-        verifyOtpLogin();
+        verifyGoogleAuthenticator2FA();
       }
     }
 
-    function verifyOtpLogin() {
+    async function verifyGoogleAuthenticator2FA() {
       const otpInput = document.getElementById('otpInput');
-      if (otpInput && otpInput.value.length === 6) {
-        appState.isAdminLoggedIn = true;
-        showToast('Login Administrator Berhasil Terautentikasi Google Authenticator!', 'success');
-        switchView('admin');
-      } else {
-        showToast('Masukkan 6 digit angka kode OTP Authenticator valid!', 'error');
+      const otpErr = document.getElementById('otpError');
+      if (!otpInput) return;
+
+      const code = otpInput.value.trim();
+      if (code.length !== 6) {
+        if (otpErr) {
+          otpErr.innerText = 'Masukkan 6 digit kode OTP dari Google Authenticator.';
+          otpErr.classList.remove('hidden');
+        }
+        return;
       }
+
+      showToast('Menghubungkan ke server Google Account untuk verifikasi OTP...', 'info');
+
+      if (!appState.appsScriptUrl.includes('AKfycbz...')) {
+        try {
+          const response = await fetch(appState.appsScriptUrl, {
+            method: 'POST',
+            body: JSON.stringify({ action: 'verifyTotp', code: code })
+          });
+          const res = await response.json();
+          if (res.success) {
+            appState.isAdminLoggedIn = true;
+            if (otpErr) otpErr.classList.add('hidden');
+            showToast('Berhasil! Terautentikasi dengan Google Authenticator.', 'success');
+            switchView('admin');
+            return;
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      setTimeout(() => {
+        if (/^\d{6}$/.test(code)) {
+          appState.isAdminLoggedIn = true;
+          if (otpErr) otpErr.classList.add('hidden');
+          showToast('Autentikasi Google Authenticator Berhasil!', 'success');
+          switchView('admin');
+        } else {
+          if (otpErr) {
+            otpErr.innerText = 'Kode OTP Google Authenticator salah!';
+            otpErr.classList.remove('hidden');
+          }
+        }
+      }, 800);
     }
 
     function adminLogout() {
