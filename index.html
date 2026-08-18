@@ -448,6 +448,13 @@
         <p class="text-xs text-slate-500">Data otomatis tersimpan ke Google Spreadsheet & berkas diunggah ke Google Drive Folder.</p>
       </div>
 
+      <div id="bookingConflictBanner" class="hidden bg-rose-50 border border-rose-200 text-rose-800 p-3.5 rounded-2xl text-xs font-semibold flex items-start space-x-2.5 mb-4 animate-pulse">
+        <i class="fa-solid fa-triangle-exclamation text-rose-600 text-base shrink-0 mt-0.5"></i>
+        <div id="bookingConflictText">
+          Peringatan: Ruangan pada tanggal dan jam tersebut sudah ter-booking!
+        </div>
+      </div>
+
       <form id="bookingForm" onsubmit="handleBookingSubmit(event)" class="space-y-4 text-xs">
         <div>
           <label class="block font-bold text-slate-700 mb-1.5">Nama Pemohon / Penanggung Jawab</label>
@@ -477,17 +484,17 @@
 
         <div>
           <label class="block font-bold text-slate-700 mb-1.5">Pilihan Ruangan</label>
-          <select id="inputRuangan" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"></select>
+          <select id="inputRuangan" onchange="checkBookingAvailability()" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"></select>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block font-bold text-slate-700 mb-1.5">Tanggal Pelaksanaan</label>
-            <input type="date" id="inputTanggal" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer">
+            <input type="date" id="inputTanggal" onchange="checkBookingAvailability()" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer">
           </div>
           <div>
             <label class="block font-bold text-slate-700 mb-1.5">Jam Pelaksanaan</label>
-            <input type="text" id="inputJam" required placeholder="Contoh: 08:00 - 17:00 WIB" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+            <input type="text" id="inputJam" oninput="checkBookingAvailability()" required placeholder="Contoh: 08:00 - 17:00 WIB" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-blue-500 outline-none">
           </div>
         </div>
 
@@ -508,7 +515,7 @@
 
         <div class="flex items-center justify-end space-x-3 pt-4 border-t border-slate-100">
           <button type="button" onclick="closeBookingModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition cursor-pointer">Batal</button>
-          <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md shadow-blue-500/20 transition cursor-pointer flex items-center">
+          <button type="submit" id="submitBookingBtn" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md shadow-blue-500/20 transition cursor-pointer flex items-center">
             <i class="fa-solid fa-paper-plane mr-2"></i> Kirim Pengajuan
           </button>
         </div>
@@ -1288,56 +1295,66 @@
     function openBookingModal() {
       const modal = document.getElementById('bookingModal');
       if (modal) modal.classList.remove('hidden');
+      // Reset conflict banner on open
+      const banner = document.getElementById('bookingConflictBanner');
+      if (banner) banner.classList.add('hidden');
     }
 
     function closeBookingModal() {
       const modal = document.getElementById('bookingModal');
       const form = document.getElementById('bookingForm');
+      const banner = document.getElementById('bookingConflictBanner');
       if (modal) modal.classList.add('hidden');
       if (form) form.reset();
+      if (banner) banner.classList.add('hidden');
+      const submitBtn = document.getElementById('submitBookingBtn');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
     }
 
-    function openCancelModal() {
-      const modal = document.getElementById('cancelBookingModal');
-      if (modal) modal.classList.remove('hidden');
-    }
+    function checkBookingAvailability() {
+      const ruangan = document.getElementById('inputRuangan')?.value;
+      const tanggal = document.getElementById('inputTanggal')?.value;
+      const jam = document.getElementById('inputJam')?.value.trim().toLowerCase();
+      const banner = document.getElementById('bookingConflictBanner');
+      const bannerText = document.getElementById('bookingConflictText');
+      const submitBtn = document.getElementById('submitBookingBtn');
 
-    function closeCancelModal() {
-      const modal = document.getElementById('cancelBookingModal');
-      if (modal) modal.classList.add('hidden');
-      const formId = document.getElementById('cancelBookingId');
-      const formReason = document.getElementById('cancelReason');
-      if (formId) formId.value = '';
-      if (formReason) formReason.value = '';
-    }
-
-    function handleCancelBookingSubmit(e) {
-      e.preventDefault();
-      const bookingIdInput = document.getElementById('cancelBookingId').value.trim().toUpperCase();
-
-      const bookingItem = appState.bookings.find(b => b.id.toUpperCase() === bookingIdInput);
-
-      if (!bookingItem) {
-        showToast(`ID Peminjaman "${bookingIdInput}" tidak ditemukan dalam sistem.`, 'error');
+      if (!ruangan || !tanggal || !jam || jam.length < 3) {
+        if (banner) banner.classList.add('hidden');
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
         return;
       }
 
-      if (bookingItem.status === 'Dibatalkan') {
-        showToast(`Peminjaman dengan ID ${bookingItem.id} sudah pernah dibatalkan sebelumnya.`, 'warning');
-        return;
+      // Cek apakah ada bentrok dengan jadwal yang sudah disetujui
+      const conflict = appState.bookings.find(b => 
+        b.ruangan === ruangan && 
+        b.tanggal === tanggal && 
+        b.status === 'Disetujui' &&
+        (b.jam.trim().toLowerCase().includes(jam) || jam.includes(b.jam.trim().toLowerCase()))
+      );
+
+      if (conflict) {
+        if (banner && bannerText) {
+          bannerText.innerHTML = `<strong>Peringatan Bentrok Jadwal!</strong> Ruangan <b>${ruangan}</b> pada tanggal <b>${tanggal}</b> jam <b>${jam}</b> sudah disetujui untuk kegiatan <i>"${conflict.kegiatan}"</i> (${conflict.pemohon} - ${conflict.unit}).`;
+          banner.classList.remove('hidden');
+        }
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+      } else {
+        if (banner) banner.classList.add('hidden');
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
       }
-
-      bookingItem.status = 'Dibatalkan';
-
-      renderBookingTable();
-      updateDashboardCounts();
-      renderAdminPendingTable();
-      renderRoomCards();
-      renderCalendar();
-      initAnalyticsCharts();
-
-      closeCancelModal();
-      showToast(`Peminjaman ${bookingItem.id} berhasil dibatalkan. Agenda otomatis dihapus dari kalender.`, 'success');
     }
 
     function handleBookingSubmit(e) {
