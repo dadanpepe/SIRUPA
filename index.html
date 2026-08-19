@@ -85,10 +85,6 @@
         <div class="absolute -right-10 -bottom-10 opacity-10 text-white text-9xl font-black pointer-events-none"><i class="fa-solid fa-building"></i></div>
         <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div class="max-w-3xl space-y-3">
-            <div class="inline-flex items-center space-x-2 px-3.5 py-1 bg-white/15 backdrop-blur-md rounded-full text-xs font-semibold tracking-wide text-white border border-white/20">
-              <span class="w-2 h-2 bg-emerald-400 rounded-full live-pulse"></span>
-              <span>Sinkronisasi Real-Time dengan Google Spreadsheet & Drive</span>
-            </div>
             <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight leading-tight">Dashboard & Statistik Ruangan</h2>
             <p class="text-blue-100 text-xs sm:text-sm leading-relaxed opacity-90">Pantau ketersediaan jadwal ruangan, analisis penggunaan fasilitas, dan status operasional secara real-time.</p>
           </div>
@@ -335,7 +331,7 @@
     © 2026 PinTaR - Sistem Informasi Peminjaman Ruangan Terpadu. Terhubung dengan Google Spreadsheet & Google Drive API.
   </footer>
 
-  <!-- MODAL: SUPER ADMIN & EDIT ADMIN -->
+  <!-- MODAL: SUPER ADMIN & EDIT ADMIN WITH DELETE BUTTON -->
   <div id="superAdminModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto space-y-6">
       <button onclick="closeSuperAdminModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
@@ -491,7 +487,6 @@
     </div>
   </div>
 
-  <!-- API Service & Main Application Logic -->
   <script>
     const ApiService = {
       appsScriptUrl: 'https://script.google.com/macros/s/AKfycbz.../exec',
@@ -620,6 +615,7 @@
       startTotpCountdown();
       renderCalendar();
       switchView('dashboard');
+      showToast('Pratinjau PinTaR berhasil dimuat ulang!', 'success');
     };
 
     async function loadCloudDataFromSpreadsheet() {
@@ -958,9 +954,9 @@
               <span class="inline-flex items-center text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${room.badgeClass}"><i class="fa-solid ${room.icon} mr-1"></i> ${room.statusText}</span>
             </div>
             <div class="flex items-center justify-end space-x-2 pt-1">
-              <button onclick="cycleRoomStatus('${room.id}')" class="px-3 py-1.5 bg-white border hover:bg-slate-100 rounded-xl text-[11px] font-bold text-slate-700 cursor-pointer shadow-2xs">Status</button>
-              <button onclick="openEditRoomModal('${room.id}')" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl text-[11px] font-bold cursor-pointer">Edit</button>
-              <button onclick="deleteRoom('${room.id}')" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-xl text-[11px] cursor-pointer">Hapus</button>
+              <button onclick="cycleRoomStatus('${room.id}')" title="Ubah Status" class="w-9 h-9 bg-white hover:bg-slate-100 text-slate-700 rounded-xl border border-slate-200 flex items-center justify-center cursor-pointer transition shadow-2xs"><i class="fa-solid fa-arrows-rotate text-xs text-blue-600"></i></button>
+              <button onclick="openEditRoomModal('${room.id}')" title="Edit Ruangan" class="w-9 h-9 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-pen-to-square text-xs"></i></button>
+              <button onclick="deleteRoom('${room.id}')" title="Hapus Ruangan" class="w-9 h-9 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-xl flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-trash-can text-xs"></i></button>
             </div>
           </div>`;
       });
@@ -1007,7 +1003,8 @@
       if (!container) return;
       container.innerHTML = '';
       appState.adminAccounts.forEach(acc => {
-        container.innerHTML += `<div class="bg-white p-3 rounded-xl border flex items-center justify-between text-xs"><div><div class="font-bold text-slate-900">${acc.name} (${acc.username})</div><div class="text-[10px] text-slate-500">Dinas: ${acc.unit}</div></div><button onclick="editAdminAccount('${acc.username}')" class="text-blue-600 font-bold cursor-pointer">Edit</button></div>`;
+        const deleteBtn = acc.isSuper ? '' : `<button onclick="deleteAdminAccount('${acc.username}')" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-lg text-[10px] cursor-pointer transition">Hapus</button>`;
+        container.innerHTML += `<div class="bg-white p-3 rounded-xl border flex items-center justify-between text-xs"><div><div class="font-bold text-slate-900">${acc.name} (${acc.username})</div><div class="text-[10px] text-slate-500">Dinas: ${acc.unit}</div></div><div class="flex items-center space-x-2"><button onclick="editAdminAccount('${acc.username}')" class="text-blue-600 font-bold cursor-pointer">Edit</button>${deleteBtn}</div></div>`;
       });
     }
 
@@ -1022,6 +1019,15 @@
       document.getElementById('adminFormTitle').innerHTML = '<i class="fa-solid fa-user-pen mr-2 text-purple-600"></i> Edit Admin';
       document.getElementById('submitAdminBtn').innerHTML = 'Perbarui';
       document.getElementById('cancelEditAdminBtn').classList.remove('hidden');
+    }
+
+    async function deleteAdminAccount(username) {
+      if (confirm(`Apakah Anda yakin ingin menghapus admin ${username}?`)) {
+        await ApiService.deleteAdmin(username);
+        appState.adminAccounts = appState.adminAccounts.filter(a => a.username !== username);
+        renderAdminAccountsList();
+        showToast('Akun admin berhasil dihapus.', 'info');
+      }
     }
 
     function resetAdminForm() {
@@ -1047,16 +1053,20 @@
       if (editKey) {
         const acc = appState.adminAccounts.find(a => a.username === editKey);
         if (acc) {
-          acc.name = name; acc.username = username; acc.pass = pass; acc.unit = unit; acc.isSuper = isSuper;
-          await ApiService.updateAdmin(acc);
-          showToast('Akun admin diperbarui!', 'success');
+          acc.name = name; 
+          acc.username = username; 
+          acc.pass = pass; 
+          acc.unit = unit; 
+          acc.isSuper = isSuper;
+          await ApiService.updateAdmin({ username, name, password: pass, unit, isSuper });
+          showToast('Akun admin diperbarui dan disinkronkan!', 'success');
         }
         resetAdminForm();
       } else {
         const newAdmin = { username, name, password: pass, unit, isSuper };
         await ApiService.addAdmin(newAdmin);
         appState.adminAccounts.push({ username, name, pass, unit, isSuper });
-        showToast('Admin berhasil dibuat!', 'success');
+        showToast('Admin berhasil dibuat dan disinkronkan!', 'success');
         e.target.reset();
       }
       renderAdminAccountsList();
@@ -1079,16 +1089,40 @@
       }
 
       const targetUnit = (appState.currentAdmin && !appState.currentAdmin.isSuper) ? appState.currentAdmin.unit : unit;
-      const roomData = { id: editId || ('room-' + (appState.rooms.length + 1)), name, category, capacity, unit: targetUnit, statusText: 'Tersedia', description, features, images: [photoUrl] };
+      const roomData = { 
+        id: editId || ('room-' + (appState.rooms.length + 1)), 
+        name, 
+        category, 
+        capacity, 
+        unit: targetUnit, 
+        statusText: 'Tersedia', 
+        badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+        icon: 'fa-circle-check',
+        description, 
+        features: typeof features === 'string' ? features.split(',').map(f => f.trim()) : features, 
+        images: [photoUrl],
+        currentImageIdx: 0
+      };
+
+      showToast('Menyimpan ruangan baru...', 'info');
+      
+      if (editId) {
+        const idx = appState.rooms.findIndex(r => r.id === editId);
+        if (idx !== -1) {
+          appState.rooms[idx] = { ...appState.rooms[idx], ...roomData };
+        }
+      } else {
+        appState.rooms.push(roomData);
+      }
 
       await ApiService.saveRoom(roomData);
-      await loadCloudDataFromSpreadsheet();
 
       closeRoomModal();
       renderAdminRoomList();
       renderRoomCards();
       populateRoomOptions();
-      showToast('Ruangan berhasil disimpan!', 'success');
+      initAnalyticsCharts();
+      showToast('Ruangan berhasil disimpan dan ditampilkan!', 'success');
     }
 
     async function deleteRoom(roomId) {
@@ -1097,7 +1131,7 @@
       renderAdminRoomList();
       renderRoomCards();
       populateRoomOptions();
-      showToast('Ruangan dihapus.', 'info');
+      showToast('Ruangan dihapus dari database.', 'info');
     }
 
     function cycleRoomStatus(roomId) {
@@ -1158,7 +1192,7 @@
 
       const newBooking = { pemohon, unit, kategori, kegiatan, ruangan, tanggal, jam, peserta, catatan };
 
-      showToast('Mengirim pengajuan ke server...', 'info');
+      showToast('Mengirim pengajuan dan sinkronisasi ke Drive...', 'info');
       let base64 = '', fileName = '', mime = '';
 
       if (berkasInput && berkasInput.files[0]) {
@@ -1175,7 +1209,7 @@
       if (res.status === 'success') {
         await loadCloudDataFromSpreadsheet();
         postBookingUIUpdates();
-        showToast('Pengajuan berhasil dikirim!', 'success');
+        showToast('Pengajuan berhasil dikirim & disinkronkan!', 'success');
       } else {
         showToast('Gagal mengirim pengajuan.', 'error');
       }
@@ -1197,7 +1231,7 @@
       renderBookingTable();
       updateDashboardCounts();
       renderCalendar();
-      showToast(`Status diperbarui: ${newStatus}`, 'success');
+      showToast(`Status diperbarui & disinkronkan: ${newStatus}`, 'success');
     }
 
     function openCancelModal() { document.getElementById('cancelBookingModal').classList.remove('hidden'); }
