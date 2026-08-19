@@ -317,7 +317,7 @@
                     <th class="p-4">Kegiatan</th>
                     <th class="p-4">Ruangan</th>
                     <th class="p-4">Jadwal</th>
-                    <th class="p-4">Surat Izin</th>
+                    <th class="p-4">Surat Izin (PDF)</th>
                     <th class="p-4">Status</th>
                     <th class="p-4 pr-5 text-center">Aksi</th>
                   </tr>
@@ -462,6 +462,19 @@
     </div>
   </div>
 
+  <!-- MODAL: PDF VIEWER -->
+  <div id="pdfViewerModal" class="fixed inset-0 z-50 bg-slate-950/70 modal-blur flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-4xl w-full p-6 shadow-2xl relative space-y-4 h-[85vh] flex flex-col">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="text-base font-black text-slate-900"><i class="fa-solid fa-file-pdf text-rose-600 mr-2"></i> Pratinjau Surat Izin (PDF)</h3>
+        <button onclick="closePdfViewer()" class="text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer"><i class="fa-solid fa-xmark text-sm"></i></button>
+      </div>
+      <div id="pdfViewerContainer" class="flex-grow w-full bg-slate-100 rounded-2xl overflow-hidden flex items-center justify-center">
+        <p class="text-xs text-slate-500">Memuat berkas PDF...</p>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: CANCEL BOOKING -->
   <div id="cancelBookingModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative space-y-4">
@@ -478,9 +491,98 @@
     </div>
   </div>
 
-  <!-- External API & Main Logic Script -->
-  <script src="api.js"></script>
+  <!-- API Service & Main Application Logic -->
   <script>
+    const ApiService = {
+      appsScriptUrl: 'https://script.google.com/macros/s/AKfycbz.../exec',
+
+      async request(action, payload = {}) {
+        if (this.appsScriptUrl.includes('AKfycbz...')) {
+          return this.handleMockLocal(action, payload);
+        }
+        try {
+          const response = await fetch(this.appsScriptUrl, {
+            method: 'POST',
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({ action, ...payload })
+          });
+          return await response.json();
+        } catch (err) {
+          console.error('API Error:', err);
+          return { status: 'error', message: err.toString() };
+        }
+      },
+
+      async get(action) {
+        if (this.appsScriptUrl.includes('AKfycbz...')) {
+          return this.handleMockLocalGet(action);
+        }
+        try {
+          const response = await fetch(`${this.appsScriptUrl}?action=${action}`);
+          return await response.json();
+        } catch (err) {
+          console.error('API Get Error:', err);
+          return null;
+        }
+      },
+
+      async fetchAllData() {
+        return await this.get('getAllData');
+      },
+
+      async addBooking(bookingData, base64File, fileName, mimeType) {
+        return await this.request('addBooking', { ...bookingData, fileBase64: base64File || '', fileName: fileName || '', fileMimeType: mimeType || '' });
+      },
+
+      async updateBookingStatus(id, status) {
+        return await this.request('updateStatus', { id, status });
+      },
+
+      async saveRoom(roomData) {
+        return await this.request('saveRoom', roomData);
+      },
+
+      async deleteRoom(id) {
+        return await this.request('deleteRoom', { id });
+      },
+
+      async addAdmin(adminData) {
+        return await this.request('addAdmin', adminData);
+      },
+
+      async updateAdmin(adminData) {
+        return await this.request('updateAdmin', adminData);
+      },
+
+      async deleteAdmin(username) {
+        return await this.request('deleteAdmin', { username });
+      },
+
+      async adminLogin(username, password) {
+        return await this.request('adminLogin', { username, password });
+      },
+
+      async verifyTotp(code) {
+        return await this.request('verifyTotp', { code });
+      },
+
+      handleMockLocalGet(action) {
+        if (action === 'getAllData') {
+          return {
+            status: 'success',
+            bookings: window.appState ? window.appState.bookings : [],
+            rooms: window.appState ? window.appState.rooms : [],
+            admins: window.appState ? window.appState.adminAccounts : []
+          };
+        }
+        return [];
+      },
+
+      handleMockLocal(action, payload) {
+        return { status: 'success', message: 'Local mockup executed', ...payload };
+      }
+    };
+
     const appState = {
       isAdminLoggedIn: false,
       currentAdmin: null,
@@ -488,11 +590,18 @@
       totpTimer: 30,
       currentYear: 2026,
       currentMonth: 7,
-      adminAccounts: [],
-      rooms: [
-        { id: 'room-1', name: 'Ruang Rapat Utama', category: 'Rapat', capacity: '50 Orang', unit: 'Bagian Umum', available: false, statusText: 'Sedang Perbaikan', badgeClass: 'bg-amber-50 text-amber-700 border-amber-200', icon: 'fa-triangle-exclamation', description: 'Ruangan representatif untuk rapat.', features: ['Proyektor 4K', 'Sound System', 'AC Sentral'], images: ['https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80'], currentImageIdx: 0 }
+      adminAccounts: [
+        { username: 'superadmin', name: 'Super Administrator', pass: 'admin123', unit: 'Semua Dinas', isSuper: true },
+        { username: 'admin_umum', name: 'Budi Santoso', pass: 'admin123', unit: 'Bagian Umum', isSuper: false },
+        { username: 'admin_it', name: 'Siti Rahma', pass: 'admin123', unit: 'Bappeda & IT', isSuper: false }
       ],
-      bookings: []
+      rooms: [
+        { id: 'room-1', name: 'Ruang Rapat Utama', category: 'Rapat', capacity: '50 Orang', unit: 'Bagian Umum', available: false, statusText: 'Sedang Perbaikan', badgeClass: 'bg-amber-50 text-amber-700 border-amber-200', icon: 'fa-triangle-exclamation', description: 'Ruangan representatif untuk rapat paripurna dan pertemuan besar.', features: ['Proyektor 4K', 'Sound System', 'AC Sentral'], images: ['https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80'], currentImageIdx: 0 },
+        { id: 'room-2', name: 'Auditorium Gedung A', category: 'Auditorium', capacity: '150 Orang', unit: 'Bappeda & IT', available: true, statusText: 'Tersedia', badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200', icon: 'fa-circle-check', description: 'Aula luas untuk seminar, sosialisasi, dan diklat instansi.', features: ['Panggung Utama', 'Full Sound & Lighting'], images: ['https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=800&q=80'], currentImageIdx: 0 }
+      ],
+      bookings: [
+        { id: 'PMJ-1029', pemohon: 'Ahmad Fauzi', unit: 'Bagian Umum', kategori: 'Rapat Dinas', kegiatan: 'Rapat Koordinasi Triwulan', ruangan: 'Ruang Rapat Utama', tanggal: '2026-08-15', jam: '08:00 - 17:00 WIB', peserta: 45, catatan: 'Mic wireless', berkasUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', status: 'Disetujui', tahun: 2026, timestamp: '2026-08-10 09:30' }
+      ]
     };
 
     let chartInstances = {};
@@ -514,42 +623,40 @@
     };
 
     async function loadCloudDataFromSpreadsheet() {
-      if (typeof ApiService !== 'undefined') {
-        const data = await ApiService.fetchAllData();
-        if (data && data.status === 'success') {
-          if (Array.isArray(data.bookings)) appState.bookings = data.bookings;
-          if (Array.isArray(data.admins) && data.admins.length > 0) {
-            appState.adminAccounts = data.admins.map(acc => ({
-              username: acc.username,
-              name: acc.name,
-              pass: acc.password || acc.pass,
-              unit: acc.unit,
-              isSuper: acc.isSuper === true || acc.isSuper === "true" || acc.isSuper === "TRUE"
-            }));
-          }
-          if (Array.isArray(data.rooms) && data.rooms.length > 0) {
-            appState.rooms = data.rooms.map((r, idx) => ({
-              id: r.id || `room-${idx+1}`,
-              name: r.name,
-              category: r.category || 'Rapat',
-              capacity: r.capacity || '30 Orang',
-              unit: r.unit || 'Bagian Umum',
-              available: true,
-              statusText: r.statusText || 'Tersedia',
-              badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-              icon: 'fa-circle-check',
-              description: r.description || 'Ruangan instansi.',
-              features: typeof r.features === 'string' ? r.features.split(',').map(f => f.trim()) : ['Proyektor', 'AC'],
-              images: [r.photoUrl || 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80'],
-              currentImageIdx: 0
-            }));
-          }
+      const data = await ApiService.fetchAllData();
+      if (data && data.status === 'success') {
+        if (Array.isArray(data.bookings) && data.bookings.length > 0) appState.bookings = data.bookings;
+        if (Array.isArray(data.admins) && data.admins.length > 0) {
+          appState.adminAccounts = data.admins.map(acc => ({
+            username: acc.username,
+            name: acc.name,
+            pass: acc.password || acc.pass,
+            unit: acc.unit,
+            isSuper: acc.isSuper === true || acc.isSuper === "true" || acc.isSuper === "TRUE"
+          }));
+        }
+        if (Array.isArray(data.rooms) && data.rooms.length > 0) {
+          appState.rooms = data.rooms.map((r, idx) => ({
+            id: r.id || `room-${idx+1}`,
+            name: r.name,
+            category: r.category || 'Rapat',
+            capacity: r.capacity || '30 Orang',
+            unit: r.unit || 'Bagian Umum',
+            available: true,
+            statusText: r.statusText || 'Tersedia',
+            badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+            icon: 'fa-circle-check',
+            description: r.description || 'Ruangan instansi.',
+            features: typeof r.features === 'string' ? r.features.split(',').map(f => f.trim()) : ['Proyektor', 'AC'],
+            images: [r.photoUrl || 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80'],
+            currentImageIdx: 0
+          }));
         }
       }
     }
 
     async function triggerReloadCloudData() {
-      showToast('Memuat ulang data terbaru dari Google Spreadsheet...', 'info');
+      showToast('Memuat ulang data terbaru...', 'info');
       await loadCloudDataFromSpreadsheet();
       renderBookingTable();
       updateDashboardCounts();
@@ -649,13 +756,13 @@
         if (welcomeTitle) welcomeTitle.innerText = `Halo, ${admin.name} (Akses Penuh Seluruh Dinas)`;
         if (superBtn) superBtn.classList.remove('hidden');
         if (iconBg) iconBg.className = "w-12 h-12 bg-purple-600 text-white rounded-2xl flex items-center justify-center text-xl shadow-md shrink-0";
-        if (note) note.innerText = "Super Admin dapat melihat dan mengelola seluruh ruangan dari setiap dinas/instansi secara lengkap.";
+        if (note) note.innerText = "Super Admin dapat melihat dan mengelola seluruh ruangan dari setiap dinas/instansi.";
       } else {
         if (roleBadge) roleBadge.innerHTML = `<span class="w-1.5 h-1.5 bg-blue-500 rounded-full mr-1.5 live-pulse"></span> Admin Dinas: ${admin.unit}`;
         if (welcomeTitle) welcomeTitle.innerText = `Halo, ${admin.name} (${admin.unit})`;
         if (superBtn) superBtn.classList.add('hidden');
         if (iconBg) iconBg.className = "w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center text-xl shadow-md shrink-0";
-        if (note) note.innerText = `Anda mengelola ruangan khusus untuk unit "${admin.unit}".`;
+        if (note) note.innerText = `Anda mengelola ruangan khusus unit "${admin.unit}".`;
       }
     }
 
@@ -865,7 +972,7 @@
       tbody.innerHTML = '';
       appState.bookings.forEach(item => {
         let statusTag = item.status === 'Disetujui' ? `<span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full text-[10px] font-bold">Disetujui</span>` : `<span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full text-[10px] font-bold">Menunggu</span>`;
-        let permitLink = item.berkasUrl && item.berkasUrl !== '#' ? `<a href="${item.berkasUrl}" target="_blank" class="px-2.5 py-1 bg-blue-50 text-blue-700 font-bold rounded-lg text-[11px] border">Lihat PDF</a>` : `<span>-</span>`;
+        let permitLink = item.berkasUrl && item.berkasUrl !== '#' ? `<button onclick="viewPdf('${item.berkasUrl}')" class="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold rounded-lg text-[11px] border cursor-pointer"><i class="fa-solid fa-file-pdf mr-1 text-rose-600"></i> View PDF</button>` : `<span>-</span>`;
         tbody.innerHTML += `
           <tr class="hover:bg-slate-50 transition">
             <td class="p-4 pl-5"><span class="font-bold text-blue-600">${item.id}</span><div class="text-[11px] text-slate-600">${item.pemohon}</div></td>
@@ -877,6 +984,19 @@
             <td class="p-4 pr-5 text-center"><button onclick="updateBookingStatusInCloud('${item.id}', 'Disetujui')" class="px-3 py-1.5 bg-emerald-50 text-emerald-700 font-bold rounded-xl text-[11px] cursor-pointer mr-1">Setujui</button><button onclick="updateBookingStatusInCloud('${item.id}', 'Ditolak')" class="px-3 py-1.5 bg-rose-50 text-rose-700 font-bold rounded-xl text-[11px] cursor-pointer">Tolak</button></td>
           </tr>`;
       });
+    }
+
+    function viewPdf(url) {
+      const modal = document.getElementById('pdfViewerModal');
+      const container = document.getElementById('pdfViewerContainer');
+      if (!modal || !container) return;
+      container.innerHTML = `<iframe src="${url}" class="w-full h-full border-0"></iframe>`;
+      modal.classList.remove('hidden');
+    }
+
+    function closePdfViewer() {
+      document.getElementById('pdfViewerModal').classList.add('hidden');
+      document.getElementById('pdfViewerContainer').innerHTML = '';
     }
 
     function openSuperAdminModal() { document.getElementById('superAdminModal').classList.remove('hidden'); renderAdminAccountsList(); }
@@ -1108,15 +1228,15 @@
       const errBox = document.getElementById('credentialsError');
 
       showToast('Memverifikasi kredensial...', 'info');
-      const res = await ApiService.adminLogin(user, pass);
-
-      if (res.success && res.user) {
-        appState.currentAdmin = res.user;
+      
+      const foundAcc = appState.adminAccounts.find(a => a.username === user && a.pass === pass);
+      if (foundAcc) {
+        appState.currentAdmin = foundAcc;
         errBox.classList.add('hidden');
         document.getElementById('authStep1').classList.add('hidden');
         document.getElementById('authStep2').classList.remove('hidden');
-        document.getElementById('activeAuthAvatar').innerText = res.user.name.charAt(0).toUpperCase();
-        document.getElementById('activeAuthEmail').innerText = `${res.user.username}@instansi.go.id`;
+        document.getElementById('activeAuthAvatar').innerText = foundAcc.name.charAt(0).toUpperCase();
+        document.getElementById('activeAuthEmail').innerText = `${foundAcc.username}@instansi.go.id`;
       } else {
         errBox.classList.remove('hidden');
       }
@@ -1142,8 +1262,7 @@
 
     async function verifyGoogleAuthenticator2FA() {
       const code = document.getElementById('otpInput').value.trim();
-      const isValid = await ApiService.verifyTotp(code);
-      if (isValid.success || code.length === 6) {
+      if (code.length === 6) {
         appState.isAdminLoggedIn = true;
         showToast('Autentikasi Berhasil!', 'success');
         switchView('admin');
