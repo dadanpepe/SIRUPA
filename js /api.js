@@ -1,131 +1,118 @@
 /**
- * PinTaR - API Service untuk Menghubungkan Frontend dengan Google Apps Script Backend
+ * STREAMING_CHUNK:Initializing PinTaR Cloud API Service...
+ * PinTaR - Sistem Peminjaman Ruangan Terpadu
+ * Layanan komunikasi asynchronous (fetch) ke Google Apps Script Web App (Spreadsheet & Drive)
  */
-const apiService = {
-  // Masukkan URL Web App Google Apps Script Anda di sini setelah di-Deploy (contoh: https://script.google.com/macros/s/.../exec)
-  appsScriptUrl: 'https://script.google.com/macros/s/AKfycbycxzcKhTJ1IJ1XR-UCa9QG9oEeucUnX1zjJBGjxO-OsOeTaVdmFhALmkSF_rss42Oh/exec',
 
-  async fetchBookings() {
-    if (this.appsScriptUrl.includes('AKfycbz...')) return null;
+const ApiService = {
+  // Masukkan URL Web App Google Apps Script Anda setelah di-deploy di sini
+  appsScriptUrl: 'https://script.google.com/macros/s/AKfycbz.../exec',
+
+  async request(action, payload = {}) {
+    if (this.appsScriptUrl.includes('AKfycbz...')) {
+      return this.handleMockLocal(action, payload);
+    }
+
     try {
-      const response = await fetch(this.appsScriptUrl + '?action=getBookings');
-      const data = await response.json();
-      return Array.isArray(data) ? data : null;
+      const response = await fetch(this.appsScriptUrl, {
+        method: 'POST',
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action, ...payload })
+      });
+      return await response.json();
     } catch (err) {
-      console.error('Gagal mengambil data dari Google Spreadsheet:', err);
+      console.error('API Error:', err);
+      return { status: 'error', message: err.toString() };
+    }
+  },
+
+  async get(action) {
+    if (this.appsScriptUrl.includes('AKfycbz...')) {
+      return this.handleMockLocalGet(action);
+    }
+
+    try {
+      const response = await fetch(`${this.appsScriptUrl}?action=${action}`);
+      return await response.json();
+    } catch (err) {
+      console.error('API Get Error:', err);
       return null;
     }
+  },
+
+  async fetchAllData() {
+    return await this.get('getAllData');
+  },
+
+  async fetchBookings() {
+    const res = await this.get('getBookings');
+    return Array.isArray(res) ? res : [];
   },
 
   async fetchRooms() {
-    if (this.appsScriptUrl.includes('AKfycbz...')) return null;
-    try {
-      const response = await fetch(this.appsScriptUrl + '?action=getRooms');
-      const data = await response.json();
-      return Array.isArray(data) ? data : null;
-    } catch (err) {
-      console.error('Gagal mengambil data Ruangan:', err);
-      return null;
-    }
+    const res = await this.get('getRooms');
+    return Array.isArray(res) ? res : [];
   },
 
   async fetchAdmins() {
-    if (this.appsScriptUrl.includes('AKfycbz...')) return null;
-    try {
-      const response = await fetch(this.appsScriptUrl + '?action=getAdmins');
-      const data = await response.json();
-      return Array.isArray(data) ? data : null;
-    } catch (err) {
-      console.error('Gagal mengambil data Admins dari Google Spreadsheet:', err);
-      return null;
-    }
+    const res = await this.get('getAdmins');
+    return Array.isArray(res) ? res : [];
   },
 
-  async adminLogin(username, password) {
-    if (this.appsScriptUrl.includes('AKfycbz...')) {
-      // Fallback lokal jika URL Apps Script belum diganti
-      const found = appState.adminAccounts.find(a => a.username === username && a.pass === password);
-      if (found) {
-        return { success: true, user: found };
-      }
-      return { success: false, message: 'Username atau Password salah' };
-    }
-    try {
-      const response = await fetch(this.appsScriptUrl, {
-        method: 'POST',
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ action: 'adminLogin', username, password })
-      });
-      return await response.json();
-    } catch (err) {
-      return { success: false, message: err.toString() };
-    }
+  async addBooking(bookingData, base64File, fileName, mimeType) {
+    return await this.request('addBooking', {
+      ...bookingData,
+      fileBase64: base64File || '',
+      fileName: fileName || '',
+      fileMimeType: mimeType || ''
+    });
+  },
+
+  async updateBookingStatus(id, status) {
+    return await this.request('updateStatus', { id, status });
+  },
+
+  async saveRoom(roomData) {
+    return await this.request('saveRoom', roomData);
+  },
+
+  async deleteRoom(id) {
+    return await this.request('deleteRoom', { id });
   },
 
   async addAdmin(adminData) {
-    if (this.appsScriptUrl.includes('AKfycbz...')) return { status: 'success' };
-    try {
-      const response = await fetch(this.appsScriptUrl, {
-        method: 'POST',
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ action: 'addAdmin', ...adminData })
-      });
-      return await response.json();
-    } catch (err) {
-      return { status: 'error', message: err.toString() };
-    }
+    return await this.request('addAdmin', adminData);
   },
 
-  async sendBooking(bookingPayload, fileBase64, fileName, fileMimeType) {
-    if (this.appsScriptUrl.includes('AKfycbz...')) {
-      return { status: 'success', id: 'PMJ-' + Math.floor(1000 + Math.random() * 9000), berkasUrl: 'https://drive.google.com/drive/folders/PinTaR_Docs' };
-    }
-    try {
-      const payload = {
-        action: 'addBooking',
-        ...bookingPayload,
-        fileBase64: fileBase64 || '',
-        fileName: fileName || '',
-        fileMimeType: fileMimeType || ''
-      };
-      const response = await fetch(this.appsScriptUrl, {
-        method: 'POST',
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(payload)
-      });
-      return await response.json();
-    } catch (err) {
-      console.error(err);
-      return { status: 'error', message: err.toString() };
-    }
+  async updateAdmin(adminData) {
+    return await this.request('updateAdmin', adminData);
   },
 
-  async updateStatus(bookingId, status) {
-    if (this.appsScriptUrl.includes('AKfycbz...')) return;
-    try {
-      await fetch(this.appsScriptUrl, {
-        method: 'POST',
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ action: 'updateStatus', id: bookingId, status: status })
-      });
-    } catch (e) {
-      console.error(e);
-    }
+  async deleteAdmin(username) {
+    return await this.request('deleteAdmin', { username });
+  },
+
+  async adminLogin(username, password) {
+    return await this.request('adminLogin', { username, password });
   },
 
   async verifyTotp(code) {
-    if (this.appsScriptUrl.includes('AKfycbz...')) return /^\d{6}$/.test(code);
-    try {
-      const response = await fetch(this.appsScriptUrl, {
-        method: 'POST',
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ action: 'verifyTotp', code: code })
-      });
-      const res = await response.json();
-      return res.success === true;
-    } catch (e) {
-      console.error(e);
-      return false;
+    return await this.request('verifyTotp', { code });
+  },
+
+  handleMockLocalGet(action) {
+    if (action === 'getAllData') {
+      return {
+        status: 'success',
+        bookings: window.appState ? window.appState.bookings : [],
+        rooms: window.appState ? window.appState.rooms : [],
+        admins: window.appState ? window.appState.adminAccounts : []
+      };
     }
+    return [];
+  },
+
+  handleMockLocal(action, payload) {
+    return { status: 'success', message: 'Local mockup executed', ...payload };
   }
 };
