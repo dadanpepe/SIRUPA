@@ -301,7 +301,7 @@
             <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h3 class="text-base font-bold text-slate-900">Daftar Masuk Permintaan Peminjaman</h3>
-                <p class="text-xs text-slate-400 mt-0.5">Setujui atau tolak pengajuan secara real-time.</p>
+                <p id="adminBookingFilterNote" class="text-xs text-slate-400 mt-0.5">Sesuai unit instansi Anda.</p>
               </div>
               <button onclick="triggerReloadCloudData()" class="inline-flex items-center px-3.5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition cursor-pointer"><i class="fa-solid fa-arrows-rotate mr-1.5 text-blue-600"></i> Muat Ulang</button>
             </div>
@@ -746,6 +746,7 @@
       const superBtn = document.getElementById('superAdminOnlyBtn');
       const iconBg = document.getElementById('adminPanelIconBg');
       const note = document.getElementById('adminRoomPermissionNote');
+      const bookingNote = document.getElementById('adminBookingFilterNote');
 
       if (admin.isSuper) {
         if (roleBadge) roleBadge.innerHTML = '<span class="w-1.5 h-1.5 bg-purple-500 rounded-full mr-1.5 live-pulse"></span> Super Administrator';
@@ -753,12 +754,14 @@
         if (superBtn) superBtn.classList.remove('hidden');
         if (iconBg) iconBg.className = "w-12 h-12 bg-purple-600 text-white rounded-2xl flex items-center justify-center text-xl shadow-md shrink-0";
         if (note) note.innerText = "Super Admin dapat melihat dan mengelola seluruh ruangan dari setiap dinas/instansi.";
+        if (bookingNote) bookingNote.innerText = "Menampilkan seluruh peminjaman dari semua unit instansi.";
       } else {
         if (roleBadge) roleBadge.innerHTML = `<span class="w-1.5 h-1.5 bg-blue-500 rounded-full mr-1.5 live-pulse"></span> Admin Dinas: ${admin.unit}`;
         if (welcomeTitle) welcomeTitle.innerText = `Halo, ${admin.name} (${admin.unit})`;
         if (superBtn) superBtn.classList.add('hidden');
         if (iconBg) iconBg.className = "w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center text-xl shadow-md shrink-0";
         if (note) note.innerText = `Anda mengelola ruangan khusus unit "${admin.unit}".`;
+        if (bookingNote) bookingNote.innerText = `Menampilkan peminjaman khusus untuk unit "${admin.unit}".`;
       }
     }
 
@@ -966,12 +969,28 @@
       const tbody = document.getElementById('adminPendingTableBody');
       if (!tbody) return;
       tbody.innerHTML = '';
-      appState.bookings.forEach(item => {
+
+      const admin = appState.currentAdmin;
+      // Filter peminjaman: Super admin melihat semua, Admin dinas hanya melihat peminjaman yang ruangannya dikelola oleh unit tersebut atau pemohon dari unit tersebut
+      const visibleBookings = (!admin || admin.isSuper) 
+        ? appState.bookings 
+        : appState.bookings.filter(item => {
+            const roomObj = appState.rooms.find(r => r.name === item.ruangan);
+            const roomUnit = roomObj ? roomObj.unit : '';
+            return item.unit === admin.unit || roomUnit === admin.unit;
+          });
+
+      if (visibleBookings.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400 font-medium">Tidak ada data peminjaman untuk unit ${admin ? admin.unit : ''}.</td></tr>`;
+        return;
+      }
+
+      visibleBookings.forEach(item => {
         let statusTag = item.status === 'Disetujui' ? `<span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full text-[10px] font-bold">Disetujui</span>` : `<span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full text-[10px] font-bold">Menunggu</span>`;
         let permitLink = item.berkasUrl && item.berkasUrl !== '#' ? `<button onclick="viewPdf('${item.berkasUrl}')" class="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold rounded-lg text-[11px] border cursor-pointer"><i class="fa-solid fa-file-pdf mr-1 text-rose-600"></i> View PDF</button>` : `<span>-</span>`;
         tbody.innerHTML += `
           <tr class="hover:bg-slate-50 transition">
-            <td class="p-4 pl-5"><span class="font-bold text-blue-600">${item.id}</span><div class="text-[11px] text-slate-600">${item.pemohon}</div></td>
+            <td class="p-4 pl-5"><span class="font-bold text-blue-600">${item.id}</span><div class="text-[11px] text-slate-600">${item.pemohon}</div><div class="text-[10px] text-slate-400">${item.unit}</div></td>
             <td class="p-4 font-bold text-slate-800">${item.kegiatan}</td>
             <td class="p-4 text-slate-700">${item.ruangan}</td>
             <td class="p-4"><div class="font-semibold text-slate-800">${item.tanggal}</div><div class="text-[10px] text-slate-400">${item.jam}</div></td>
