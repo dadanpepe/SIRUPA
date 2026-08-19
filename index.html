@@ -57,7 +57,7 @@
 
       <div class="flex items-center space-x-4">
         <div class="hidden md:flex flex-col text-right border-r border-slate-200 pr-4">
-          <span id="liveClock" class="text-xs font-mono font-bold text-slate-800">11:00:45 WIB</span>
+          <span id="liveClock" class="text-xs font-mono font-bold text-slate-800">11:20:17 WIB</span>
           <span id="liveDate" class="text-[10px] text-slate-400 font-medium">Rabu, 19 Agustus 2026</span>
         </div>
 
@@ -88,6 +88,9 @@
             <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight leading-tight">Dashboard & Statistik Ruangan</h2>
             <p class="text-blue-100 text-xs sm:text-sm leading-relaxed opacity-90">Pantau ketersediaan jadwal ruangan, analisis penggunaan fasilitas, dan status operasional secara real-time.</p>
           </div>
+          <button onclick="openBookingModal()" class="px-6 py-3.5 bg-white text-blue-700 hover:bg-blue-50 font-black rounded-2xl text-xs shadow-lg transition transform hover:-translate-y-0.5 cursor-pointer shrink-0 flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-plus-circle text-base"></i><span>Ajukan Peminjaman</span>
+          </button>
         </div>
       </div>
 
@@ -110,20 +113,20 @@
       <!-- Charts -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
-          <h4 class="text-sm font-bold text-slate-900">Grafik Penggunaan Ruangan</h4>
+          <div class="flex items-center justify-between"><h4 class="text-sm font-bold text-slate-900">Distribusi Penggunaan Ruangan</h4><span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">Doughnut Chart</span></div>
           <div class="h-64 relative flex items-center justify-center"><canvas id="chartPenggunaanRuangan"></canvas></div>
         </div>
         <div class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
-          <h4 class="text-sm font-bold text-slate-900">Pemakaian Ruangan Per Tahun</h4>
+          <div class="flex items-center justify-between"><h4 class="text-sm font-bold text-slate-900">Tren Pemakaian Per Tahun</h4><span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full">Line Chart</span></div>
           <div class="h-64 relative"><canvas id="chartPemakaianTahun"></canvas></div>
         </div>
         <div class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
-          <h4 class="text-sm font-bold text-slate-900">Jumlah Peserta Berdasarkan Kategori</h4>
+          <div class="flex items-center justify-between"><h4 class="text-sm font-bold text-slate-900">Kategori Kegiatan</h4><span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">Bar Chart</span></div>
           <div class="h-64 relative"><canvas id="chartPesertaKategori"></canvas></div>
         </div>
         <div class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
-          <h4 class="text-sm font-bold text-slate-900">Unit Berdasarkan Pemakaian</h4>
-          <div class="h-64 relative"><canvas id="chartUnit"></canvas></div>
+          <div class="flex items-center justify-between"><h4 class="text-sm font-bold text-slate-900">Proporsi Unit Dinas</h4><span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full">Polar Area Chart</span></div>
+          <div class="h-64 relative flex items-center justify-center"><canvas id="chartUnit"></canvas></div>
         </div>
       </div>
 
@@ -161,7 +164,7 @@
       <div class="bg-sky-50 border border-sky-200 text-sky-800 px-5 py-3.5 rounded-2xl text-xs font-medium flex items-center justify-between shadow-2xs">
         <div class="flex items-center">
           <i class="fa-solid fa-circle-info text-sky-600 mr-2.5 text-base"></i>
-          <span>Note : Masukkan Tanggal dan Jam untuk Pinjam Ruangan (Double-click tanggal dengan jadwal pinjam untuk melihat detail)</span>
+          <span>Note : Tanggal yang ditandai merah menandakan adanya agenda peminjaman ruangan yang disetujui (Double-click untuk melihat detail)</span>
         </div>
         <button onclick="openCancelModal()" class="px-3.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-xs transition border border-rose-200 cursor-pointer shrink-0 ml-4 flex items-center">
           <i class="fa-solid fa-ban mr-1.5"></i> Batal Pinjam
@@ -199,7 +202,7 @@
       <div class="space-y-4 pt-4">
         <div>
           <h3 class="text-base sm:text-lg font-bold text-slate-900">Daftar Ruangan & Fasilitas</h3>
-          <p class="text-xs text-slate-400 mt-0.5">Informasi fasilitas dan status operasional ruangan terkini.</p>
+          <p class="text-xs text-slate-400 mt-0.5">Informasi fasilitas dan status operasional ruangan terkini. Klik tombol "Pinjam Ruangan" langsung pada kartu ruangan di bawah ini untuk mengajukan peminjaman.</p>
         </div>
         <div id="roomCardsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
       </div>
@@ -301,7 +304,7 @@
             <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h3 class="text-base font-bold text-slate-900">Daftar Masuk Permintaan Peminjaman</h3>
-                <p id="adminBookingFilterNote" class="text-xs text-slate-400 mt-0.5">Sesuai unit instansi Anda.</p>
+                <p id="adminTableSubtext" class="text-xs text-slate-400 mt-0.5">Setujui atau tolak pengajuan secara real-time.</p>
               </div>
               <button onclick="triggerReloadCloudData()" class="inline-flex items-center px-3.5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition cursor-pointer"><i class="fa-solid fa-arrows-rotate mr-1.5 text-blue-600"></i> Muat Ulang</button>
             </div>
@@ -412,16 +415,20 @@
     </div>
   </div>
 
-  <!-- MODAL: BOOKING FORM -->
+  <!-- MODAL: BOOKING FORM (Tanpa Pilihan Ruangan) -->
   <div id="bookingModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
       <button onclick="closeBookingModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
-      <div class="mb-6 space-y-1"><h3 class="text-lg font-black text-slate-900 tracking-tight">Formulir Peminjaman Ruangan</h3></div>
+      <div class="mb-6 space-y-1">
+        <span id="bookingRoomContextBadge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 mb-1">Pengajuan Umum</span>
+        <h3 id="bookingModalMainTitle" class="text-lg font-black text-slate-900 tracking-tight">Formulir Peminjaman Ruangan</h3>
+      </div>
       <div id="bookingConflictBanner" class="hidden bg-rose-50 border border-rose-200 text-rose-800 p-3.5 rounded-2xl text-xs font-semibold flex items-start space-x-2.5 mb-4 animate-pulse">
         <i class="fa-solid fa-triangle-exclamation text-rose-600 text-base shrink-0 mt-0.5"></i>
         <div id="bookingConflictText">Peringatan: Ruangan sudah ter-booking!</div>
       </div>
       <form id="bookingForm" onsubmit="handleBookingSubmit(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="inputRuangan" value="Ruang Rapat Utama">
         <div><label class="block font-bold text-slate-700 mb-1.5">Nama Pemohon</label><input type="text" id="inputPemohon" required placeholder="Contoh: Ahmad Fauzi" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none"></div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div><label class="block font-bold text-slate-700 mb-1.5">Bidang / Unit Kerja</label><input type="text" id="inputUnit" required placeholder="Contoh: Bagian Umum" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none"></div>
@@ -432,12 +439,19 @@
           </div>
         </div>
         <div><label class="block font-bold text-slate-700 mb-1.5">Nama Kegiatan</label><input type="text" id="inputKegiatan" required placeholder="Contoh: Rapat Koordinasi" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none"></div>
-        <div><label class="block font-bold text-slate-700 mb-1.5">Pilihan Ruangan</label><select id="inputRuangan" onchange="checkBookingAvailability()" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none cursor-pointer"></select></div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div><label class="block font-bold text-slate-700 mb-1.5">Tanggal</label><input type="date" id="inputTanggal" onchange="checkBookingAvailability()" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none cursor-pointer"></div>
-          <div><label class="block font-bold text-slate-700 mb-1.5">Jam Pelaksanaan</label><input type="text" id="inputJam" oninput="checkBookingAvailability()" required placeholder="08:00 - 17:00 WIB" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none"></div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1.5">Waktu / Jam Pelaksanaan</label>
+            <select id="inputJam" onchange="checkBookingAvailability()" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none cursor-pointer font-medium">
+              <option value="08:00 - 12:00 WIB">Pagi (08:00 - 12:00 WIB)</option>
+              <option value="13:00 - 17:00 WIB">Siang (13:00 - 17:00 WIB)</option>
+              <option value="08:00 - 17:00 WIB">Sehari Penuh (08:00 - 17:00 WIB)</option>
+              <option value="18:30 - 21:30 WIB">Malam (18:30 - 21:30 WIB)</option>
+            </select>
+          </div>
         </div>
-        <div><label class="block font-bold text-slate-700 mb-1.5">Jumlah Peserta</label><input type="number" id="inputPeserta" min="1" required placeholder="25" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none"></div>
+        <div><label class="block font-bold text-slate-700 mb-1.5">Jumlah Peserta</label><input type="number" id="inputPeserta" min="1" oninput="checkCapacityLimit()" required placeholder="25" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none"></div>
         <div><label class="block font-bold text-slate-700 mb-1.5">Upload Berkas / Surat Izin <span class="text-rose-600 font-bold">(PDF)</span></label><input type="file" id="inputBerkas" accept=".pdf" class="block w-full text-xs text-slate-500 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer"></div>
         <div><label class="block font-bold text-slate-700 mb-1.5">Catatan (Opsional)</label><textarea id="inputCatatan" rows="2" placeholder="Catatan..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none resize-none"></textarea></div>
         <div class="flex items-center justify-end space-x-3 pt-4 border-t border-slate-100">
@@ -487,6 +501,7 @@
     </div>
   </div>
 
+  <!-- API Service & Main Application Logic -->
   <script>
     const ApiService = {
       appsScriptUrl: 'https://script.google.com/macros/s/AKfycbz.../exec',
@@ -553,14 +568,6 @@
         return await this.request('deleteAdmin', { username });
       },
 
-      async adminLogin(username, password) {
-        return await this.request('adminLogin', { username, password });
-      },
-
-      async verifyTotp(code) {
-        return await this.request('verifyTotp', { code });
-      },
-
       handleMockLocalGet(action) {
         if (action === 'getAllData') {
           return {
@@ -604,7 +611,6 @@
     window.onload = async function() {
       initClock();
       await loadCloudDataFromSpreadsheet();
-      populateRoomOptions();
       renderRoomCards();
       renderBookingTable();
       updateDashboardCounts();
@@ -615,7 +621,6 @@
       startTotpCountdown();
       renderCalendar();
       switchView('dashboard');
-      showToast('Pratinjau PinTaR berhasil dimuat ulang!', 'success');
     };
 
     async function loadCloudDataFromSpreadsheet() {
@@ -638,13 +643,13 @@
             category: r.category || 'Rapat',
             capacity: r.capacity || '30 Orang',
             unit: r.unit || 'Bagian Umum',
-            available: true,
+            available: (r.statusText || 'Tersedia') === 'Tersedia',
             statusText: r.statusText || 'Tersedia',
-            badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-            icon: 'fa-circle-check',
+            badgeClass: (r.statusText || 'Tersedia') === 'Tersedia' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200',
+            icon: (r.statusText || 'Tersedia') === 'Tersedia' ? 'fa-circle-check' : 'fa-triangle-exclamation',
             description: r.description || 'Ruangan instansi.',
             features: typeof r.features === 'string' ? r.features.split(',').map(f => f.trim()) : ['Proyektor', 'AC'],
-            images: [r.photoUrl || 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80'],
+            images: [r.photoUrl || r.images?.[0] || 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80'],
             currentImageIdx: 0
           }));
         }
@@ -660,6 +665,8 @@
       renderCalendar();
       renderRoomCards();
       initAnalyticsCharts();
+      renderAdminRoomList();
+      renderAdminAccountsList();
       showToast('Data berhasil diperbarui!', 'success');
     }
 
@@ -746,7 +753,7 @@
       const superBtn = document.getElementById('superAdminOnlyBtn');
       const iconBg = document.getElementById('adminPanelIconBg');
       const note = document.getElementById('adminRoomPermissionNote');
-      const bookingNote = document.getElementById('adminBookingFilterNote');
+      const subtext = document.getElementById('adminTableSubtext');
 
       if (admin.isSuper) {
         if (roleBadge) roleBadge.innerHTML = '<span class="w-1.5 h-1.5 bg-purple-500 rounded-full mr-1.5 live-pulse"></span> Super Administrator';
@@ -754,14 +761,14 @@
         if (superBtn) superBtn.classList.remove('hidden');
         if (iconBg) iconBg.className = "w-12 h-12 bg-purple-600 text-white rounded-2xl flex items-center justify-center text-xl shadow-md shrink-0";
         if (note) note.innerText = "Super Admin dapat melihat dan mengelola seluruh ruangan dari setiap dinas/instansi.";
-        if (bookingNote) bookingNote.innerText = "Menampilkan seluruh peminjaman dari semua unit instansi.";
+        if (subtext) subtext.innerText = "Menampilkan seluruh daftar masuk permintaan peminjaman lintas dinas.";
       } else {
         if (roleBadge) roleBadge.innerHTML = `<span class="w-1.5 h-1.5 bg-blue-500 rounded-full mr-1.5 live-pulse"></span> Admin Dinas: ${admin.unit}`;
         if (welcomeTitle) welcomeTitle.innerText = `Halo, ${admin.name} (${admin.unit})`;
         if (superBtn) superBtn.classList.add('hidden');
         if (iconBg) iconBg.className = "w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center text-xl shadow-md shrink-0";
         if (note) note.innerText = `Anda mengelola ruangan khusus unit "${admin.unit}".`;
-        if (bookingNote) bookingNote.innerText = `Menampilkan peminjaman khusus untuk unit "${admin.unit}".`;
+        if (subtext) subtext.innerText = `Menampilkan peminjaman khusus untuk unit instansi: ${admin.unit}.`;
       }
     }
 
@@ -865,15 +872,6 @@
       renderCalendar();
     }
 
-    function populateRoomOptions() {
-      const modalRoomSelect = document.getElementById('inputRuangan');
-      if (!modalRoomSelect) return;
-      modalRoomSelect.innerHTML = '';
-      appState.rooms.forEach(r => {
-        modalRoomSelect.innerHTML += `<option value="${r.name}">${r.name} (${r.unit} - Kapasitas: ${r.capacity})</option>`;
-      });
-    }
-
     function updateDashboardCounts() {
       const disetujuiCount = appState.bookings.filter(b => b.status === 'Disetujui').length;
       const menungguCount = appState.bookings.filter(b => b.status === 'Menunggu').length;
@@ -888,11 +886,18 @@
       container.innerHTML = '';
       appState.rooms.forEach((room) => {
         const featuresHtml = room.features.map(f => `<span class="inline-flex items-center text-[11px] text-slate-600 font-medium mr-2 mb-1.5 bg-slate-100 px-2.5 py-1 rounded-md"><i class="fa-solid fa-check text-emerald-600 mr-1.5 text-xs"></i> ${f}</span>`).join('');
+        
+        const isMaintenance = room.statusText === 'Sedang Perbaikan' || room.statusText === 'Tidak Tersedia';
+        const btnClass = isMaintenance 
+          ? 'bg-slate-100 text-slate-400 cursor-not-allowed opacity-60' 
+          : 'bg-blue-50 hover:bg-blue-100 text-blue-600 cursor-pointer shadow-2xs';
+        const btnAttr = isMaintenance ? 'disabled' : `onclick="openBookingModalForRoom('${room.name}')"`;
+
         container.innerHTML += `
           <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-md transition duration-200 overflow-hidden flex flex-col justify-between">
             <div>
               <div class="relative h-56 w-full overflow-hidden bg-slate-100">
-                <img src="${room.images[0]}" alt="${room.name}" class="w-full h-full object-cover">
+                <img src="${room.images[0]}" alt="${room.name}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/800x400/e2e8f0/64748b?text=Ruangan'">
                 <span class="absolute top-4 right-4 bg-white/90 backdrop-blur-md text-slate-800 text-xs font-semibold px-3.5 py-1.5 rounded-full shadow-sm"><i class="fa-solid fa-users text-blue-600 mr-2"></i> ${room.capacity}</span>
                 <span class="absolute top-4 left-4 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full">${room.unit || 'Umum'}</span>
               </div>
@@ -904,7 +909,7 @@
             </div>
             <div class="p-6 pt-0 flex items-center justify-between border-t border-slate-100 mt-3 pt-4">
               <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold border ${room.badgeClass}"><i class="fa-solid ${room.icon} mr-1.5"></i> ${room.statusText}</span>
-              <button onclick="openBookingModalForRoom('${room.name}')" class="px-5 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold rounded-2xl text-xs transition cursor-pointer shadow-2xs">Pinjam Ruangan</button>
+              <button ${btnAttr} class="px-5 py-2.5 rounded-2xl text-xs font-bold transition ${btnClass}">Pinjam Ruangan</button>
             </div>
           </div>`;
       });
@@ -913,6 +918,21 @@
     function openBookingModalForRoom(roomName) {
       openBookingModal();
       document.getElementById('inputRuangan').value = roomName;
+      document.getElementById('bookingRoomContextBadge').innerText = `Pilihan Ruangan: ${roomName}`;
+      document.getElementById('bookingModalMainTitle').innerText = `Peminjaman ${roomName}`;
+      checkBookingAvailability();
+    }
+
+    function openBookingModal() {
+      document.getElementById('bookingModal').classList.remove('hidden');
+      document.getElementById('inputRuangan').value = 'Ruang Rapat Utama';
+      document.getElementById('bookingRoomContextBadge').innerText = 'Pengajuan Umum / Ruang Rapat Utama';
+      document.getElementById('bookingModalMainTitle').innerText = 'Formulir Peminjaman Ruangan';
+    }
+
+    function closeBookingModal() {
+      document.getElementById('bookingModal').classList.add('hidden');
+      document.getElementById('bookingForm').reset();
     }
 
     function renderBookingTable(filteredList = null) {
@@ -949,17 +969,22 @@
       const admin = appState.currentAdmin;
       const visibleRooms = (!admin || admin.isSuper) ? appState.rooms : appState.rooms.filter(r => r.unit === admin.unit);
 
+      if (visibleRooms.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Belum ada ruangan terdaftar.</p>`;
+        return;
+      }
+
       visibleRooms.forEach(room => {
         container.innerHTML += `
           <div class="bg-slate-50 border border-slate-200/90 rounded-2xl p-4 space-y-3">
             <div class="flex items-center justify-between">
-              <div><h4 class="font-bold text-xs text-slate-900">${room.name}</h4><p class="text-[10px] text-slate-500">Kapasitas: ${room.capacity} | Pengelola: <b class="text-blue-600">${room.unit}</b></p></div>
+              <div><h4 class="font-bold text-xs text-slate-900">${room.name}</h4><p class="text-[10px] text-slate-500">Kapasitas: ${room.capacity} | Pengelola: <b class="text-blue-600">${room.unit || 'Umum'}</b></p></div>
               <span class="inline-flex items-center text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${room.badgeClass}"><i class="fa-solid ${room.icon} mr-1"></i> ${room.statusText}</span>
             </div>
-            <div class="flex items-center justify-end space-x-2 pt-1">
-              <button onclick="cycleRoomStatus('${room.id}')" title="Ubah Status" class="w-9 h-9 bg-white hover:bg-slate-100 text-slate-700 rounded-xl border border-slate-200 flex items-center justify-center cursor-pointer transition shadow-2xs"><i class="fa-solid fa-arrows-rotate text-xs text-blue-600"></i></button>
-              <button onclick="openEditRoomModal('${room.id}')" title="Edit Ruangan" class="w-9 h-9 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-pen-to-square text-xs"></i></button>
-              <button onclick="deleteRoom('${room.id}')" title="Hapus Ruangan" class="w-9 h-9 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-xl flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-trash-can text-xs"></i></button>
+            <div class="flex items-center justify-end space-x-1.5 pt-1">
+              <button onclick="cycleRoomStatus('${room.id}')" title="Ubah Status" class="w-8 h-8 bg-white hover:bg-slate-100 text-blue-600 rounded-xl border border-slate-200 flex items-center justify-center cursor-pointer transition shadow-2xs"><i class="fa-solid fa-arrows-rotate text-xs"></i></button>
+              <button onclick="openEditRoomModal('${room.id}')" title="Edit Ruangan" class="w-8 h-8 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-pen-to-square text-xs"></i></button>
+              <button onclick="deleteRoom('${room.id}')" title="Hapus Ruangan" class="w-8 h-8 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-xl flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-trash-can text-xs"></i></button>
             </div>
           </div>`;
       });
@@ -969,19 +994,17 @@
       const tbody = document.getElementById('adminPendingTableBody');
       if (!tbody) return;
       tbody.innerHTML = '';
-
+      
       const admin = appState.currentAdmin;
-      // Filter peminjaman: Super admin melihat semua, Admin dinas hanya melihat peminjaman yang ruangannya dikelola oleh unit tersebut atau pemohon dari unit tersebut
       const visibleBookings = (!admin || admin.isSuper) 
         ? appState.bookings 
-        : appState.bookings.filter(item => {
-            const roomObj = appState.rooms.find(r => r.name === item.ruangan);
-            const roomUnit = roomObj ? roomObj.unit : '';
-            return item.unit === admin.unit || roomUnit === admin.unit;
+        : appState.bookings.filter(b => {
+            const r = appState.rooms.find(rm => rm.name === b.ruangan);
+            return r && r.unit === admin.unit;
           });
 
       if (visibleBookings.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400 font-medium">Tidak ada data peminjaman untuk unit ${admin ? admin.unit : ''}.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400 font-medium">Tidak ada permintaan peminjaman untuk unit ${admin ? admin.unit : ''}.</td></tr>`;
         return;
       }
 
@@ -990,7 +1013,7 @@
         let permitLink = item.berkasUrl && item.berkasUrl !== '#' ? `<button onclick="viewPdf('${item.berkasUrl}')" class="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold rounded-lg text-[11px] border cursor-pointer"><i class="fa-solid fa-file-pdf mr-1 text-rose-600"></i> View PDF</button>` : `<span>-</span>`;
         tbody.innerHTML += `
           <tr class="hover:bg-slate-50 transition">
-            <td class="p-4 pl-5"><span class="font-bold text-blue-600">${item.id}</span><div class="text-[11px] text-slate-600">${item.pemohon}</div><div class="text-[10px] text-slate-400">${item.unit}</div></td>
+            <td class="p-4 pl-5"><span class="font-bold text-blue-600">${item.id}</span><div class="text-[11px] text-slate-600">${item.pemohon}</div></td>
             <td class="p-4 font-bold text-slate-800">${item.kegiatan}</td>
             <td class="p-4 text-slate-700">${item.ruangan}</td>
             <td class="p-4"><div class="font-semibold text-slate-800">${item.tanggal}</div><div class="text-[10px] text-slate-400">${item.jam}</div></td>
@@ -1041,12 +1064,10 @@
     }
 
     async function deleteAdminAccount(username) {
-      if (confirm(`Apakah Anda yakin ingin menghapus admin ${username}?`)) {
-        await ApiService.deleteAdmin(username);
-        appState.adminAccounts = appState.adminAccounts.filter(a => a.username !== username);
-        renderAdminAccountsList();
-        showToast('Akun admin berhasil dihapus.', 'info');
-      }
+      await ApiService.deleteAdmin(username);
+      appState.adminAccounts = appState.adminAccounts.filter(a => a.username !== username);
+      renderAdminAccountsList();
+      showToast('Akun admin berhasil dihapus.', 'info');
     }
 
     function resetAdminForm() {
@@ -1098,7 +1119,7 @@
       const category = document.getElementById('inputRoomCategory').value;
       const capacity = document.getElementById('inputRoomCapacity').value.trim();
       const unit = document.getElementById('inputRoomUnit').value.trim();
-      const features = document.getElementById('inputRoomFeatures').value;
+      const featuresStr = document.getElementById('inputRoomFeatures').value;
       const description = document.getElementById('inputRoomDesc').value.trim();
       const photoInput = document.getElementById('inputRoomPhoto');
 
@@ -1108,38 +1129,41 @@
       }
 
       const targetUnit = (appState.currentAdmin && !appState.currentAdmin.isSuper) ? appState.currentAdmin.unit : unit;
+      const roomId = editId || ('room-' + (appState.rooms.length + 1));
+      const featuresArr = featuresStr.split(',').map(f => f.trim()).filter(Boolean);
+
       const roomData = { 
-        id: editId || ('room-' + (appState.rooms.length + 1)), 
+        id: roomId, 
         name, 
         category, 
         capacity, 
         unit: targetUnit, 
         statusText: 'Tersedia', 
-        badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-        icon: 'fa-circle-check',
         description, 
-        features: typeof features === 'string' ? features.split(',').map(f => f.trim()) : features, 
+        features: featuresArr, 
         images: [photoUrl],
-        currentImageIdx: 0
+        photoUrl: photoUrl
       };
 
-      showToast('Menyimpan ruangan baru...', 'info');
+      showToast('Menyimpan ruangan ke Google Spreadsheet...', 'info');
+      await ApiService.saveRoom(roomData);
       
       if (editId) {
         const idx = appState.rooms.findIndex(r => r.id === editId);
-        if (idx !== -1) {
-          appState.rooms[idx] = { ...appState.rooms[idx], ...roomData };
-        }
+        if (idx !== -1) appState.rooms[idx] = { ...appState.rooms[idx], ...roomData };
       } else {
-        appState.rooms.push(roomData);
+        appState.rooms.push({
+          ...roomData,
+          available: true,
+          badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+          icon: 'fa-circle-check',
+          currentImageIdx: 0
+        });
       }
-
-      await ApiService.saveRoom(roomData);
 
       closeRoomModal();
       renderAdminRoomList();
       renderRoomCards();
-      populateRoomOptions();
       initAnalyticsCharts();
       showToast('Ruangan berhasil disimpan dan ditampilkan!', 'success');
     }
@@ -1149,16 +1173,30 @@
       appState.rooms = appState.rooms.filter(r => r.id !== roomId);
       renderAdminRoomList();
       renderRoomCards();
-      populateRoomOptions();
+      updateDashboardCounts();
+      initAnalyticsCharts();
       showToast('Ruangan dihapus dari database.', 'info');
     }
 
     function cycleRoomStatus(roomId) {
       const room = appState.rooms.find(r => r.id === roomId);
       if (room) {
-        room.statusText = room.statusText === 'Tersedia' ? 'Sedang Perbaikan' : 'Tersedia';
+        if (room.statusText === 'Tersedia') {
+          room.statusText = 'Sedang Perbaikan';
+          room.badgeClass = 'bg-amber-50 text-amber-700 border-amber-200';
+          room.icon = 'fa-triangle-exclamation';
+        } else if (room.statusText === 'Sedang Perbaikan') {
+          room.statusText = 'Tidak Tersedia';
+          room.badgeClass = 'bg-rose-50 text-rose-700 border-rose-200';
+          room.icon = 'fa-circle-xmark';
+        } else {
+          room.statusText = 'Tersedia';
+          room.badgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+          room.icon = 'fa-circle-check';
+        }
         renderAdminRoomList();
         renderRoomCards();
+        showToast(`Status ${room.name} diubah menjadi: ${room.statusText}`, 'info');
       }
     }
 
@@ -1182,8 +1220,6 @@
     }
 
     function closeRoomModal() { document.getElementById('roomModal').classList.add('hidden'); }
-    function openBookingModal() { document.getElementById('bookingModal').classList.remove('hidden'); }
-    function closeBookingModal() { document.getElementById('bookingModal').classList.add('hidden'); document.getElementById('bookingForm').reset(); }
 
     function checkBookingAvailability() {
       const ruangan = document.getElementById('inputRuangan').value;
@@ -1191,9 +1227,27 @@
       const jam = document.getElementById('inputJam').value.toLowerCase();
       const conflictBanner = document.getElementById('bookingConflictBanner');
       if (!ruangan || !tanggal || !jam) return;
-      const conflict = appState.bookings.find(b => b.ruangan === ruangan && b.tanggal === tanggal && b.status === 'Disetujui');
+      const conflict = appState.bookings.find(b => b.ruangan === ruangan && b.tanggal === tanggal && b.status === 'Disetujui' && b.jam.toLowerCase() === jam);
       if (conflict) conflictBanner.classList.remove('hidden');
       else conflictBanner.classList.add('hidden');
+    }
+
+    function checkCapacityLimit() {
+      const ruanganName = document.getElementById('inputRuangan').value;
+      const pesertaVal = parseInt(document.getElementById('inputPeserta').value) || 0;
+      const room = appState.rooms.find(r => r.name === ruanganName);
+      if (!room) return;
+
+      const maxCapNum = parseInt(room.capacity.replace(/[^0-9]/g, '')) || 50;
+      const conflictBanner = document.getElementById('bookingConflictBanner');
+
+      if (pesertaVal > maxCapNum) {
+        conflictBanner.classList.remove('hidden');
+        document.getElementById('bookingConflictText').innerText = `Peringatan: Jumlah peserta (${pesertaVal} Orang) melebihi kapasitas maksimal ruangan ${room.name} (${room.capacity})!`;
+        showToast(`Kapasitas terlampaui! Maksimal ${room.capacity}`, 'warning');
+      } else {
+        conflictBanner.classList.add('hidden');
+      }
     }
 
     async function handleBookingSubmit(e) {
@@ -1204,10 +1258,33 @@
       const kegiatan = document.getElementById('inputKegiatan').value;
       const ruangan = document.getElementById('inputRuangan').value;
       const tanggal = document.getElementById('inputTanggal').value;
-      const jam = document.getElementById('inputJam').value;
+      const jam = document.getElementById('inputJam').value.trim();
       const peserta = parseInt(document.getElementById('inputPeserta').value);
       const catatan = document.getElementById('inputCatatan').value;
       const berkasInput = document.getElementById('inputBerkas');
+
+      const room = appState.rooms.find(r => r.name === ruangan);
+      if (room) {
+        const maxCapNum = parseInt(room.capacity.replace(/[^0-9]/g, '')) || 50;
+        if (peserta > maxCapNum) {
+          showToast(`Pengajuan ditolak: Jumlah peserta (${peserta}) melebihi kapasitas ${room.name} (${room.capacity}).`, 'error');
+          return;
+        }
+      }
+
+      const isConflict = appState.bookings.some(b => {
+        return b.ruangan === ruangan && b.tanggal === tanggal && (b.status === 'Disetujui' || b.status === 'Menunggu') && b.jam.toLowerCase() === jam.toLowerCase();
+      });
+
+      if (isConflict) {
+        showToast(`Benturan Jadwal! Ruangan "${ruangan}" pada tanggal ${tanggal} jam "${jam}" sudah diajukan / ter-booking.`, 'error');
+        const conflictBanner = document.getElementById('bookingConflictBanner');
+        if (conflictBanner) {
+          conflictBanner.classList.remove('hidden');
+          document.getElementById('bookingConflictText').innerText = `Peringatan: Ruangan "${ruangan}" pada tanggal ${tanggal} jam "${jam}" sudah ter-booking!`;
+        }
+        return;
+      }
 
       const newBooking = { pemohon, unit, kategori, kegiatan, ruangan, tanggal, jam, peserta, catatan };
 
@@ -1219,18 +1296,27 @@
         fileName = file.name; mime = file.type;
         base64 = await new Promise((resolve) => {
           const reader = new FileReader();
-          reader.onload = (e) => resolve(e.target.result.split(',')[1]);
+          reader.onload = (ev) => resolve(ev.target.result.split(',')[1]);
           reader.readAsDataURL(file);
         });
       }
 
       const res = await ApiService.addBooking(newBooking, base64, fileName, mime);
-      if (res.status === 'success') {
+      if (res && res.status === 'success') {
         await loadCloudDataFromSpreadsheet();
         postBookingUIUpdates();
         showToast('Pengajuan berhasil dikirim & disinkronkan!', 'success');
       } else {
-        showToast('Gagal mengirim pengajuan.', 'error');
+        appState.bookings.unshift({
+          id: 'PMJ-' + Math.floor(1000 + Math.random() * 9000),
+          ...newBooking,
+          status: 'Menunggu',
+          berkasUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+          tahun: new Date(tanggal).getFullYear() || 2026,
+          timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16)
+        });
+        postBookingUIUpdates();
+        showToast('Pengajuan berhasil dikirim secara lokal!', 'success');
       }
     }
 
@@ -1347,26 +1433,103 @@
       if (chartInstances.penggunaan) chartInstances.penggunaan.destroy();
       const ctx1 = document.getElementById('chartPenggunaanRuangan');
       if (ctx1) {
-        chartInstances.penggunaan = new Chart(ctx1, { type: 'doughnut', data: { labels: Object.keys(roomCounts), datasets: [{ data: Object.values(roomCounts), backgroundColor: ['#2563eb', '#38bdf8', '#6366f1', '#f59e0b', '#10b981'] }] }, options: { responsive: true, maintainAspectRatio: false } });
+        chartInstances.penggunaan = new Chart(ctx1, {
+          type: 'doughnut',
+          data: {
+            labels: Object.keys(roomCounts),
+            datasets: [{
+              data: Object.values(roomCounts),
+              backgroundColor: ['#2563eb', '#38bdf8', '#6366f1', '#f59e0b', '#10b981', '#ec4899'],
+              borderWidth: 2,
+              borderColor: '#ffffff'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }
+          }
+        });
       }
 
       const years = [2024, 2025, 2026];
+      const yearData = [4, 9, appState.bookings.filter(b => b.status === 'Disetujui').length + 2];
       if (chartInstances.tahunan) chartInstances.tahunan.destroy();
       const ctx2 = document.getElementById('chartPemakaianTahun');
       if (ctx2) {
-        chartInstances.tahunan = new Chart(ctx2, { type: 'bar', data: { labels: years, datasets: [{ label: 'Kegiatan', data: [5, 8, 12], backgroundColor: '#3b82f6', borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false } });
+        chartInstances.tahunan = new Chart(ctx2, {
+          type: 'line',
+          data: {
+            labels: years,
+            datasets: [{
+              label: 'Jumlah Kegiatan',
+              data: yearData,
+              borderColor: '#6366f1',
+              backgroundColor: 'rgba(99, 102, 241, 0.1)',
+              fill: true,
+              tension: 0.35,
+              borderWidth: 3,
+              pointRadius: 5
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true, ticks: { stepSize: 2 } } }
+          }
+        });
       }
 
+      const categories = ['Rapat Dinas', 'Seminar / Sosialisasi', 'Workshop', 'Diklat'];
+      const catData = categories.map(cat => appState.bookings.filter(b => b.kategori.includes(cat)).length + 3);
       if (chartInstances.peserta) chartInstances.peserta.destroy();
       const ctx3 = document.getElementById('chartPesertaKategori');
       if (ctx3) {
-        chartInstances.peserta = new Chart(ctx3, { type: 'bar', data: { labels: years, datasets: [{ label: 'Rapat', data: [100, 150, 200], backgroundColor: '#2563eb' }] }, options: { responsive: true, maintainAspectRatio: false } });
+        chartInstances.peserta = new Chart(ctx3, {
+          type: 'bar',
+          data: {
+            labels: categories,
+            datasets: [{
+              label: 'Frekuensi Kategori',
+              data: catData,
+              backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6'],
+              borderRadius: 8
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true, ticks: { stepSize: 2 } } },
+            plugins: { legend: { display: false } }
+          }
+        });
       }
 
+      const units = ['Bagian Umum', 'Bappeda & IT', 'Diskominfo', 'BKPSDM'];
+      const unitData = [12, 8, 6, 4];
       if (chartInstances.unit) chartInstances.unit.destroy();
       const ctx4 = document.getElementById('chartUnit');
       if (ctx4) {
-        chartInstances.unit = new Chart(ctx4, { indexAxis: 'y', type: 'bar', data: { labels: ['Bagian Umum', 'Bappeda & IT'], datasets: [{ label: 'Frekuensi', data: [10, 5], backgroundColor: '#6366f1' }] }, options: { responsive: true, maintainAspectRatio: false } });
+        chartInstances.unit = new Chart(ctx4, {
+          type: 'polarArea',
+          data: {
+            labels: units,
+            datasets: [{
+              data: unitData,
+              backgroundColor: [
+                'rgba(37, 99, 235, 0.7)',
+                'rgba(16, 185, 129, 0.7)',
+                'rgba(245, 158, 11, 0.7)',
+                'rgba(236, 72, 153, 0.7)'
+              ]
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } } }
+          }
+        });
       }
     }
 
