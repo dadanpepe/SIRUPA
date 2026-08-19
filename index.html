@@ -266,7 +266,7 @@
             </div>
           </div>
           <div class="flex items-center space-x-3 flex-wrap gap-y-2">
-            <button id="superAdminOnlyBtn" onclick="openSuperAdminModal()" class="inline-flex items-center px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs transition shadow-sm cursor-pointer"><i class="fa-solid fa-users-gear mr-1.5"></i> Kelola Akun Admin Dinas</button>
+            <button id="superAdminOnlyBtn" onclick="openSuperAdminModal()" class="hidden inline-flex items-center px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs transition shadow-sm cursor-pointer"><i class="fa-solid fa-users-gear mr-1.5"></i> Kelola Akun Admin Dinas</button>
             <button onclick="openAddRoomModal()" class="inline-flex items-center px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition shadow-sm cursor-pointer"><i class="fa-solid fa-plus mr-1.5"></i> Tambah Ruangan</button>
             <button onclick="adminLogout()" class="inline-flex items-center px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-xs transition border border-rose-200 cursor-pointer"><i class="fa-solid fa-right-from-bracket mr-2"></i> Keluar</button>
           </div>
@@ -316,7 +316,7 @@
     © 2026 PinTaR - Sistem Informasi Peminjaman Ruangan Terpadu.
   </footer>
 
-  <!-- MODAL: SUPER ADMIN & EDIT ADMIN WITH DELETE BUTTON -->
+  <!-- MODAL: SUPER ADMIN & EDIT ADMIN -->
   <div id="superAdminModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto space-y-6">
       <button onclick="closeSuperAdminModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
@@ -332,7 +332,7 @@
           <div><label class="block font-bold text-slate-700 mb-1">Username</label><input type="text" id="newAdminUsername" required placeholder="Contoh: admin_umum" class="w-full bg-white border border-slate-200 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-purple-500 font-mono"></div>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div><label class="block font-bold text-slate-700 mb-1">Password</label><input type="password" id="newAdminPassword" required placeholder="••••••••" class="w-full bg-white border border-slate-200 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-purple-500"></div>
+          <div><label class="block font-bold text-slate-700 mb-1">Password</label><input type="text" id="newAdminPassword" required placeholder="••••••••" class="w-full bg-white border border-slate-200 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-purple-500"></div>
           <div>
             <label class="block font-bold text-slate-700 mb-1">Level Akses Admin</label>
             <select id="newAdminLevel" onchange="toggleUnitDropdown()" class="w-full bg-white border border-slate-200 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer font-bold text-purple-700">
@@ -379,13 +379,13 @@
         <div><label class="block font-bold text-slate-700 mb-1.5">URL Foto Ruangan</label><input type="text" id="inputRoomPhoto" placeholder="https://..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none"></div>
         <div class="flex items-center justify-end space-x-3 pt-4 border-t border-slate-100">
           <button type="button" onclick="closeRoomModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition cursor-pointer">Batal</button>
-          <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition cursor-pointer flex items-center"><i class="fa-solid fa-floppy-disk mr-2"></i> Simpan</button>
+          <button type="submit" id="submitRoomBtn" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition cursor-pointer flex items-center"><i class="fa-solid fa-floppy-disk mr-2"></i> Simpan Ruangan</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- MODAL: BOOKING FORM (Tanpa Pilihan Ruangan, Input Waktu Jam Custom, & Min Tanggal Hari Ini) -->
+  <!-- MODAL: BOOKING FORM -->
   <div id="bookingModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
       <button onclick="closeBookingModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
@@ -393,12 +393,20 @@
         <span id="bookingRoomContextBadge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 mb-1">Pengajuan Umum</span>
         <h3 id="bookingModalMainTitle" class="text-lg font-black text-slate-900 tracking-tight">Formulir Peminjaman Ruangan</h3>
       </div>
+
+      <!-- CAPACITY WARNING BANNER -->
+      <div id="capacityWarningBanner" class="hidden bg-amber-50 border border-amber-200 text-amber-800 p-3.5 rounded-2xl text-xs font-semibold flex items-center space-x-2.5 mb-4">
+        <i class="fa-solid fa-triangle-exclamation text-amber-600 text-base shrink-0"></i>
+        <span id="capacityWarningText">Peringatan: Jumlah peserta melebihi kapasitas ruangan!</span>
+      </div>
+
       <div id="bookingConflictBanner" class="hidden bg-rose-50 border border-rose-200 text-rose-800 p-3.5 rounded-2xl text-xs font-semibold flex items-start space-x-2.5 mb-4 animate-pulse">
         <i class="fa-solid fa-triangle-exclamation text-rose-600 text-base shrink-0 mt-0.5"></i>
         <div id="bookingConflictText">Peringatan: Ruangan sudah ter-booking!</div>
       </div>
+
       <form id="bookingForm" onsubmit="handleBookingSubmit(event)" class="space-y-4 text-xs">
-        <input type="hidden" id="inputRuangan" value="Ruang Rapat Utama">
+        <div><label class="block font-bold text-slate-700 mb-1.5">Pilih Ruangan</label><select id="inputRuangan" onchange="checkCapacityLimit(); checkBookingAvailability();" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none cursor-pointer font-bold text-blue-700"></select></div>
         <div><label class="block font-bold text-slate-700 mb-1.5">Nama Pemohon</label><input type="text" id="inputPemohon" required placeholder="Contoh: Ahmad Fauzi" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none"></div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div><label class="block font-bold text-slate-700 mb-1.5">Bidang / Unit Kerja <span class="text-slate-400 font-normal">(Ketik Manual)</span></label><input type="text" id="inputUnit" required placeholder="Contoh: Bagian Umum" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none"></div>
@@ -411,7 +419,7 @@
         <div><label class="block font-bold text-slate-700 mb-1.5">Nama Kegiatan</label><input type="text" id="inputKegiatan" required placeholder="Contoh: Rapat Koordinasi" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none"></div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block font-bold text-slate-700 mb-1.5">Tanggal (Terkunci Sebelum Hari Ini)</label>
+            <label class="block font-bold text-slate-700 mb-1.5">Tanggal Pelaksanaan</label>
             <input type="date" id="inputTanggal" onchange="checkBookingAvailability()" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none cursor-pointer">
           </div>
           <div>
@@ -436,6 +444,18 @@
           <button type="submit" id="submitBookingBtn" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition cursor-pointer flex items-center"><i class="fa-solid fa-paper-plane mr-2"></i> Kirim</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CAPACITY WARNING POPUP -->
+  <div id="capacityPopupModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl relative text-center space-y-4">
+      <div class="w-14 h-14 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto text-2xl"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <div class="space-y-1">
+        <h3 class="text-base font-black text-slate-900">Kapasitas Ruangan Terlampaui!</h3>
+        <p id="popupCapacityText" class="text-xs text-slate-600 leading-relaxed">Jumlah peserta melebihi kapasitas maksimal ruangan.</p>
+      </div>
+      <button onclick="closeCapacityPopup()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs transition cursor-pointer">Mengerti</button>
     </div>
   </div>
 
@@ -492,6 +512,7 @@
 
     window.onload = function() {
       initClock();
+      populateRoomOptions();
       
       const todayStr = new Date().toISOString().split('T')[0];
       const dateInput = document.getElementById('inputTanggal');
@@ -520,6 +541,15 @@
         if (document.getElementById('liveClock')) document.getElementById('liveClock').innerText = timeStr;
         if (document.getElementById('liveDate')) document.getElementById('liveDate').innerText = dateStr;
       }, 1000);
+    }
+
+    function populateRoomOptions() {
+      const select = document.getElementById('inputRuangan');
+      if (!select) return;
+      select.innerHTML = '';
+      appState.rooms.forEach(room => {
+        select.innerHTML += `<option value="${room.name}">${room.name} (Kapasitas: ${room.capacity})</option>`;
+      });
     }
 
     function switchView(viewName) {
@@ -673,6 +703,13 @@
       container.innerHTML = '';
       appState.rooms.forEach((room) => {
         const featuresHtml = room.features.map(f => `<span class="inline-flex items-center text-[11px] text-slate-600 font-medium mr-2 mb-1.5 bg-slate-100 px-2.5 py-1 rounded-md"><i class="fa-solid fa-check text-emerald-600 mr-1.5 text-xs"></i> ${f}</span>`).join('');
+        
+        const isUnderMaintenance = room.statusText === 'Sedang Perbaikan' || room.statusText === 'Tidak Tersedia';
+        const btnDisabledAttr = isUnderMaintenance ? 'disabled' : '';
+        const btnClass = isUnderMaintenance 
+          ? 'bg-slate-200 text-slate-400 cursor-not-allowed px-5 py-2.5 rounded-2xl text-xs font-bold' 
+          : 'bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold rounded-2xl text-xs transition cursor-pointer shadow-2xs';
+
         container.innerHTML += `
           <div class="bg-white rounded-3xl border border-slate-200 shadow-xs hover:shadow-md transition duration-200 overflow-hidden flex flex-col justify-between">
             <div>
@@ -689,24 +726,30 @@
             </div>
             <div class="p-6 pt-0 flex items-center justify-between border-t border-slate-100 mt-3 pt-4">
               <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold border ${room.badgeClass}"><i class="fa-solid ${room.icon} mr-1.5"></i> ${room.statusText}</span>
-              <button onclick="openBookingModalForRoom('${room.name}')" class="px-5 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold rounded-2xl text-xs transition cursor-pointer shadow-2xs">Pinjam Ruangan</button>
+              <button ${btnDisabledAttr} onclick="openBookingModalForRoom('${room.name}')" class="${btnClass}">Pinjam Ruangan</button>
             </div>
           </div>`;
       });
     }
 
     function openBookingModalForRoom(roomName) {
+      const room = appState.rooms.find(r => r.name === roomName);
+      if (room && (room.statusText === 'Sedang Perbaikan' || room.statusText === 'Tidak Tersedia')) {
+        showToast(`Maaf, ruangan ${roomName} sedang dalam perbaikan dan tidak dapat dipinjam.`, 'error');
+        return;
+      }
       openBookingModal();
-      document.getElementById('inputRuangan').value = roomName;
+      const roomSelect = document.getElementById('inputRuangan');
+      if (roomSelect) roomSelect.value = roomName;
       document.getElementById('bookingRoomContextBadge').innerText = `Pilihan Ruangan: ${roomName}`;
       document.getElementById('bookingModalMainTitle').innerText = `Peminjaman ${roomName}`;
+      checkCapacityLimit();
     }
 
     function openBookingModal() {
       document.getElementById('bookingModal').classList.remove('hidden');
-      document.getElementById('inputRuangan').value = 'Ruang Rapat Utama';
-      document.getElementById('bookingRoomContextBadge').innerText = 'Pengajuan Umum / Ruang Rapat Utama';
-      document.getElementById('bookingModalMainTitle').innerText = 'Formulir Peminjaman Ruangan';
+      populateRoomOptions();
+      checkCapacityLimit();
     }
 
     function closeBookingModal() {
@@ -745,11 +788,21 @@
       const container = document.getElementById('adminRoomList');
       if (!container) return;
       container.innerHTML = '';
-      appState.rooms.forEach(room => {
+      
+      const filteredRooms = (appState.currentAdmin && !appState.currentAdmin.isSuper)
+        ? appState.rooms.filter(r => r.unit.toLowerCase() === appState.currentAdmin.unit.toLowerCase())
+        : appState.rooms;
+
+      if (filteredRooms.length === 0) {
+        container.innerHTML = `<div class="p-4 text-center text-slate-400 text-xs">Tidak ada ruangan di bawah unit Anda.</div>`;
+        return;
+      }
+
+      filteredRooms.forEach(room => {
         container.innerHTML += `
           <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
             <div class="flex items-center justify-between">
-              <div><h4 class="font-bold text-xs text-slate-900">${room.name}</h4><p class="text-[10px] text-slate-500">Kapasitas: ${room.capacity}</p></div>
+              <div><h4 class="font-bold text-xs text-slate-900">${room.name}</h4><p class="text-[10px] text-slate-500">Unit: ${room.unit || 'Umum'} | Kapasitas: ${room.capacity}</p></div>
               <span class="inline-flex items-center text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${room.badgeClass}"><i class="fa-solid ${room.icon} mr-1"></i> ${room.statusText}</span>
             </div>
             <div class="flex items-center justify-end space-x-1.5 pt-1">
@@ -765,11 +818,19 @@
       const tbody = document.getElementById('adminPendingTableBody');
       if (!tbody) return;
       tbody.innerHTML = '';
-      if (appState.bookings.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400 font-medium">Tidak ada permintaan peminjaman.</td></tr>`;
+
+      let bookingsToDisplay = appState.bookings;
+      if (appState.currentAdmin && !appState.currentAdmin.isSuper) {
+        const adminUnit = appState.currentAdmin.unit.toLowerCase();
+        const adminRoomNames = appState.rooms.filter(r => (r.unit || '').toLowerCase() === adminUnit).map(r => r.name);
+        bookingsToDisplay = appState.bookings.filter(b => adminRoomNames.includes(b.ruangan));
+      }
+
+      if (bookingsToDisplay.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400 font-medium">Tidak ada permintaan peminjaman untuk unit Anda.</td></tr>`;
         return;
       }
-      appState.bookings.forEach(item => {
+      bookingsToDisplay.forEach(item => {
         let statusTag = item.status === 'Disetujui' ? `<span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full text-[10px] font-bold">Disetujui</span>` : item.status === 'Menunggu' ? `<span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full text-[10px] font-bold">Menunggu</span>` : `<span class="bg-rose-100 text-rose-800 px-2.5 py-1 rounded-full text-[10px] font-bold">${item.status}</span>`;
         tbody.innerHTML += `
           <tr class="hover:bg-slate-50 transition">
@@ -800,7 +861,7 @@
             </div>
             <div class="flex items-center space-x-1.5">
               <button onclick="openEditAdminModal('${acc.username}')" class="w-7 h-7 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center hover:bg-blue-100 transition"><i class="fa-solid fa-pen text-[10px]"></i></button>
-              ${!acc.isSuper ? `<button onclick="deleteAdminAccount('${acc.username}')" class="w-7 h-7 bg-rose-50 text-rose-600 rounded-lg flex items-center justify-center hover:bg-rose-100 transition"><i class="fa-solid fa-trash text-[10px]"></i></button>` : ''}
+              <button onclick="deleteAdminAccount('${acc.username}')" class="w-7 h-7 bg-rose-50 text-rose-600 rounded-lg flex items-center justify-center hover:bg-rose-100 transition"><i class="fa-solid fa-trash text-[10px]"></i></button>
             </div>
           </div>`;
       });
@@ -812,7 +873,6 @@
         document.getElementById('editAdminUsernameKey').value = acc.username;
         document.getElementById('newAdminName').value = acc.name;
         document.getElementById('newAdminUsername').value = acc.username;
-        document.getElementById('newAdminUsername').disabled = true;
         document.getElementById('newAdminPassword').value = acc.pass;
         document.getElementById('newAdminLevel').value = acc.isSuper ? 'super' : 'dinas';
         document.getElementById('newAdminUnit').value = acc.unit;
@@ -825,7 +885,6 @@
 
     function resetAdminForm() {
       document.getElementById('editAdminUsernameKey').value = '';
-      document.getElementById('newAdminUsername').disabled = false;
       document.getElementById('adminFormTitle').innerHTML = `<i class="fa-solid fa-user-plus mr-2 text-purple-600"></i> Tambah Akun Admin Baru`;
       document.getElementById('submitAdminBtn').innerHTML = `<i class="fa-solid fa-floppy-disk mr-2"></i> Simpan Akun Admin`;
       document.getElementById('cancelEditAdminBtn').classList.add('hidden');
@@ -836,13 +895,43 @@
     }
 
     function deleteAdminAccount(username) {
+      if (appState.adminAccounts.length <= 1) {
+        showToast('Minimal harus ada satu akun admin di dalam sistem!', 'warning');
+        return;
+      }
       appState.adminAccounts = appState.adminAccounts.filter(a => a.username !== username);
       renderAdminAccountsList();
       showToast('Akun admin berhasil dihapus.', 'info');
     }
 
-    function openAddRoomModal() { document.getElementById('roomModal').classList.remove('hidden'); document.getElementById('roomForm').reset(); }
+    function openAddRoomModal() {
+      document.getElementById('editRoomId').value = '';
+      document.getElementById('roomModalTitle').innerText = 'Tambah Ruangan Baru';
+      document.getElementById('submitRoomBtn').innerHTML = '<i class="fa-solid fa-floppy-disk mr-2"></i> Simpan Ruangan';
+      document.getElementById('roomForm').reset();
+      document.getElementById('roomModal').classList.remove('hidden');
+    }
+
     function closeRoomModal() { document.getElementById('roomModal').classList.add('hidden'); }
+
+    function openEditRoomModal(roomId) {
+      const room = appState.rooms.find(r => r.id === roomId);
+      if (room) {
+        document.getElementById('editRoomId').value = room.id;
+        document.getElementById('roomModalTitle').innerText = `Edit Ruangan: ${room.name}`;
+        document.getElementById('submitRoomBtn').innerHTML = '<i class="fa-solid fa-floppy-disk mr-2"></i> Update Ruangan';
+        
+        document.getElementById('inputRoomName').value = room.name;
+        document.getElementById('inputRoomCategory').value = room.category;
+        document.getElementById('inputRoomCapacity').value = room.capacity;
+        document.getElementById('inputRoomUnit').value = room.unit || '';
+        document.getElementById('inputRoomFeatures').value = room.features ? room.features.join(', ') : '';
+        document.getElementById('inputRoomDesc').value = room.description;
+        document.getElementById('inputRoomPhoto').value = (room.images && room.images[0]) ? room.images[0] : '';
+        
+        document.getElementById('roomModal').classList.remove('hidden');
+      }
+    }
 
     function cycleRoomStatus(roomId) {
       const room = appState.rooms.find(r => r.id === roomId);
@@ -858,71 +947,96 @@
 
     function handleRoomFormSubmit(e) {
       e.preventDefault();
-      const name = document.getElementById('inputRoomName').value;
-      const category = document.getElementById('inputRoomCategory').value;
-      const capacity = document.getElementById('inputRoomCapacity').value;
-      const unit = document.getElementById('inputRoomUnit').value;
-      const features = document.getElementById('inputRoomFeatures').value.split(',').map(s => s.trim());
-      const description = document.getElementById('inputRoomDesc').value;
-      const photoUrl = document.getElementById('inputRoomPhoto').value || 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80';
+      const editId = (document.getElementById('editRoomId').value || '').trim();
+      const name = document.getElementById('inputRoomName').value.trim();
+      const category = document.getElementById('inputRoomCategory').value.trim();
+      const capacity = document.getElementById('inputRoomCapacity').value.trim();
+      const unit = document.getElementById('inputRoomUnit').value.trim();
+      const featuresRaw = document.getElementById('inputRoomFeatures').value;
+      const features = featuresRaw ? featuresRaw.split(',').map(s => s.trim()).filter(s => s.length > 0) : ['Proyektor', 'AC'];
+      const description = document.getElementById('inputRoomDesc').value.trim();
+      const photoUrl = document.getElementById('inputRoomPhoto').value.trim() || 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80';
 
-      const newRoom = {
-        id: 'room-' + (appState.rooms.length + 1),
-        name, category, capacity, unit,
-        available: true, statusText: 'Tersedia',
-        badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-        icon: 'fa-circle-check',
-        description, features, images: [photoUrl], currentImageIdx: 0
-      };
+      if (editId !== '') {
+        const roomIndex = appState.rooms.findIndex(r => r.id === editId);
+        if (roomIndex !== -1) {
+          // Pertahankan properti lama yang tidak ada di form (seperti status, icon, badgeClass, images jika tidak diubah)
+          const existingRoom = appState.rooms[roomIndex];
+          appState.rooms[roomIndex] = {
+            ...existingRoom,
+            name,
+            category,
+            capacity,
+            unit,
+            features,
+            description,
+            images: [photoUrl, ...(existingRoom.images.slice(1))]
+          };
+          showToast(`Ruangan ${name} berhasil diperbarui!`, 'success');
+        } else {
+          showToast('Data ruangan tidak ditemukan untuk diperbarui.', 'error');
+        }
+      } else {
+        const newRoom = {
+          id: 'room-' + (appState.rooms.length + 1) + '-' + Math.floor(Math.random() * 1000),
+          name, category, capacity, unit,
+          available: true, statusText: 'Tersedia',
+          badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+          icon: 'fa-circle-check',
+          description, features, images: [photoUrl], currentImageIdx: 0
+        };
+        appState.rooms.push(newRoom);
+        showToast(`Ruangan ${name} berhasil ditambahkan!`, 'success');
+      }
 
-      appState.rooms.push(newRoom);
       renderRoomCards();
       renderAdminRoomList();
+      populateRoomOptions();
+      initAnalyticsCharts();
       closeRoomModal();
-      showToast(`Ruangan ${name} berhasil ditambahkan!`, 'success');
     }
 
     function deleteRoom(roomId) {
       appState.rooms = appState.rooms.filter(r => r.id !== roomId);
       renderRoomCards();
       renderAdminRoomList();
+      populateRoomOptions();
+      initAnalyticsCharts();
       showToast('Ruangan berhasil dihapus.', 'info');
-    }
-
-    function openEditRoomModal(roomId) {
-      const room = appState.rooms.find(r => r.id === roomId);
-      if (room) {
-        openAddRoomModal();
-        document.getElementById('inputRoomName').value = room.name;
-        document.getElementById('inputRoomCategory').value = room.category;
-        document.getElementById('inputRoomCapacity').value = room.capacity;
-        document.getElementById('inputRoomUnit').value = room.unit;
-        document.getElementById('inputRoomFeatures').value = room.features.join(', ');
-        document.getElementById('inputRoomDesc').value = room.description;
-        document.getElementById('inputRoomPhoto').value = room.images[0] || '';
-      }
     }
 
     function handleCreateAdminSubmit(e) {
       e.preventDefault();
-      const editKey = document.getElementById('editAdminUsernameKey').value;
-      const name = document.getElementById('newAdminName').value;
-      const username = document.getElementById('newAdminUsername').value;
-      const pass = document.getElementById('newAdminPassword').value;
+      const editKey = document.getElementById('editAdminUsernameKey').value.trim();
+      const name = document.getElementById('newAdminName').value.trim();
+      const username = document.getElementById('newAdminUsername').value.trim();
+      const pass = document.getElementById('newAdminPassword').value.trim();
       const isSuper = document.getElementById('newAdminLevel').value === 'super';
-      const unit = document.getElementById('newAdminUnit').value;
+      const unit = document.getElementById('newAdminUnit').value.trim();
 
       if (editKey) {
         const acc = appState.adminAccounts.find(a => a.username === editKey);
         if (acc) {
           acc.name = name;
+          acc.username = username;
           acc.pass = pass;
-          acc.unit = unit;
+          acc.unit = isSuper ? 'Semua Dinas' : unit;
           acc.isSuper = isSuper;
         }
         showToast(`Akun admin ${username} berhasil diperbarui!`, 'success');
       } else {
-        appState.adminAccounts.push({ username, name, pass, unit, isSuper });
+        const existing = appState.adminAccounts.find(a => a.username === username);
+        if (existing) {
+          showToast('Username sudah terdaftar! Gunakan username lain.', 'error');
+          return;
+        }
+        appState.adminAccounts.push({
+          username,
+          name,
+          pass,
+          unit: isSuper ? 'Semua Dinas' : unit,
+          isSuper
+        });
         showToast(`Akun admin ${username} berhasil dibuat!`, 'success');
       }
       resetAdminForm();
@@ -950,6 +1064,16 @@
       const jam = `${jamMulai} - ${jamSelesai} WIB`;
       const peserta = parseInt(document.getElementById('inputPeserta').value);
       const catatan = document.getElementById('inputCatatan').value;
+
+      const currentRoom = appState.rooms.find(r => r.name === ruangan);
+      if (currentRoom) {
+        const maxCapNum = parseInt(currentRoom.capacity) || 100;
+        if (peserta > maxCapNum) {
+          document.getElementById('popupCapacityText').innerText = `Jumlah peserta (${peserta}) melebihi kapasitas maksimal ruangan ${ruangan} (${currentRoom.capacity}). Harap kurangi jumlah peserta atau pilih ruangan lain.`;
+          document.getElementById('capacityPopupModal').classList.remove('hidden');
+          return;
+        }
+      }
 
       const newBooking = {
         id: 'PMJ-' + Math.floor(1000 + Math.random() * 9000),
@@ -1006,12 +1130,26 @@
       const pesertaInput = parseInt(document.getElementById('inputPeserta').value) || 0;
       const ruangan = document.getElementById('inputRuangan').value;
       const currentRoom = appState.rooms.find(r => r.name === ruangan);
+      const banner = document.getElementById('capacityWarningBanner');
+      const textEl = document.getElementById('capacityWarningText');
+
       if (currentRoom) {
-        const maxCap = parseInt(currentRoom.capacity) || 100;
-        if (pesertaInput > maxCap) {
-          showToast(`Peringatan: Jumlah peserta (${pesertaInput}) melebihi kapasitas maksimal ruangan (${currentRoom.capacity})!`, 'warning');
+        const maxCapNum = parseInt(currentRoom.capacity) || 100;
+        if (pesertaInput > maxCapNum) {
+          if (banner && textEl) {
+            textEl.innerText = `Peringatan: Jumlah peserta (${pesertaInput}) melebihi kapasitas maksimal ruangan (${currentRoom.capacity})!`;
+            banner.classList.remove('hidden');
+          }
+          document.getElementById('popupCapacityText').innerText = `Jumlah peserta (${pesertaInput}) melebihi kapasitas maksimal ruangan ${ruangan} (${currentRoom.capacity}).`;
+          document.getElementById('capacityPopupModal').classList.remove('hidden');
+        } else {
+          if (banner) banner.classList.add('hidden');
         }
       }
+    }
+
+    function closeCapacityPopup() {
+      document.getElementById('capacityPopupModal').classList.add('hidden');
     }
 
     function openCancelModal() { document.getElementById('cancelBookingModal').classList.remove('hidden'); }
@@ -1022,6 +1160,10 @@
       const id = document.getElementById('cancelBookingId').value.trim().toUpperCase();
       const item = appState.bookings.find(b => b.id.toUpperCase() === id);
       if (item) {
+        if (item.status === 'Disetujui') {
+          showToast('Peminjaman yang sudah disetujui tidak dapat dibatalkan secara mandiri. Silakan hubungi admin instansi.', 'error');
+          return;
+        }
         item.status = 'Dibatalkan';
         closeCancelModal();
         renderBookingTable();
@@ -1049,6 +1191,7 @@
         document.getElementById('authStep2').classList.remove('hidden');
         document.getElementById('activeAuthEmail').innerText = `${foundAcc.username}@instansi.go.id`;
         document.getElementById('activeAuthAvatar').innerText = foundAcc.name.charAt(0).toUpperCase();
+        document.getElementById('credentialsError').classList.add('hidden');
       } else {
         document.getElementById('credentialsError').classList.remove('hidden');
       }
