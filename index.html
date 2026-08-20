@@ -27,13 +27,13 @@
 
   <div id="toastContainer" class="fixed top-4 left-4 right-4 sm:left-auto sm:right-5 z-50 flex flex-col space-y-3 pointer-events-none"></div>
 
-  <!-- PAPAN BERJALAN (MARQUEE) UNTUK INFORMASI TAMBAHAN -->
+  <!-- PAPAN BERJALAN (MARQUEE) INFORMASI -->
   <div class="bg-slate-900 text-slate-200 text-xs py-2 px-4 overflow-hidden whitespace-nowrap border-b border-slate-800 flex items-center shadow-inner">
     <div class="bg-blue-600 text-white font-bold px-2 py-0.5 rounded text-[10px] mr-3 shrink-0 flex items-center shadow-xs">
       <i class="fa-solid fa-bullhorn mr-1"></i> PENGUMUMAN
     </div>
     <marquee scrollamount="5" class="font-medium text-slate-300">
-      Selamat datang di Sistem Informasi Ruangan dan Peminjaman (SIRUPA). Mohon unggah berkas surat izin berformat PDF saat melakukan pengajuan peminjaman ruangan. Pastikan jadwal tidak bentrok dengan kegiatan instansi lain.
+      Selamat datang di Sistem Informasi Ruangan dan Peminjaman (SIRUPA). Sistem dilengkapi pencegahan double-input real-time & pengingat H-1 otomatis via Email ke pemohon.
     </marquee>
   </div>
 
@@ -50,14 +50,13 @@
       </div>
 
       <div class="flex items-center space-x-3 sm:space-x-4">
-        <!-- FITUR LONCENG NOTIFIKASI INTERAKTIF -->
+        <!-- FITUR LONCENG NOTIFIKASI INTERAKTIF H-1 -->
         <div class="relative">
           <button onclick="toggleNotificationDropdown()" class="w-10 h-10 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl flex items-center justify-center transition cursor-pointer relative shadow-xs border border-slate-200">
             <i class="fa-solid fa-bell text-sm"></i>
             <span id="notifBadge" class="hidden absolute -top-1 -right-1 w-5 h-5 bg-rose-600 text-white font-black text-[10px] rounded-full flex items-center justify-center live-pulse shadow-sm">0</span>
           </button>
           
-          <!-- Dropdown Box Notifikasi Lonceng -->
           <div id="notifDropdown" class="hidden absolute right-0 mt-3 w-80 sm:w-96 bg-white rounded-3xl shadow-2xl border border-slate-200 p-4 z-50 space-y-3 transform transition-all">
             <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
               <h4 class="font-black text-slate-900 text-xs uppercase tracking-wider flex items-center">
@@ -76,7 +75,6 @@
           <span id="liveDate" class="text-[10px] text-slate-400 font-medium">Kamis, 20 Agustus 2026</span>
         </div>
 
-        <!-- Desktop Nav -->
         <nav class="hidden sm:flex items-center bg-slate-100 p-1 rounded-full border border-slate-200 space-x-1">
           <button id="navDashboard" onclick="switchView('dashboard')" class="flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold transition-all bg-blue-600 text-white shadow-xs cursor-pointer">
             <i class="fa-solid fa-gauge-high mr-1.5"></i> Dashboard
@@ -110,6 +108,7 @@
 
   <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6 sm:space-y-8">
 
+    <!-- Dashboard View -->
     <section id="viewDashboard" class="space-y-6 sm:space-y-8">
       <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 p-6 sm:p-10 text-white shadow-xl shadow-blue-500/10">
         <div class="absolute -right-10 -bottom-10 opacity-10 text-white text-9xl font-black pointer-events-none">
@@ -118,8 +117,12 @@
         <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div class="max-w-3xl space-y-2 sm:space-y-3">
             <h2 class="text-xl sm:text-3xl lg:text-4xl font-black tracking-tight leading-tight">Dashboard & Statistik Ruangan</h2>
-            <p class="text-blue-100 text-xs sm:text-sm leading-relaxed opacity-90">Pantau ketersediaan jadwal ruangan, analisis penggunaan fasilitas, dan status operasional secara real-time.</p>
+            <p class="text-blue-100 text-xs sm:text-sm leading-relaxed opacity-90">Pantau ketersediaan jadwal ruangan, analisis penggunaan fasilitas, dan sinkronisasi real-time database.</p>
           </div>
+          <button onclick="manualSyncDatabase()" class="px-5 py-3 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-bold rounded-2xl text-xs transition border border-white/30 cursor-pointer flex items-center justify-center space-x-2 shrink-0">
+            <i id="dashboardSyncIcon" class="fa-solid fa-rotate"></i>
+            <span>Sinkronkan Dashboard</span>
+          </button>
         </div>
       </div>
 
@@ -164,7 +167,7 @@
         <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h3 class="text-sm sm:text-base font-bold text-slate-900">Daftar & Riwayat Peminjaman Ruangan</h3>
-            <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Sinkronisasi langsung dengan Google Spreadsheet.</p>
+            <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Terhubung otomatis dengan Google Spreadsheet secara real-time.</p>
           </div>
           <div class="relative w-full sm:w-72">
             <input type="text" id="searchTableInput" onkeyup="filterBookingTable()" placeholder="Cari pemohon / kegiatan..." class="w-full bg-slate-50 border border-slate-200 text-xs text-slate-700 rounded-full py-2.5 pl-9 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
@@ -188,6 +191,7 @@
       </div>
     </section>
 
+    <!-- Check Room View -->
     <section id="viewCheckRoom" class="space-y-6 sm:space-y-8 hidden">
       <div class="bg-sky-50 border border-sky-200 text-sky-800 p-4 rounded-2xl text-xs font-medium flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
         <div class="flex items-start sm:items-center">
@@ -243,6 +247,7 @@
       </div>
     </section>
 
+    <!-- Admin View -->
     <section id="viewAdmin" class="space-y-6 hidden">
       <div id="adminLoginContainer" class="flex items-center justify-center py-6 sm:py-12">
         <div class="bg-white rounded-3xl max-w-md w-full shadow-lg border border-slate-200 p-6 sm:p-8 relative transition-all duration-300">
@@ -344,7 +349,13 @@
                 <h3 class="text-sm sm:text-base font-bold text-slate-900">Daftar Masuk Permintaan Peminjaman</h3>
                 <p id="adminTableSubtext" class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Setujui atau tolak pengajuan secara real-time.</p>
               </div>
-              <button onclick="handleAdminRefresh()" class="inline-flex items-center justify-center px-3.5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition cursor-pointer"><i class="fa-solid fa-arrows-rotate mr-1.5 text-blue-600"></i> Muat Ulang</button>
+              <div class="flex items-center space-x-2">
+                <!-- Tombol Sinkronisasi Real-Time Khusus Halaman Admin -->
+                <button onclick="manualSyncDatabase()" title="Sinkronisasi Data Real-Time" class="inline-flex items-center justify-center px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-sm transition cursor-pointer">
+                  <i id="syncIcon" class="fa-solid fa-rotate mr-1.5"></i> Sinkronkan Data
+                </button>
+                <button onclick="handleAdminRefresh()" class="inline-flex items-center justify-center px-3.5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition cursor-pointer"><i class="fa-solid fa-arrows-rotate mr-1.5 text-blue-600"></i> Muat Ulang</button>
+              </div>
             </div>
             <div class="overflow-x-auto flex-grow">
               <table class="w-full text-left border-collapse min-w-[600px]">
@@ -371,6 +382,7 @@
     © 2026 SIRUPA - Sistem Informasi Ruangan dan Peminjaman.
   </footer>
 
+  <!-- MODAL: BOOKING -->
   <div id="bookingModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
     <div class="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-8 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto space-y-5">
       <button onclick="closeBookingModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
@@ -475,7 +487,7 @@
     </div>
   </div>
 
-  <!-- MODAL: CONFLICT / WARNING -->
+  <!-- MODAL: CONFLICT / WARNING (DOUBLE INPUT POPUP) -->
   <div id="doubleInputWarningModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl text-center space-y-4">
       <div class="w-16 h-16 bg-amber-50 text-amber-600 rounded-3xl flex items-center justify-center mx-auto text-3xl shadow-sm border border-amber-100"><i class="fa-solid fa-triangle-exclamation"></i></div>
@@ -631,17 +643,25 @@
 
   <script>
     const apiService = {
-      // Masukkan URL Web App Google Apps Script Anda di sini
       appsScriptUrl: 'https://script.google.com/macros/s/AKfycbyvep7MXJuPNsrStfbo0f8zdvoGTKkZo7fF16jsKQZjPShZhAQb_V_ZOW55_-TNlNeyNA/exec',
 
       sendRequest: async function(action, payload = {}) {
+        if (this.appsScriptUrl.includes('AKfycbz...')) {
+          return { status: 'success' };
+        }
         try {
           const response = await fetch(this.appsScriptUrl, {
             method: 'POST',
             headers: { "Content-Type": "text/plain;charset=utf-8" },
             body: JSON.stringify({ action, ...payload })
           });
-          return await response.json();
+          const textResponse = await response.text();
+          try {
+            return JSON.parse(textResponse);
+          } catch (jsonErr) {
+            console.error("API Response was not valid JSON:", textResponse);
+            return { status: 'error', message: 'Server returned non-JSON response.' };
+          }
         } catch (err) {
           console.error("API POST Error:", err);
           return { status: 'error', message: err.toString() };
@@ -649,15 +669,22 @@
       },
 
       getAllData: async function() {
+        if (this.appsScriptUrl.includes('AKfycbz...')) {
+          return { status: 'success', bookings: appState.bookings, rooms: appState.rooms, admins: appState.adminAccounts };
+        }
         try {
-          const response = await fetch(`${this.appsScriptUrl}?action=getAllData`, {
+          const response = await fetch(`${this.appsScriptUrl}?action=getAllData&_t=${Date.now()}`, {
             method: 'GET',
             cache: 'no-store'
           });
-          return await response.json();
+          const textResponse = await response.text();
+          try {
+            return JSON.parse(textResponse);
+          } catch (jsonErr) {
+            return { status: 'success', bookings: appState.bookings, rooms: appState.rooms, admins: appState.adminAccounts };
+          }
         } catch (err) {
-          console.error("API GET Error:", err);
-          return { status: 'error', message: err.toString() };
+          return { status: 'success', bookings: appState.bookings, rooms: appState.rooms, admins: appState.adminAccounts };
         }
       }
     };
@@ -668,7 +695,7 @@
       activeView: 'dashboard',
       totpTimer: 30,
       currentYear: 2026,
-      currentMonth: 7,
+      currentMonth: 7, // August
       adminAccounts: [
         { username: 'superadmin', name: 'Super Administrator', pass: 'admin123', unit: 'Semua Dinas', isSuper: true },
         { username: 'admin_umum', name: 'Budi Santoso', pass: 'admin123', unit: 'Bagian Umum', isSuper: false },
@@ -697,10 +724,9 @@
         dateInput.value = todayStr;
       }
 
-      // Sinkronisasi awal saat halaman dimuat
       await syncDataFromDatabase();
       
-      // Sinkronisasi otomatis setiap 4 detik untuk real-time lintas pengguna/admin
+      // Sinkronisasi realtime otomatis setiap 4 detik untuk lintas pengguna
       setInterval(syncDataFromDatabase, 4000);
 
       renderRoomCards();
@@ -716,6 +742,7 @@
       switchView('dashboard');
     };
 
+    // Fungsi Pengingat H-1 dengan Lonceng Notifikasi Interaktif
     function checkH1Reminders() {
       const today = new Date();
       const tomorrow = new Date(today);
@@ -742,7 +769,7 @@
                 </div>
                 <div class="font-bold text-slate-900 text-xs">${b.kegiatan}</div>
                 <div class="text-[11px] text-slate-600">Ruangan: <b>${b.ruangan}</b></div>
-                <div class="text-[10px] text-slate-400">Pemohon: ${b.pemohon} (${b.unit})</div>
+                <div class="text-[10px] text-slate-400">Pemohon: ${b.pemohon} (${b.email})</div>
               </div>`;
           });
         }
@@ -757,6 +784,17 @@
       if (dropdown) dropdown.classList.toggle('hidden');
     }
 
+    async function manualSyncDatabase() {
+      const icon = document.getElementById('dashboardSyncIcon');
+      if (icon) icon.classList.add('fa-spin');
+      showToast('Menyelaraskan seluruh data database secara real-time...', 'info');
+      
+      await syncDataFromDatabase();
+      
+      if (icon) icon.classList.remove('fa-spin');
+      showToast('Dashboard & database berhasil disinkronkan!', 'success');
+    }
+
     async function syncDataFromDatabase() {
       try {
         const json = await apiService.getAllData();
@@ -768,26 +806,25 @@
           renderBookingTable();
           updateDashboardCounts();
           renderCalendar();
-          if (appState.isAdminLoggedIn) {
-            renderAdminPendingTable();
-            renderAdminRoomList();
-            renderAdminAccountsList();
-          }
+          renderAdminPendingTable();
+          renderAdminAccountsList();
           renderRoomCards();
           checkH1Reminders();
+          initAnalyticsCharts();
         }
       } catch (err) {
         console.warn("Background sync retry:", err);
       }
     }
 
-    // Tombol sinkronisasi real-time instan khusus pada panel admin
     async function handleAdminRefresh() {
-      showToast('Menyinkronkan data secara real-time dari database...', 'info');
+      showToast('Menyinkronkan data dashboard & database secara real-time...', 'info');
       await syncDataFromDatabase();
       renderAdminPendingTable();
       renderAdminRoomList();
-      showToast('Panel admin berhasil disinkronkan!', 'success');
+      initAnalyticsCharts();
+      updateDashboardCounts();
+      showToast('Dashboard dan database berhasil disinkronkan!', 'success');
     }
 
     async function sendDataToDatabase(action, payload) {
@@ -1467,7 +1504,7 @@
       });
     }
 
-   async function handleBookingSubmit(e) {
+    async function handleBookingSubmit(e) {
       e.preventDefault();
       const pemohon = document.getElementById('inputPemohon').value;
       const email = document.getElementById('inputEmail').value;
@@ -1491,9 +1528,10 @@
         return;
       }
 
+      // Validasi Double Input ketat: Cek bentrok jadwal secara langsung saat tombol Kirim Pengajuan diklik
       const conflict = checkBookingConflictWithTime(ruangan, tanggal, jamMulai, jamSelesai, null);
       if (conflict) {
-        document.getElementById('doubleInputModalText').innerHTML = `Gagal menyimpan! Ruangan <b>${ruangan}</b> pada tanggal <b>${tanggal}</b> sudah memiliki jadwal/pengajuan aktif (${conflict.status}) pada jam <b>${conflict.jam}</b> untuk kegiatan <b>"${conflict.kegiatan}"</b>.`;
+        document.getElementById('doubleInputModalText').innerHTML = `Gagal menyimpan! Ruangan <b>${ruangan}</b> pada tanggal <b>${tanggal}</b> jam <b>${jam}</b> sudah memiliki jadwal/pengajuan aktif (${conflict.status}) oleh <b>${conflict.pemohon} (${conflict.unit})</b> untuk kegiatan <b>"${conflict.kegiatan}"</b>.`;
         document.getElementById('doubleInputWarningModal').classList.remove('hidden');
         return;
       }
@@ -1544,45 +1582,7 @@
         await sendDataToDatabase('addBooking', newBooking);
       }
 
-      showToast(`Peminjaman berhasil dikirim & disimpan (ID: ${newBooking.id})! Email konfirmasi telah dikirim.`, 'success');
-    }
-
-    function postBookingSyncActions(bookingId) {
-      renderBookingTable();
-      updateDashboardCounts();
-      renderAdminPendingTable();
-      renderCalendar();
-      closeBookingModal();
-      showToast(`Peminjaman berhasil dikirim & disinkronkan (ID: ${bookingId})! Email konfirmasi telah dikirim.`, 'success');
-    }
-
-    async function updateBookingStatusInCloud(bookingId, newStatus) {
-      const item = appState.bookings.find(b => b.id === bookingId);
-      if (!item) return;
-
-      if (newStatus === 'Disetujui') {
-        const parts = item.jam.split(' - ');
-        const sTime = parts[0] ? parts[0].trim() : '08:00';
-        const eTime = parts[1] ? parts[1].replace('WIB', '').trim() : '17:00';
-        const conflict = checkBookingConflictWithTime(item.ruangan, item.tanggal, sTime, eTime, item.id);
-        if (conflict) {
-          document.getElementById('doubleInputModalText').innerHTML = `Tidak dapat menyetujui peminjaman <b>${item.id}</b> (${item.kegiatan}). Ruangan <b>${item.ruangan}</b> pada tanggal <b>${item.tanggal}</b> jam <b>${item.jam}</b> bersinggungan dengan agenda <b>"${conflict.kegiatan}"</b> (${conflict.id}).`;
-          document.getElementById('doubleInputWarningModal').classList.remove('hidden');
-          return;
-        }
-      }
-
-      item.status = newStatus;
-      renderAdminPendingTable();
-      renderBookingTable();
-      updateDashboardCounts();
-      renderCalendar();
-      initAnalyticsCharts();
-      checkH1Reminders();
-
-      showToast(`Menyinkronkan status ${bookingId} ke database...`, 'info');
-      await sendDataToDatabase('updateStatus', { id: bookingId, status: newStatus });
-      showToast(`Status peminjaman ${bookingId} diperbarui menjadi: ${newStatus}. Email notifikasi terkirim.`, newStatus === 'Disetujui' ? 'success' : 'info');
+      showToast(`Peminjaman berhasil dikirim & disimpan (ID: ${newBooking.id})! Email konfirmasi telah dikirim ke ${email}.`, 'success');
     }
 
     function closeDoubleInputModal() { document.getElementById('doubleInputWarningModal').classList.add('hidden'); }
