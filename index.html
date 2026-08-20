@@ -4,11 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>SIRUPA - Sistem Informasi Ruangan dan Peminjaman</title>
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
@@ -27,7 +24,6 @@
 
   <div id="toastContainer" class="fixed top-4 left-4 right-4 sm:left-auto sm:right-5 z-50 flex flex-col space-y-3 pointer-events-none"></div>
 
-  <!-- PAPAN BERJALAN (MARQUEE) INFORMASI TAMBAHAN -->
   <div class="bg-slate-900 text-slate-200 text-xs py-2 px-4 overflow-hidden whitespace-nowrap border-b border-slate-800 flex items-center shadow-inner">
     <div class="bg-blue-600 text-white font-bold px-2 py-0.5 rounded text-[10px] mr-3 shrink-0 flex items-center shadow-xs">
       <i class="fa-solid fa-bullhorn mr-1"></i> PENGUMUMAN
@@ -50,14 +46,12 @@
       </div>
 
       <div class="flex items-center space-x-3 sm:space-x-4">
-        <!-- FITUR LONCENG NOTIFIKASI INTERAKTIF -->
         <div class="relative">
           <button onclick="toggleNotificationDropdown()" class="w-10 h-10 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl flex items-center justify-center transition cursor-pointer relative shadow-xs border border-slate-200">
             <i class="fa-solid fa-bell text-sm"></i>
             <span id="notifBadge" class="hidden absolute -top-1 -right-1 w-5 h-5 bg-rose-600 text-white font-black text-[10px] rounded-full flex items-center justify-center live-pulse shadow-sm">0</span>
           </button>
           
-          <!-- Dropdown Box Notifikasi Lonceng -->
           <div id="notifDropdown" class="hidden absolute right-0 mt-3 w-80 sm:w-96 bg-white rounded-3xl shadow-2xl border border-slate-200 p-4 z-50 space-y-3 transform transition-all">
             <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
               <h4 class="font-black text-slate-900 text-xs uppercase tracking-wider flex items-center">
@@ -76,7 +70,6 @@
           <span id="liveDate" class="text-[10px] text-slate-400 font-medium">Kamis, 20 Agustus 2026</span>
         </div>
 
-        <!-- Desktop Nav -->
         <nav class="hidden sm:flex items-center bg-slate-100 p-1 rounded-full border border-slate-200 space-x-1">
           <button id="navDashboard" onclick="switchView('dashboard')" class="flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold transition-all bg-blue-600 text-white shadow-xs cursor-pointer">
             <i class="fa-solid fa-gauge-high mr-1.5"></i> Dashboard
@@ -92,7 +85,6 @@
     </div>
   </header>
 
-  <!-- Mobile Bottom Nav -->
   <div class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-6 py-2.5 flex justify-around items-center shadow-2xl">
     <button onclick="switchView('dashboard')" id="mobNavDashboard" class="flex flex-col items-center text-blue-600 space-y-0.5 cursor-pointer">
       <i class="fa-solid fa-gauge-high text-lg"></i>
@@ -110,7 +102,6 @@
 
   <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6 sm:space-y-8">
 
-    <!-- Dashboard View -->
     <section id="viewDashboard" class="space-y-6 sm:space-y-8">
       <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 p-6 sm:p-10 text-white shadow-xl shadow-blue-500/10">
         <div class="absolute -right-10 -bottom-10 opacity-10 text-white text-9xl font-black pointer-events-none">
@@ -124,7 +115,6 @@
         </div>
       </div>
 
-      <!-- KPI Cards -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
         <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
           <div class="space-y-1"><p class="text-xs font-medium text-slate-400">Total Ruangan</p><h4 class="text-2xl font-black text-slate-900" id="kpiTotalRuangan">0</h4></div>
@@ -140,7 +130,6 @@
         </div>
       </div>
 
-      <!-- Charts -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
           <div class="flex items-center justify-between"><h4 class="text-xs sm:text-sm font-bold text-slate-900">Distribusi Penggunaan Ruangan</h4><span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">Doughnut</span></div>
@@ -160,7 +149,6 @@
         </div>
       </div>
 
-      <!-- Booking History Table -->
       <div class="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden">
         <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
@@ -189,7 +177,6 @@
       </div>
     </section>
 
-    <!-- Check Room View -->
     <section id="viewCheckRoom" class="space-y-6 sm:space-y-8 hidden">
       <div class="bg-sky-50 border border-sky-200 text-sky-800 p-4 rounded-2xl text-xs font-medium flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
         <div class="flex items-start sm:items-center">
@@ -245,7 +232,6 @@
       </div>
     </section>
 
-    <!-- Admin View -->
     <section id="viewAdmin" class="space-y-6 hidden">
       <div id="adminLoginContainer" class="flex items-center justify-center py-6 sm:py-12">
         <div class="bg-white rounded-3xl max-w-md w-full shadow-lg border border-slate-200 p-6 sm:p-8 relative transition-all duration-300">
@@ -279,7 +265,6 @@
             </form>
           </div>
 
-          <!-- 2FA Step -->
           <div id="authStep2" class="space-y-4 hidden">
             <div class="text-center">
               <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl mx-auto flex items-center justify-center text-xl mb-2 shadow-xs border border-blue-100"><i class="fa-brands fa-google text-lg"></i></div>
@@ -308,7 +293,6 @@
         </div>
       </div>
 
-      <!-- Admin Panel Container -->
       <div id="adminPanelContainer" class="space-y-6 hidden">
         <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div class="flex items-center space-x-3.5">
@@ -333,7 +317,6 @@
                 <p id="adminRoomPermissionNote" class="text-[11px] text-slate-400">Daftar ruangan instansi.</p>
               </div>
             </div>
-            <!-- Kolom Pencarian Ruangan Berdasarkan Dinas/Bidang -->
             <div class="relative">
               <input type="text" id="adminSearchRoomInput" onkeyup="renderAdminRoomList()" placeholder="Cari nama ruangan / dinas..." class="w-full bg-slate-50 border border-slate-200 text-xs text-slate-700 rounded-xl py-2.5 pl-9 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
               <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
@@ -348,7 +331,6 @@
                 <p id="adminTableSubtext" class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Setujui atau tolak pengajuan secara real-time.</p>
               </div>
               <div class="flex items-center space-x-2">
-                <!-- Tombol Sinkronisasi Real-Time Khusus Halaman Admin -->
                 <button onclick="manualSyncDatabase()" title="Sinkronisasi Data Real-Time" class="inline-flex items-center justify-center px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-sm transition cursor-pointer">
                   <i id="syncIcon" class="fa-solid fa-rotate mr-1.5"></i> Sinkronkan Data
                 </button>
@@ -380,7 +362,6 @@
     © 2026 SIRUPA - Sistem Informasi Ruangan dan Peminjaman.
   </footer>
 
-  <!-- MODAL: BOOKING -->
   <div id="bookingModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
     <div class="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-8 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto space-y-5">
       <button onclick="closeBookingModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
@@ -485,7 +466,6 @@
     </div>
   </div>
 
-  <!-- MODAL: CONFLICT / WARNING -->
   <div id="doubleInputWarningModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl text-center space-y-4">
       <div class="w-16 h-16 bg-amber-50 text-amber-600 rounded-3xl flex items-center justify-center mx-auto text-3xl shadow-sm border border-amber-100"><i class="fa-solid fa-triangle-exclamation"></i></div>
@@ -508,7 +488,6 @@
     </div>
   </div>
 
-  <!-- MODAL: BOOKING DETAILS -->
   <div id="bookingDetailsModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
     <div class="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-8 shadow-2xl relative space-y-4 my-auto">
       <button onclick="closeBookingDetailsModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
@@ -520,7 +499,6 @@
     </div>
   </div>
 
-  <!-- MODAL: CAPACITY EXCEEDED WARNING -->
   <div id="capacityPopupModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center space-y-4">
       <div class="w-14 h-14 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-sm"><i class="fa-solid fa-triangle-exclamation"></i></div>
@@ -530,7 +508,6 @@
     </div>
   </div>
 
-  <!-- MODAL: CANCEL BOOKING -->
   <div id="cancelBookingModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
     <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-8 shadow-2xl relative space-y-5 my-auto">
       <button onclick="closeCancelModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
@@ -558,7 +535,6 @@
     </div>
   </div>
 
-  <!-- MODAL: SUPER ADMIN & EDIT ADMIN -->
   <div id="superAdminModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
     <div class="bg-white rounded-3xl max-w-2xl w-full p-5 sm:p-8 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto space-y-6">
       <button onclick="closeSuperAdminModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
@@ -599,7 +575,6 @@
     </div>
   </div>
 
-  <!-- MODAL: ADD / EDIT ROOM -->
   <div id="roomModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
     <div class="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-8 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto">
       <button onclick="closeRoomModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
@@ -671,27 +646,16 @@
       activeView: 'dashboard',
       totpTimer: 30,
       currentYear: 2026,
-      currentMonth: 7, // August
-      adminAccounts: [
-        { username: 'superadmin', name: 'Super Administrator', pass: 'admin123', unit: 'Semua Dinas', isSuper: true },
-        { username: 'admin_umum', name: 'Budi Santoso', pass: 'admin123', unit: 'Bagian Umum', isSuper: false },
-        { username: 'admin_it', name: 'Siti Rahma', pass: 'admin123', unit: 'Bappeda & IT', isSuper: false }
-      ],
-      rooms: [
-        { id: 'room-1', name: 'Ruang Aula Besar', category: 'Auditorium', capacity: '100 Orang', unit: 'INSPEKTORAT', available: true, statusText: 'Tersedia', badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200', icon: 'fa-circle-check', description: 'Ruangan representatif untuk rapat paripurna dan pertemuan besar.', features: ['Proyektor 4K', 'Sound System', 'AC Sentral'], images: ['https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80'], currentImageIdx: 0 },
-        { id: 'room-2', name: 'Auditorium Gedung A', category: 'Auditorium', capacity: '150 Orang', unit: 'Bappeda & IT', available: true, statusText: 'Tersedia', badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200', icon: 'fa-circle-check', description: 'Aula luas untuk seminar, sosialisasi, dan diklat instansi.', features: ['Panggung Utama', 'Full Sound & Lighting'], images: ['https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=800&q=80'], currentImageIdx: 0 }
-      ],
-      bookings: [
-        { id: 'PMJ-1029', pemohon: 'Ahmad Fauzi', email: 'ahmad@example.com', unit: 'Bagian Umum', kategori: 'Rapat Dinas', kegiatan: 'Rapat Koordinasi Triwulan', ruangan: 'Ruang Aula Besar', tanggal: '2026-08-21', jam: '08:00 - 17:00 WIB', peserta: 45, catatan: 'Mic wireless', berkasUrl: '#', status: 'Disetujui', tahun: 2026, timestamp: '2026-08-10 09:30' }
-      ]
+      currentMonth: 7,
+      adminAccounts: [],
+      rooms: [],
+      bookings: []
     };
 
     let chartInstances = {};
 
     window.onload = async function() {
       initClock();
-      populateRoomOptions();
-      populateUnitFilterOptions();
       
       const todayStr = new Date().toISOString().split('T')[0];
       const dateInput = document.getElementById('inputTanggal');
@@ -701,22 +665,12 @@
       }
 
       await syncDataFromDatabase();
-      setInterval(syncDataFromDatabase, 5000);
+      setInterval(syncDataFromDatabase, 10000);
 
-      renderRoomCards();
-      renderBookingTable();
-      updateDashboardCounts();
-      renderAdminRoomList();
-      renderAdminPendingTable();
-      renderAdminAccountsList();
-      initAnalyticsCharts();
       startTotpCountdown();
-      renderCalendar();
-      checkH1Reminders();
       switchView('dashboard');
     };
 
-    // Fungsi Pengingat H-1 dengan Lonceng Notifikasi Interaktif
     function checkH1Reminders() {
       const today = new Date();
       const tomorrow = new Date(today);
@@ -758,16 +712,15 @@
       if (dropdown) dropdown.classList.toggle('hidden');
     }
 
-    // Fungsi Tombol Sinkronisasi Real-Time Manual (Di Panel Admin)
     async function manualSyncDatabase() {
       const icon = document.getElementById('syncIcon');
       if (icon) icon.classList.add('fa-spin');
-      showToast('Menyelaraskan data dengan database Google Spreadsheet...', 'info');
+      showToast('Menyelaraskan seluruh data database Google Spreadsheet...', 'info');
       
       await syncDataFromDatabase();
       
       if (icon) icon.classList.remove('fa-spin');
-      showToast('Data aplikasi berhasil disinkronkan dengan database!', 'success');
+      showToast('Seluruh data aplikasi & database berhasil disinkronkan!', 'success');
     }
 
     async function syncDataFromDatabase() {
@@ -777,13 +730,15 @@
           if (json.bookings && Array.isArray(json.bookings)) {
             appState.bookings = json.bookings;
           }
-          if (json.rooms && Array.isArray(json.rooms) && json.rooms.length > 0) {
+          if (json.rooms && Array.isArray(json.rooms)) {
             appState.rooms = json.rooms;
           }
-          if (json.admins && Array.isArray(json.admins) && json.admins.length > 0) {
+          if (json.admins && Array.isArray(json.admins)) {
             appState.adminAccounts = json.admins;
           }
           
+          populateRoomOptions();
+          populateUnitFilterOptions();
           renderBookingTable();
           updateDashboardCounts();
           renderCalendar();
@@ -791,9 +746,10 @@
           renderAdminAccountsList();
           renderRoomCards();
           checkH1Reminders();
+          initAnalyticsCharts();
         }
       } catch (err) {
-        console.warn("Real-time sync error:", err);
+        console.error("Sinkronisasi error:", err);
       }
     }
 
@@ -1020,7 +976,7 @@
           ? 'bg-slate-200 text-slate-400 cursor-not-allowed px-4 py-2.5 rounded-2xl text-xs font-bold' 
           : 'bg-transparent text-blue-600 hover:underline font-bold text-xs transition cursor-pointer';
 
-        const photo = (room.images && room.images[0]) ? room.images[0] : 'https://placehold.co/800x400/e2e8f0/64748b?text=Ruangan';
+        const photo = (room.images && room.images[0]) ? room.images[0] : 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80';
 
         container.innerHTML += `
           <div class="bg-white rounded-3xl border border-slate-200 shadow-xs hover:shadow-md transition duration-200 overflow-hidden flex flex-col justify-between">
@@ -1315,7 +1271,7 @@
       const room = appState.rooms.find(r => r.id === roomId);
       if (room) {
         room.statusText = room.statusText === 'Tersedia' ? 'Sedang Perbaikan' : 'Tersedia';
-        room.badgeClass = room.statusText === 'Tersedia' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200';
+        room.badgeClass = room.statusText === 'Tersedia' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-emerald-200';
         room.icon = room.statusText === 'Tersedia' ? 'fa-circle-check' : 'fa-triangle-exclamation';
         renderAdminRoomList();
         renderRoomCards();
