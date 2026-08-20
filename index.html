@@ -27,10 +27,27 @@
 
   <div id="toastContainer" class="fixed top-4 left-4 right-4 sm:left-auto sm:right-5 z-50 flex flex-col space-y-3 pointer-events-none"></div>
 
-  <!-- Banner Notifikasi H-1 Penggunaan Ruangan -->
-  <div id="h1ReminderBanner" class="hidden bg-gradient-to-r from-amber-500 to-orange-600 text-white px-4 py-3 text-xs font-bold text-center shadow-md flex items-center justify-center space-x-2 z-40 sticky top-0">
-    <i class="fa-solid fa-bell-ring text-sm animate-bounce"></i>
-    <span id="h1ReminderText">Pengingat: Anda memiliki jadwal penggunaan ruangan besok (H-1)!</span>
+  <!-- BANNER NOTIFIKASI H-1 (UI/UX MODERN & ELEGAN) -->
+  <div id="h1ReminderBanner" class="hidden relative overflow-hidden bg-gradient-to-r from-amber-500 via-orange-500 to-rose-600 text-white px-4 py-3.5 shadow-lg z-40 sticky top-0 border-b border-orange-400/30 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5">
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center text-white shrink-0 live-pulse shadow-inner">
+          <i class="fa-solid fa-bell text-sm"></i>
+        </div>
+        <div>
+          <div class="text-[10px] uppercase font-black tracking-widest text-amber-100">Pengingat Otomatis H-1</div>
+          <p id="h1ReminderText" class="text-xs sm:text-sm font-bold tracking-tight">Terdapat jadwal penggunaan ruangan yang akan berlangsung besok.</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2 shrink-0">
+        <button onclick="switchView('checkRoom')" class="px-3.5 py-1.5 bg-white text-orange-700 hover:bg-orange-50 font-black rounded-xl text-xs transition shadow-sm cursor-pointer flex items-center space-x-1">
+          <i class="fa-solid fa-calendar-day text-[10px]"></i><span>Cek Jadwal</span>
+        </button>
+        <button onclick="document.getElementById('h1ReminderBanner').classList.add('hidden')" class="w-7 h-7 bg-black/10 hover:bg-black/20 text-white rounded-full flex items-center justify-center transition cursor-pointer">
+          <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+      </div>
+    </div>
   </div>
 
   <header class="bg-white/95 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200 shadow-xs">
@@ -47,7 +64,7 @@
 
       <div class="flex items-center space-x-3">
         <div class="hidden md:flex flex-col text-right border-r border-slate-200 pr-4">
-          <span id="liveClock" class="text-xs font-mono font-bold text-slate-800">17:36:40 WIB</span>
+          <span id="liveClock" class="text-xs font-mono font-bold text-slate-800">17:46:57 WIB</span>
           <span id="liveDate" class="text-[10px] text-slate-400 font-medium">Kamis, 20 Agustus 2026</span>
         </div>
 
@@ -454,7 +471,7 @@
     </div>
   </div>
 
-  <!-- POP-UP NOTIFICATION: DOUBLE INPUT / CONFLICT WARNING MODAL -->
+  <!-- MODAL: CONFLICT / WARNING -->
   <div id="doubleInputWarningModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl text-center space-y-4">
       <div class="w-16 h-16 bg-amber-50 text-amber-600 rounded-3xl flex items-center justify-center mx-auto text-3xl shadow-sm border border-amber-100"><i class="fa-solid fa-triangle-exclamation"></i></div>
@@ -462,25 +479,16 @@
         <h3 class="text-lg font-black text-slate-900 tracking-tight">Peringatan: Jadwal Bentrok (Double Input)!</h3>
         <p id="doubleInputModalText" class="text-xs text-slate-500 leading-relaxed"></p>
       </div>
-      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3 text-left space-y-1 text-xs">
-        <div class="font-bold text-slate-800"><i class="fa-solid fa-circle-info text-blue-600 mr-1"></i> Informasi Sistem:</div>
-        <p class="text-slate-600 text-[11px]">Sistem mendeteksi jadwal jam yang bertubrukan pada ruangan dan tanggal yang sama. Pengajuan dibatalkan dan tidak disimpan.</p>
-      </div>
       <button onclick="closeDoubleInputModal()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition cursor-pointer shadow-md">Saya Mengerti</button>
     </div>
   </div>
 
-  <!-- POP-UP NOTIFICATION: PAST TIME WARNING MODAL -->
   <div id="pastTimeWarningModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl text-center space-y-4">
       <div class="w-16 h-16 bg-rose-50 text-rose-600 rounded-3xl flex items-center justify-center mx-auto text-3xl shadow-sm border border-rose-100"><i class="fa-solid fa-clock-rotate-left"></i></div>
       <div class="space-y-1">
         <h3 class="text-lg font-black text-slate-900 tracking-tight">Waktu Peminjaman Telah Lewat!</h3>
         <p id="pastTimeModalText" class="text-xs text-slate-500 leading-relaxed"></p>
-      </div>
-      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3 text-left space-y-1 text-xs">
-        <div class="font-bold text-slate-800"><i class="fa-solid fa-circle-info text-rose-600 mr-1"></i> Aturan Sistem:</div>
-        <p class="text-slate-600 text-[11px]">Anda tidak dapat melakukan booking untuk tanggal atau jam yang sudah berlalu. Pengajuan ditolak.</p>
       </div>
       <button onclick="closePastTimeModal()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition cursor-pointer shadow-md">Saya Mengerti</button>
     </div>
@@ -690,11 +698,10 @@
       initAnalyticsCharts();
       startTotpCountdown();
       renderCalendar();
-      checkH1Reminders(); // Cek pengingat H-1
+      checkH1Reminders();
       switchView('dashboard');
     };
 
-    // Fungsi Pengecekan H-1 Penggunaan Ruangan
     function checkH1Reminders() {
       const today = new Date();
       const tomorrow = new Date(today);
@@ -706,7 +713,7 @@
         const banner = document.getElementById('h1ReminderBanner');
         const textEl = document.getElementById('h1ReminderText');
         if (banner && textEl) {
-          textEl.innerHTML = `PENGINGAT H-1: Terdapat <b>${h1Bookings.length} agenda</b> peminjaman ruangan yang akan berlangsung BESOK (${tomorrowStr}). Periksa detail jadwal Anda!`;
+          textEl.innerHTML = `PENGINGAT H-1: Terdapat <b>${h1Bookings.length} agenda</b> peminjaman ruangan yang akan berlangsung BESOK (${tomorrowStr}).`;
           banner.classList.remove('hidden');
         }
         h1Bookings.forEach(b => {
@@ -1727,12 +1734,45 @@
     function showToast(message, type = 'info') {
       const container = document.getElementById('toastContainer');
       if (!container) return;
+
+      const toastId = 'toast-' + Date.now();
+      let bgClass = 'bg-slate-900 text-white border-slate-800';
+      let iconHtml = '<i class="fa-solid fa-circle-info text-blue-400 text-base shrink-0"></i>';
+      
+      if (type === 'success') {
+        bgClass = 'bg-emerald-950/95 text-emerald-100 border-emerald-800/60';
+        iconHtml = '<i class="fa-solid fa-circle-check text-emerald-400 text-base shrink-0"></i>';
+      } else if (type === 'warning') {
+        bgClass = 'bg-amber-950/95 text-amber-100 border-amber-800/60';
+        iconHtml = '<i class="fa-solid fa-triangle-exclamation text-amber-400 text-base shrink-0 animate-bounce"></i>';
+      } else if (type === 'error') {
+        bgClass = 'bg-rose-950/95 text-rose-100 border-rose-800/60';
+        iconHtml = '<i class="fa-solid fa-circle-xmark text-rose-400 text-base shrink-0"></i>';
+      }
+
       const toast = document.createElement('div');
-      toast.className = `bg-white border shadow-lg rounded-2xl p-3.5 flex items-center space-x-3 text-xs font-semibold text-slate-800 transition transform translate-y-2 opacity-0 pointer-events-auto`;
-      toast.innerHTML = `<i class="fa-solid fa-info-circle text-base shrink-0"></i><span class="flex-grow">${message}</span>`;
+      toast.id = toastId;
+      toast.className = `backdrop-blur-xl border shadow-2xl rounded-2xl p-4 flex items-start space-x-3 text-xs font-medium transition-all transform translate-y-3 opacity-0 pointer-events-auto max-w-sm w-full ${bgClass}`;
+      toast.innerHTML = `
+        <div class="mt-0.5">${iconHtml}</div>
+        <div class="flex-grow space-y-0.5">
+          <div class="font-bold tracking-tight uppercase text-[9px] opacity-75">${type === 'warning' ? 'Perhatian Khusus' : 'Informasi Sistem'}</div>
+          <div class="leading-relaxed">${message}</div>
+        </div>
+        <button onclick="document.getElementById('${toastId}').remove()" class="text-white/50 hover:text-white transition cursor-pointer p-1">
+          <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+      `;
+      
       container.appendChild(toast);
-      setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 50);
-      setTimeout(() => { toast.classList.add('opacity-0', 'translate-y-2'); setTimeout(() => toast.remove(), 300); }, 3500);
+      setTimeout(() => toast.classList.remove('translate-y-3', 'opacity-0'), 50);
+      setTimeout(() => {
+        const el = document.getElementById(toastId);
+        if (el) {
+          el.classList.add('opacity-0', 'translate-y-3');
+          setTimeout(() => el.remove(), 300);
+        }
+      }, 5000);
     }
   </script>
 </body>
