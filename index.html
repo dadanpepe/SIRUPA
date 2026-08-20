@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>PinTaR - Sistem Peminjaman Ruangan Terpadu</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -12,40 +12,43 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-    body { font-family: 'Inter', sans-serif; }
+    body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
     .modal-blur { backdrop-filter: blur(8px); }
     @keyframes pulseGlow {
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.6; transform: scale(0.98); }
     }
     .live-pulse { animation: pulseGlow 2s infinite ease-in-out; }
+    /* Mobile smooth scrolling */
+    html { scroll-behavior: smooth; }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white">
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white pb-16 sm:pb-0">
 
   <!-- TOAST NOTIFICATION CONTAINER -->
-  <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col space-y-3"></div>
+  <div id="toastContainer" class="fixed top-4 left-4 right-4 sm:left-auto sm:right-5 z-50 flex flex-col space-y-3 pointer-events-none"></div>
 
-  <!-- HEADER / NAVIGATION -->
-  <header class="bg-white/90 backdrop-blur-md sticky top-0 z-40 border-b border-slate-200 shadow-xs">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-      <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('dashboard')">
-        <div class="w-11 h-11 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-2xl flex items-center justify-center font-black text-xl shadow-md shadow-blue-500/20">
+  <!-- HEADER / NAVIGATION (RESPONSIVE) -->
+  <header class="bg-white/95 backdrop-blur-md sticky top-0 z-40 border-b border-slate-200 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
+      <div class="flex items-center space-x-2.5 cursor-pointer" onclick="switchView('dashboard')">
+        <div class="w-9 h-9 sm:w-11 sm:h-11 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-2xl flex items-center justify-center font-black text-base sm:text-xl shadow-md shadow-blue-500/20 shrink-0">
           <i class="fa-solid fa-building-columns"></i>
         </div>
         <div>
-          <h1 id="headerTitle" class="text-lg font-black tracking-tight text-slate-900">PinTaR <span class="text-slate-400 font-normal">| Peminjaman Ruangan</span></h1>
-          <p id="headerSubtitle" class="text-[11px] font-semibold text-blue-600">Sistem Informasi Peminjaman Ruangan Terpadu</p>
+          <h1 id="headerTitle" class="text-sm sm:text-lg font-black tracking-tight text-slate-900 leading-tight">PinTaR <span class="text-slate-400 font-normal hidden sm:inline">| Peminjaman Ruangan</span></h1>
+          <p id="headerSubtitle" class="text-[10px] sm:text-[11px] font-semibold text-blue-600">Sistem Informasi Terpadu</p>
         </div>
       </div>
 
-      <div class="flex items-center space-x-4">
+      <div class="flex items-center space-x-3">
         <div class="hidden md:flex flex-col text-right border-r border-slate-200 pr-4">
           <span id="liveClock" class="text-xs font-mono font-bold text-slate-800">12:08:26 WIB</span>
           <span id="liveDate" class="text-[10px] text-slate-400 font-medium">Rabu, 19 Agustus 2026</span>
         </div>
 
-        <nav class="flex items-center bg-slate-100 p-1 rounded-full border border-slate-200 space-x-1">
+        <!-- Desktop Nav -->
+        <nav class="hidden sm:flex items-center bg-slate-100 p-1 rounded-full border border-slate-200 space-x-1">
           <button id="navDashboard" onclick="switchView('dashboard')" class="flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold transition-all bg-blue-600 text-white shadow-xs cursor-pointer">
             <i class="fa-solid fa-gauge-high mr-1.5"></i> Dashboard
           </button>
@@ -60,66 +63,82 @@
     </div>
   </header>
 
+  <!-- MOBILE BOTTOM NAVIGATION BAR -->
+  <div class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-6 py-2 flex justify-around items-center shadow-lg">
+    <button onclick="switchView('dashboard')" id="mobNavDashboard" class="flex flex-col items-center text-blue-600 space-y-0.5">
+      <i class="fa-solid fa-gauge-high text-lg"></i>
+      <span class="text-[10px] font-bold">Dashboard</span>
+    </button>
+    <button onclick="switchView('checkRoom')" id="mobNavCheckRoom" class="flex flex-col items-center text-slate-400 space-y-0.5">
+      <i class="fa-solid fa-magnifying-glass-chart text-lg"></i>
+      <span class="text-[10px] font-bold">Cek Ruang</span>
+    </button>
+    <button onclick="switchView('admin')" id="mobNavAdmin" class="flex flex-col items-center text-slate-400 space-y-0.5">
+      <i class="fa-solid fa-user-shield text-lg"></i>
+      <span class="text-[10px] font-bold">Admin</span>
+    </button>
+  </div>
+
   <!-- MAIN CONTENT -->
-  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+  <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6 sm:space-y-8">
 
     <!-- VIEW 1: DASHBOARD -->
-    <section id="viewDashboard" class="space-y-8">
-      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 p-8 sm:p-10 text-white shadow-xl shadow-blue-500/10">
+    <section id="viewDashboard" class="space-y-6 sm:space-y-8">
+      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 p-6 sm:p-10 text-white shadow-xl shadow-blue-500/10">
         <div class="absolute -right-10 -bottom-10 opacity-10 text-white text-9xl font-black pointer-events-none"><i class="fa-solid fa-building"></i></div>
         <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div class="max-w-3xl space-y-3">
-            <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight leading-tight">Dashboard & Statistik Ruangan</h2>
+          <div class="max-w-3xl space-y-2 sm:space-y-3">
+            <h2 class="text-xl sm:text-3xl lg:text-4xl font-black tracking-tight leading-tight">Dashboard & Statistik Ruangan</h2>
             <p class="text-blue-100 text-xs sm:text-sm leading-relaxed opacity-90">Pantau ketersediaan jadwal ruangan, analisis penggunaan fasilitas, dan status operasional secara real-time.</p>
           </div>
-          <button onclick="openBookingModal()" class="px-6 py-3.5 bg-white text-blue-700 hover:bg-blue-50 font-black rounded-2xl text-xs shadow-lg transition transform hover:-translate-y-0.5 cursor-pointer shrink-0 flex items-center justify-center space-x-2">
+          <button onclick="openBookingModal()" class="w-full sm:w-auto px-6 py-3.5 bg-white text-blue-700 hover:bg-blue-50 font-black rounded-2xl text-xs shadow-lg transition transform active:scale-95 cursor-pointer shrink-0 flex items-center justify-center space-x-2">
             <i class="fa-solid fa-plus-circle text-base"></i><span>Ajukan Peminjaman</span>
           </button>
         </div>
       </div>
 
       <!-- KPI Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
           <div class="space-y-1"><p class="text-xs font-medium text-slate-400">Total Ruangan</p><h4 class="text-2xl font-black text-slate-900" id="kpiTotalRuangan">0</h4></div>
-          <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-door-open"></i></div>
+          <div class="w-11 h-11 sm:w-12 sm:h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-door-open"></i></div>
         </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
           <div class="space-y-1"><p class="text-xs font-medium text-slate-400">Peminjaman Disetujui</p><h4 class="text-2xl font-black text-slate-900" id="kpiDisetujuiCount">0</h4></div>
-          <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-calendar-check"></i></div>
+          <div class="w-11 h-11 sm:w-12 sm:h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-calendar-check"></i></div>
         </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
           <div class="space-y-1"><p class="text-xs font-medium text-slate-400">Menunggu Verifikasi</p><h4 class="text-2xl font-black text-slate-900" id="kpiMenungguCount">0</h4></div>
-          <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-hourglass-half"></i></div>
+          <div class="w-11 h-11 sm:w-12 sm:h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-hourglass-half"></i></div>
         </div>
       </div>
 
       <!-- Charts -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
-          <div class="flex items-center justify-between"><h4 class="text-sm font-bold text-slate-900">Distribusi Penggunaan Ruangan</h4><span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">Doughnut</span></div>
-          <div class="h-64 relative flex items-center justify-center"><canvas id="chartPenggunaanRuangan"></canvas></div>
+        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
+          <div class="flex items-center justify-between"><h4 class="text-xs sm:text-sm font-bold text-slate-900">Distribusi Penggunaan Ruangan</h4><span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">Doughnut</span></div>
+          <div class="h-56 sm:h-64 relative flex items-center justify-center"><canvas id="chartPenggunaanRuangan"></canvas></div>
         </div>
-        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
-          <div class="flex items-center justify-between"><h4 class="text-sm font-bold text-slate-900">Tren Pemakaian Per Tahun</h4><span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full">Line</span></div>
-          <div class="h-64 relative"><canvas id="chartPemakaianTahun"></canvas></div>
+        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
+          <div class="flex items-center justify-between"><h4 class="text-xs sm:text-sm font-bold text-slate-900">Tren Pemakaian Per Tahun</h4><span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full">Line</span></div>
+          <div class="h-56 sm:h-64 relative"><canvas id="chartPemakaianTahun"></canvas></div>
         </div>
-        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
-          <div class="flex items-center justify-between"><h4 class="text-sm font-bold text-slate-900">Kategori Kegiatan</h4><span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">Bar</span></div>
-          <div class="h-64 relative"><canvas id="chartPesertaKategori"></canvas></div>
+        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
+          <div class="flex items-center justify-between"><h4 class="text-xs sm:text-sm font-bold text-slate-900">Kategori Kegiatan</h4><span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">Bar</span></div>
+          <div class="h-56 sm:h-64 relative"><canvas id="chartPesertaKategori"></canvas></div>
         </div>
-        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
-          <div class="flex items-center justify-between"><h4 class="text-sm font-bold text-slate-900">Proporsi Unit Dinas</h4><span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full">Polar Area</span></div>
-          <div class="h-64 relative flex items-center justify-center"><canvas id="chartUnit"></canvas></div>
+        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
+          <div class="flex items-center justify-between"><h4 class="text-xs sm:text-sm font-bold text-slate-900">Proporsi Unit Dinas</h4><span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full">Polar Area</span></div>
+          <div class="h-56 sm:h-64 relative flex items-center justify-center"><canvas id="chartUnit"></canvas></div>
         </div>
       </div>
 
       <!-- Booking History Table -->
       <div class="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden">
-        <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h3 class="text-base font-bold text-slate-900">Daftar & Riwayat Peminjaman Ruangan</h3>
-            <p class="text-xs text-slate-400 mt-0.5">Sinkronisasi langsung dengan sistem.</p>
+            <h3 class="text-sm sm:text-base font-bold text-slate-900">Daftar & Riwayat Peminjaman Ruangan</h3>
+            <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Sinkronisasi langsung dengan sistem.</p>
           </div>
           <div class="relative w-full sm:w-72">
             <input type="text" id="searchTableInput" onkeyup="filterBookingTable()" placeholder="Cari pemohon / kegiatan..." class="w-full bg-slate-50 border border-slate-200 text-xs text-slate-700 rounded-full py-2.5 pl-9 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
@@ -127,14 +146,14 @@
           </div>
         </div>
         <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
+          <table class="w-full text-left border-collapse min-w-[600px]">
             <thead>
               <tr class="bg-slate-50/70 border-b border-slate-100 text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
-                <th class="p-4 pl-6">ID / Pemohon</th>
-                <th class="p-4">Kegiatan</th>
-                <th class="p-4">Ruangan</th>
-                <th class="p-4">Waktu Pelaksanaan</th>
-                <th class="p-4 pr-6">Status</th>
+                <th class="p-3 sm:p-4 pl-5 sm:pl-6">ID / Pemohon</th>
+                <th class="p-3 sm:p-4">Kegiatan</th>
+                <th class="p-3 sm:p-4">Ruangan</th>
+                <th class="p-3 sm:p-4">Waktu Pelaksanaan</th>
+                <th class="p-3 sm:p-4 pr-5 sm:pr-6">Status</th>
               </tr>
             </thead>
             <tbody id="bookingTableBody" class="divide-y divide-slate-100 text-xs text-slate-700"></tbody>
@@ -144,38 +163,38 @@
     </section>
 
     <!-- VIEW 2: CHECK ROOM -->
-    <section id="viewCheckRoom" class="space-y-8 hidden">
-      <div class="bg-sky-50 border border-sky-200 text-sky-800 px-5 py-3.5 rounded-2xl text-xs font-medium flex items-center justify-between shadow-2xs">
-        <div class="flex items-center">
-          <i class="fa-solid fa-circle-info text-sky-600 mr-2.5 text-base"></i>
-          <span>Note : Tanggal yang ditandai merah menandakan adanya agenda peminjaman ruangan yang disetujui (Double-click untuk melihat detail)</span>
+    <section id="viewCheckRoom" class="space-y-6 sm:space-y-8 hidden">
+      <div class="bg-sky-50 border border-sky-200 text-sky-800 p-4 rounded-2xl text-xs font-medium flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
+        <div class="flex items-start sm:items-center">
+          <i class="fa-solid fa-circle-info text-sky-600 mr-2.5 text-base mt-0.5 sm:mt-0 shrink-0"></i>
+          <span>Note : Tanggal ditandai merah menandakan adanya agenda peminjaman disetujui (Double-tap/klik untuk detail)</span>
         </div>
-        <button onclick="openCancelModal()" class="px-3.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-xs transition border border-rose-200 cursor-pointer shrink-0 ml-4 flex items-center">
+        <button onclick="openCancelModal()" class="w-full sm:w-auto px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-xs transition border border-rose-200 cursor-pointer shrink-0 flex items-center justify-center">
           <i class="fa-solid fa-ban mr-1.5"></i> Batal Pinjam
         </button>
       </div>
 
-      <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-xs space-y-6">
+      <div class="bg-white rounded-3xl border border-slate-200 p-4 sm:p-5 shadow-xs space-y-4 sm:space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <h3 class="text-sm font-black text-slate-900 tracking-wide uppercase">Cek Ruang</h3>
-          <span class="text-sm font-black text-slate-800 tracking-wider" id="calendarMonthTitle">AGUSTUS 2026</span>
-          <div class="flex items-center space-x-2">
+          <h3 class="text-xs sm:text-sm font-black text-slate-900 tracking-wide uppercase">Cek Ruang</h3>
+          <span class="text-xs sm:text-sm font-black text-slate-800 tracking-wider" id="calendarMonthTitle">AGUSTUS 2026</span>
+          <div class="flex items-center justify-between sm:justify-end space-x-2">
             <button onclick="changeMonth(-1)" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-bold transition cursor-pointer"><i class="fa-solid fa-chevron-left"></i></button>
             <button id="nextMonthBtn" onclick="changeMonth(1)" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-sm cursor-pointer">September 2026</button>
             <button onclick="changeMonth(1)" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-bold transition cursor-pointer"><i class="fa-solid fa-chevron-right"></i></button>
           </div>
         </div>
         <div class="overflow-x-auto border border-slate-200 rounded-2xl">
-          <table class="w-full text-center border-collapse">
+          <table class="w-full text-center border-collapse min-w-[500px]">
             <thead>
-              <tr class="bg-slate-50 border-b border-slate-200 text-xs font-extrabold text-slate-600">
-                <th class="py-3 border-r border-slate-200">Min</th>
-                <th class="py-3 border-r border-slate-200">Sen</th>
-                <th class="py-3 border-r border-slate-200">Sel</th>
-                <th class="py-3 border-r border-slate-200">Rab</th>
-                <th class="py-3 border-r border-slate-200">Kam</th>
-                <th class="py-3 border-r border-slate-200">Jum</th>
-                <th class="py-3">Sab</th>
+              <tr class="bg-slate-50 border-b border-slate-200 text-[11px] sm:text-xs font-extrabold text-slate-600">
+                <th class="py-2.5 sm:py-3 border-r border-slate-200">Min</th>
+                <th class="py-2.5 sm:py-3 border-r border-slate-200">Sen</th>
+                <th class="py-2.5 sm:py-3 border-r border-slate-200">Sel</th>
+                <th class="py-2.5 sm:py-3 border-r border-slate-200">Rab</th>
+                <th class="py-2.5 sm:py-3 border-r border-slate-200">Kam</th>
+                <th class="py-2.5 sm:py-3 border-r border-slate-200">Jum</th>
+                <th class="py-2.5 sm:py-3">Sab</th>
               </tr>
             </thead>
             <tbody id="calendarBody" class="divide-y divide-slate-200 text-xs font-medium"></tbody>
@@ -183,23 +202,23 @@
         </div>
       </div>
 
-      <div class="space-y-4 pt-4">
+      <div class="space-y-4 pt-2">
         <div>
-          <h3 class="text-base sm:text-lg font-bold text-slate-900">Daftar Ruangan & Fasilitas</h3>
-          <p class="text-xs text-slate-400 mt-0.5">Informasi fasilitas dan status operasional ruangan terkini. Klik tombol "Pinjam Ruangan" langsung pada kartu ruangan di bawah ini untuk mengajukan peminjaman.</p>
+          <h3 class="text-sm sm:text-lg font-bold text-slate-900">Daftar Ruangan & Fasilitas</h3>
+          <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Informasi fasilitas dan status operasional ruangan terkini. Klik "Pinjam Ruangan" di bawah kartu.</p>
         </div>
-        <div id="roomCardsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+        <div id="roomCardsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6"></div>
       </div>
     </section>
 
     <!-- VIEW 3: ADMIN -->
     <section id="viewAdmin" class="space-y-6 hidden">
-      <div id="adminLoginContainer" class="flex items-center justify-center py-12">
-        <div class="bg-white rounded-3xl max-w-md w-full shadow-lg border border-slate-200 p-8 relative transition-all duration-300">
-          <div id="authStep1" class="space-y-6">
+      <div id="adminLoginContainer" class="flex items-center justify-center py-6 sm:py-12">
+        <div class="bg-white rounded-3xl max-w-md w-full shadow-lg border border-slate-200 p-6 sm:p-8 relative transition-all duration-300">
+          <div id="authStep1" class="space-y-5 sm:space-y-6">
             <div class="text-center space-y-2">
-              <div class="w-14 h-14 bg-slate-900 text-white rounded-2xl mx-auto flex items-center justify-center text-2xl shadow-md"><i class="fa-solid fa-user-shield"></i></div>
-              <h3 class="text-xl font-black text-slate-900 tracking-tight">Login Administrator</h3>
+              <div class="w-12 h-12 sm:w-14 sm:h-14 bg-slate-900 text-white rounded-2xl mx-auto flex items-center justify-center text-xl sm:text-2xl shadow-md"><i class="fa-solid fa-user-shield"></i></div>
+              <h3 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight">Login Administrator</h3>
               <p class="text-xs text-slate-500 leading-relaxed max-w-xs mx-auto">Masuk sebagai Super Admin atau Admin Dinas/Bidang.</p>
             </div>
             <form onsubmit="handleCredentialsSubmit(event)" class="space-y-4 text-xs">
@@ -230,7 +249,7 @@
           <div id="authStep2" class="space-y-4 hidden">
             <div class="text-center">
               <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl mx-auto flex items-center justify-center text-xl mb-2 shadow-xs border border-blue-100"><i class="fa-brands fa-google text-lg"></i></div>
-              <h3 class="text-base font-extrabold text-slate-900">Autentikasi Google Authenticator</h3>
+              <h3 class="text-sm sm:text-base font-extrabold text-slate-900">Autentikasi Google Authenticator</h3>
             </div>
             <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
               <div class="flex items-center space-x-3">
@@ -244,11 +263,11 @@
             </div>
             <div class="text-left space-y-1">
               <label class="block text-xs font-bold text-slate-700 text-center">Masukkan 6-Digit Kode Google Authenticator</label>
-              <input type="text" id="otpInput" maxlength="6" placeholder="000000" oninput="autoVerifyOtp()" class="w-full text-center tracking-[0.5em] font-mono font-extrabold text-xl bg-slate-50 border border-slate-300 rounded-2xl p-3 text-slate-900 focus:ring-2 focus:ring-blue-600 outline-none mt-1">
+              <input type="text" id="otpInput" maxlength="6" placeholder="000000" oninput="autoVerifyOtp()" class="w-full text-center tracking-[0.4em] font-mono font-extrabold text-lg sm:text-xl bg-slate-50 border border-slate-300 rounded-2xl p-3 text-slate-900 focus:ring-2 focus:ring-blue-600 outline-none mt-1">
             </div>
             <div id="otpError" class="hidden bg-rose-50 border border-rose-200 text-rose-700 p-2.5 rounded-xl text-xs font-semibold text-center">Kode OTP Google Authenticator tidak valid.</div>
             <div class="grid grid-cols-2 gap-3 pt-1">
-              <button type="button" onclick="backToStep1()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold text-xs rounded-xl transition cursor-pointer flex items-center justify-center"><i class="fa-solid fa-arrow-left mr-1.5"></i> Ganti Akun</button>
+              <button type="button" onclick="backToStep1()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold text-xs rounded-xl transition cursor-pointer flex items-center justify-center"><i class="fa-solid fa-arrow-left mr-1.5"></i> Ganti</button>
               <button type="button" onclick="verifyGoogleAuthenticator2FA()" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition cursor-pointer flex items-center justify-center"><i class="fa-solid fa-shield-halved mr-1.5"></i> Autentikasi</button>
             </div>
           </div>
@@ -257,50 +276,50 @@
 
       <!-- Admin Panel Container -->
       <div id="adminPanelContainer" class="space-y-6 hidden">
-        <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div class="flex items-center space-x-4">
-            <div id="adminPanelIconBg" class="w-12 h-12 bg-slate-900 text-white rounded-2xl flex items-center justify-center text-xl shadow-md shrink-0"><i class="fa-solid fa-user-shield"></i></div>
+        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="flex items-center space-x-3.5">
+            <div id="adminPanelIconBg" class="w-11 h-11 sm:w-12 sm:h-12 bg-slate-900 text-white rounded-2xl flex items-center justify-center text-lg sm:text-xl shadow-md shrink-0"><i class="fa-solid fa-user-shield"></i></div>
             <div class="space-y-0.5">
               <span id="adminRoleBadge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200"><span class="w-1.5 h-1.5 bg-purple-500 rounded-full mr-1.5 live-pulse"></span> Super Administrator</span>
-              <h2 id="adminWelcomeTitle" class="text-lg font-black text-slate-900">Panel Kendali & Manajemen Ruangan</h2>
+              <h2 id="adminWelcomeTitle" class="text-base sm:text-lg font-black text-slate-900">Panel Kendali & Manajemen Ruangan</h2>
             </div>
           </div>
-          <div class="flex items-center space-x-3 flex-wrap gap-y-2">
-            <button id="superAdminOnlyBtn" onclick="openSuperAdminModal()" class="hidden inline-flex items-center px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs transition shadow-sm cursor-pointer"><i class="fa-solid fa-users-gear mr-1.5"></i> Kelola Akun Admin Dinas</button>
-            <button onclick="openAddRoomModal()" class="inline-flex items-center px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition shadow-sm cursor-pointer"><i class="fa-solid fa-plus mr-1.5"></i> Tambah Ruangan</button>
-            <button onclick="adminLogout()" class="inline-flex items-center px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-xs transition border border-rose-200 cursor-pointer"><i class="fa-solid fa-right-from-bracket mr-2"></i> Keluar</button>
+          <div class="flex items-center space-x-2.5 flex-wrap gap-y-2">
+            <button id="superAdminOnlyBtn" onclick="openSuperAdminModal()" class="hidden inline-flex items-center px-3.5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs transition shadow-sm cursor-pointer"><i class="fa-solid fa-users-gear mr-1.5"></i> Kelola Admin</button>
+            <button onclick="openAddRoomModal()" class="inline-flex items-center px-3.5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition shadow-sm cursor-pointer"><i class="fa-solid fa-plus mr-1.5"></i> Tambah Ruangan</button>
+            <button onclick="adminLogout()" class="inline-flex items-center px-3.5 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-xs transition border border-rose-200 cursor-pointer"><i class="fa-solid fa-right-from-bracket mr-1.5"></i> Keluar</button>
           </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div class="lg:col-span-5 bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
+          <div class="lg:col-span-5 bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
             <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
               <div>
-                <h3 class="text-sm font-bold text-slate-900">Ruangan Berdasarkan Dinas/Bidang</h3>
-                <p id="adminRoomPermissionNote" class="text-xs text-slate-400">Daftar ruangan instansi.</p>
+                <h3 class="text-xs sm:text-sm font-bold text-slate-900">Ruangan Berdasarkan Dinas/Bidang</h3>
+                <p id="adminRoomPermissionNote" class="text-[11px] text-slate-400">Daftar ruangan instansi.</p>
               </div>
             </div>
             <div id="adminRoomList" class="space-y-3 max-h-[500px] overflow-y-auto pr-1"></div>
           </div>
 
           <div class="lg:col-span-7 bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
-            <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h3 class="text-base font-bold text-slate-900">Daftar Masuk Permintaan Peminjaman</h3>
-                <p id="adminTableSubtext" class="text-xs text-slate-400 mt-0.5">Setujui atau tolak pengajuan secara real-time.</p>
+                <h3 class="text-sm sm:text-base font-bold text-slate-900">Daftar Masuk Permintaan Peminjaman</h3>
+                <p id="adminTableSubtext" class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Setujui atau tolak pengajuan secara real-time.</p>
               </div>
-              <button onclick="renderAdminPendingTable()" class="inline-flex items-center px-3.5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition cursor-pointer"><i class="fa-solid fa-arrows-rotate mr-1.5 text-blue-600"></i> Muat Ulang</button>
+              <button onclick="renderAdminPendingTable()" class="inline-flex items-center justify-center px-3.5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition cursor-pointer"><i class="fa-solid fa-arrows-rotate mr-1.5 text-blue-600"></i> Muat Ulang</button>
             </div>
             <div class="overflow-x-auto flex-grow">
-              <table class="w-full text-left border-collapse">
+              <table class="w-full text-left border-collapse min-w-[600px]">
                 <thead>
                   <tr class="bg-slate-50/70 border-b border-slate-100 text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
-                    <th class="p-4 pl-5">ID / Pemohon</th>
-                    <th class="p-4">Kegiatan</th>
-                    <th class="p-4">Ruangan</th>
-                    <th class="p-4">Jadwal</th>
-                    <th class="p-4">Status</th>
-                    <th class="p-4 pr-5 text-center">Aksi</th>
+                    <th class="p-3 sm:p-4 pl-5">ID / Pemohon</th>
+                    <th class="p-3 sm:p-4">Kegiatan</th>
+                    <th class="p-3 sm:p-4">Ruangan</th>
+                    <th class="p-3 sm:p-4">Jadwal</th>
+                    <th class="p-3 sm:p-4">Status</th>
+                    <th class="p-3 sm:p-4 pr-5 text-center">Aksi</th>
                   </tr>
                 </thead>
                 <tbody id="adminPendingTableBody" class="divide-y divide-slate-100 text-xs text-slate-700"></tbody>
@@ -317,25 +336,25 @@
   </footer>
 
   <!-- MODAL: SUPER ADMIN & EDIT ADMIN -->
-  <div id="superAdminModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto space-y-6">
-      <button onclick="closeSuperAdminModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
+  <div id="superAdminModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-5 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto space-y-6">
+      <button onclick="closeSuperAdminModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
       <div class="space-y-1">
         <span class="text-[10px] font-black text-purple-600 uppercase tracking-wider">Super Admin Kontrol</span>
-        <h3 class="text-lg font-black text-slate-900 tracking-tight">Manajemen Akun Admin Dinas & Bidang</h3>
+        <h3 class="text-base sm:text-lg font-black text-slate-900 tracking-tight">Manajemen Akun Admin Dinas & Bidang</h3>
       </div>
-      <form onsubmit="handleCreateAdminSubmit(event)" class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4 text-xs">
+      <form onsubmit="handleCreateAdminSubmit(event)" class="bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200 space-y-4 text-xs">
         <input type="hidden" id="editAdminUsernameKey">
         <h4 id="adminFormTitle" class="font-bold text-slate-900 flex items-center"><i class="fa-solid fa-user-plus mr-2 text-purple-600"></i> Tambah Akun Admin Baru</h4>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div><label class="block font-bold text-slate-700 mb-1">Nama Admin</label><input type="text" id="newAdminName" required placeholder="Contoh: Budi Santoso" class="w-full bg-white border border-slate-200 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-purple-500"></div>
-          <div><label class="block font-bold text-slate-700 mb-1">Username</label><input type="text" id="newAdminUsername" required placeholder="Contoh: admin_umum" class="w-full bg-white border border-slate-200 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-purple-500 font-mono"></div>
+          <div><label class="block font-bold text-slate-700 mb-1">Nama Admin</label><input type="text" id="newAdminName" required placeholder="Contoh: Budi Santoso" class="w-full bg-white border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-purple-500"></div>
+          <div><label class="block font-bold text-slate-700 mb-1">Username</label><input type="text" id="newAdminUsername" required placeholder="Contoh: admin_umum" class="w-full bg-white border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-purple-500 font-mono"></div>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div><label class="block font-bold text-slate-700 mb-1">Password</label><input type="text" id="newAdminPassword" required placeholder="••••••••" class="w-full bg-white border border-slate-200 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-purple-500"></div>
+          <div><label class="block font-bold text-slate-700 mb-1">Password</label><input type="text" id="newAdminPassword" required placeholder="••••••••" class="w-full bg-white border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-purple-500"></div>
           <div>
             <label class="block font-bold text-slate-700 mb-1">Level Akses Admin</label>
-            <select id="newAdminLevel" onchange="toggleUnitDropdown()" class="w-full bg-white border border-slate-200 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer font-bold text-purple-700">
+            <select id="newAdminLevel" onchange="toggleUnitDropdown()" class="w-full bg-white border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer font-bold text-purple-700">
               <option value="dinas">Admin Dinas / Bidang</option>
               <option value="super">Super Administrator</option>
             </select>
@@ -343,11 +362,11 @@
         </div>
         <div id="unitSelectionGroup">
           <label class="block font-bold text-slate-700 mb-1">Nama Dinas / Instansi / Bidang <span class="text-slate-400 font-normal">(Ketik Manual)</span></label>
-          <input type="text" id="newAdminUnit" placeholder="Contoh: Bagian Umum / Dinas Pendidikan" class="w-full bg-white border border-slate-200 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-purple-500">
+          <input type="text" id="newAdminUnit" placeholder="Contoh: Bagian Umum / Dinas Pendidikan" class="w-full bg-white border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-purple-500">
         </div>
         <div class="flex items-center justify-end space-x-2 pt-1">
           <button type="button" id="cancelEditAdminBtn" onclick="resetAdminForm()" class="hidden px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl transition cursor-pointer">Batal</button>
-          <button type="submit" id="submitAdminBtn" class="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-md transition cursor-pointer flex items-center"><i class="fa-solid fa-floppy-disk mr-2"></i> Simpan Akun Admin</button>
+          <button type="submit" id="submitAdminBtn" class="w-full sm:w-auto px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-md transition cursor-pointer flex items-center justify-center"><i class="fa-solid fa-floppy-disk mr-2"></i> Simpan Akun Admin</button>
         </div>
       </form>
       <div class="space-y-3">
@@ -358,10 +377,10 @@
   </div>
 
   <!-- MODAL: ADD / EDIT ROOM -->
-  <div id="roomModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-      <button onclick="closeRoomModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
-      <div class="mb-6 space-y-1"><h3 id="roomModalTitle" class="text-lg font-black text-slate-900 tracking-tight">Tambah Ruangan Baru</h3></div>
+  <div id="roomModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeRoomModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
+      <div class="mb-5 space-y-1"><h3 id="roomModalTitle" class="text-base sm:text-lg font-black text-slate-900 tracking-tight">Tambah Ruangan Baru</h3></div>
       <form id="roomForm" onsubmit="handleRoomFormSubmit(event)" class="space-y-4 text-xs">
         <input type="hidden" id="editRoomId">
         <div><label class="block font-bold text-slate-700 mb-1.5">Nama Ruangan</label><input type="text" id="inputRoomName" required placeholder="Contoh: Ruang Rapat Kartini" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none"></div>
@@ -377,7 +396,7 @@
         <div><label class="block font-bold text-slate-700 mb-1.5">Fasilitas <span class="text-slate-400 font-normal">(pisahkan dengan koma)</span></label><input type="text" id="inputRoomFeatures" required placeholder="Contoh: Proyektor, AC" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none"></div>
         <div><label class="block font-bold text-slate-700 mb-1.5">Deskripsi</label><textarea id="inputRoomDesc" rows="2" required placeholder="Deskripsi..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none resize-none"></textarea></div>
         <div><label class="block font-bold text-slate-700 mb-1.5">URL Foto Ruangan</label><input type="text" id="inputRoomPhoto" placeholder="https://..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none"></div>
-        <div class="flex items-center justify-end space-x-3 pt-4 border-t border-slate-100">
+        <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100">
           <button type="button" onclick="closeRoomModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition cursor-pointer">Batal</button>
           <button type="submit" id="submitRoomBtn" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition cursor-pointer flex items-center"><i class="fa-solid fa-floppy-disk mr-2"></i> Simpan Ruangan</button>
         </div>
@@ -386,12 +405,12 @@
   </div>
 
   <!-- MODAL: BOOKING FORM -->
-  <div id="bookingModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-      <button onclick="closeBookingModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
-      <div class="mb-6 space-y-1">
+  <div id="bookingModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeBookingModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
+      <div class="mb-5 space-y-1">
         <span id="bookingRoomContextBadge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 mb-1">Pengajuan Umum</span>
-        <h3 id="bookingModalMainTitle" class="text-lg font-black text-slate-900 tracking-tight">Formulir Peminjaman Ruangan</h3>
+        <h3 id="bookingModalMainTitle" class="text-base sm:text-lg font-black text-slate-900 tracking-tight">Formulir Peminjaman Ruangan</h3>
       </div>
 
       <!-- CAPACITY WARNING BANNER -->
@@ -439,7 +458,7 @@
         <div><label class="block font-bold text-slate-700 mb-1.5">Jumlah Peserta</label><input type="number" id="inputPeserta" min="1" oninput="checkCapacityLimit()" required placeholder="25" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none"></div>
         <div><label class="block font-bold text-slate-700 mb-1.5">Upload Berkas / Surat Izin <span class="text-rose-600 font-bold">(PDF)</span></label><input type="file" id="inputBerkas" accept=".pdf" class="block w-full text-xs text-slate-500 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer"></div>
         <div><label class="block font-bold text-slate-700 mb-1.5">Catatan (Opsional)</label><textarea id="inputCatatan" rows="2" placeholder="Catatan..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none resize-none"></textarea></div>
-        <div class="flex items-center justify-end space-x-3 pt-4 border-t border-slate-100">
+        <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100">
           <button type="button" onclick="closeBookingModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition cursor-pointer">Batal</button>
           <button type="submit" id="submitBookingBtn" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition cursor-pointer flex items-center"><i class="fa-solid fa-paper-plane mr-2"></i> Kirim</button>
         </div>
@@ -461,8 +480,8 @@
 
   <!-- MODAL: DETAIL BOOKING -->
   <div id="bookingDetailsModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative space-y-4">
-      <button onclick="closeBookingDetailsModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
+    <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-8 shadow-2xl relative space-y-4">
+      <button onclick="closeBookingDetailsModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
       <div class="space-y-1"><span class="text-[10px] font-black text-blue-600 uppercase tracking-wider">Detail Agenda</span><h3 id="modalDetailTitle" class="text-base font-black text-slate-900">Informasi Jadwal</h3></div>
       <div id="modalDetailContent" class="space-y-2.5 text-xs text-slate-700 bg-slate-50 p-4 rounded-2xl border border-slate-200"></div>
       <div class="pt-2 flex justify-end"><button onclick="closeBookingDetailsModal()" class="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition cursor-pointer">Tutup</button></div>
@@ -471,8 +490,8 @@
 
   <!-- MODAL: CANCEL BOOKING -->
   <div id="cancelBookingModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative space-y-4">
-      <button onclick="closeCancelModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
+    <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-8 shadow-2xl relative space-y-4">
+      <button onclick="closeCancelModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
       <div class="space-y-1"><span class="text-[10px] font-black text-rose-600 uppercase tracking-wider">Pembatalan Jadwal</span><h3 class="text-base font-black text-slate-900">Batalkan Peminjaman</h3></div>
       <form onsubmit="handleCancelBookingSubmit(event)" class="space-y-4 text-xs">
         <div><label class="block font-bold text-slate-700 mb-1.5">ID Peminjaman</label><input type="text" id="cancelBookingId" required placeholder="PMJ-XXXX" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-mono font-bold uppercase outline-none"></div>
@@ -559,24 +578,34 @@
         if (el) el.classList.add('hidden');
       });
 
+      // Reset desktop nav
       ['navDashboard', 'navCheckRoom', 'navAdmin'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.className = "flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold transition-all text-slate-600 hover:text-blue-600 cursor-pointer";
       });
 
+      // Reset mobile bottom nav
+      ['mobNavDashboard', 'mobNavCheckRoom', 'mobNavAdmin'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.className = "flex flex-col items-center text-slate-400 space-y-0.5";
+      });
+
       if (viewName === 'dashboard') {
         document.getElementById('viewDashboard').classList.remove('hidden');
-        document.getElementById('navDashboard').className = "flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold transition-all bg-blue-600 text-white shadow-xs cursor-pointer";
+        if (document.getElementById('navDashboard')) document.getElementById('navDashboard').className = "flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold transition-all bg-blue-600 text-white shadow-xs cursor-pointer";
+        if (document.getElementById('mobNavDashboard')) document.getElementById('mobNavDashboard').className = "flex flex-col items-center text-blue-600 space-y-0.5";
         updateDashboardCounts();
         setTimeout(initAnalyticsCharts, 200);
       } else if (viewName === 'checkRoom') {
         document.getElementById('viewCheckRoom').classList.remove('hidden');
-        document.getElementById('navCheckRoom').className = "flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold transition-all bg-blue-600 text-white shadow-xs cursor-pointer";
+        if (document.getElementById('navCheckRoom')) document.getElementById('navCheckRoom').className = "flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold transition-all bg-blue-600 text-white shadow-xs cursor-pointer";
+        if (document.getElementById('mobNavCheckRoom')) document.getElementById('mobNavCheckRoom').className = "flex flex-col items-center text-blue-600 space-y-0.5";
         renderCalendar();
         renderRoomCards();
       } else if (viewName === 'admin') {
         document.getElementById('viewAdmin').classList.remove('hidden');
-        document.getElementById('navAdmin').className = "flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold transition-all bg-slate-900 text-white shadow-xs cursor-pointer";
+        if (document.getElementById('navAdmin')) document.getElementById('navAdmin').className = "flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold transition-all bg-slate-900 text-white shadow-xs cursor-pointer";
+        if (document.getElementById('mobNavAdmin')) document.getElementById('mobNavAdmin').className = "flex flex-col items-center text-blue-600 space-y-0.5";
         
         const loginContainer = document.getElementById('adminLoginContainer');
         const panelContainer = document.getElementById('adminPanelContainer');
@@ -591,6 +620,7 @@
           panelContainer.classList.add('hidden');
         }
       }
+      window.scrollTo(0, 0);
     }
 
     const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
@@ -619,7 +649,7 @@
       let dateCounter = 1, nextMonthCounter = 1, rowHtml = '';
 
       for (let i = 0; i < 6; i++) {
-        rowHtml += '<tr class="h-24">';
+        rowHtml += '<tr class="h-20 sm:h-24">';
         for (let j = 0; j < 7; j++) {
           let dayNum = 0, isCurrentMonth = false, dateStr = '';
           if (i === 0 && j < firstDayIndex) {
@@ -642,15 +672,15 @@
           let cellBgClass = 'bg-white', textColor = isCurrentMonth ? 'text-slate-800' : 'text-slate-300', dblClickAttr = '';
 
           if (hasBookings) {
-            cellBgClass = 'bg-rose-100/75 cursor-pointer hover:bg-rose-200/80';
+            cellBgClass = 'bg-rose-100/75 cursor-pointer hover:bg-rose-200/80 active:bg-rose-300';
             textColor = 'text-slate-900 font-bold';
             const bInfo = encodeURIComponent(JSON.stringify(bookingsOnThisDay));
-            dblClickAttr = `ondblclick="showBookingDetails('${bInfo}')"`;
+            dblClickAttr = `onclick="showBookingDetails('${bInfo}')" ondblclick="showBookingDetails('${bInfo}')"`;
           } else {
-            dblClickAttr = `ondblclick="showEmptyAgendaModal('${dateStr}')"`;
+            dblClickAttr = `onclick="showEmptyAgendaModal('${dateStr}')" ondblclick="showEmptyAgendaModal('${dateStr}')"`;
           }
 
-          rowHtml += `<td ${dblClickAttr} class="align-top border-r border-slate-200 p-2 relative ${cellBgClass} transition cursor-pointer"><span class="${textColor} text-xs">${dayNum}</span></td>`;
+          rowHtml += `<td ${dblClickAttr} class="align-top border-r border-slate-200 p-1.5 sm:p-2 relative ${cellBgClass} transition cursor-pointer"><span class="${textColor} text-xs">${dayNum}</span></td>`;
         }
         rowHtml += '</tr>';
         if (dateCounter > totalDays && i >= 4) break;
@@ -702,30 +732,30 @@
       if (!container) return;
       container.innerHTML = '';
       appState.rooms.forEach((room) => {
-        const featuresHtml = room.features.map(f => `<span class="inline-flex items-center text-[11px] text-slate-600 font-medium mr-2 mb-1.5 bg-slate-100 px-2.5 py-1 rounded-md"><i class="fa-solid fa-check text-emerald-600 mr-1.5 text-xs"></i> ${f}</span>`).join('');
+        const featuresHtml = room.features.map(f => `<span class="inline-flex items-center text-[10px] sm:text-[11px] text-slate-600 font-medium mr-1.5 mb-1 bg-slate-100 px-2 py-0.5 rounded-md"><i class="fa-solid fa-check text-emerald-600 mr-1 text-xs"></i> ${f}</span>`).join('');
         
         const isUnderMaintenance = room.statusText === 'Sedang Perbaikan' || room.statusText === 'Tidak Tersedia';
         const btnDisabledAttr = isUnderMaintenance ? 'disabled' : '';
         const btnClass = isUnderMaintenance 
-          ? 'bg-slate-200 text-slate-400 cursor-not-allowed px-5 py-2.5 rounded-2xl text-xs font-bold' 
-          : 'bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold rounded-2xl text-xs transition cursor-pointer shadow-2xs';
+          ? 'bg-slate-200 text-slate-400 cursor-not-allowed px-4 py-2.5 rounded-2xl text-xs font-bold' 
+          : 'bg-blue-50 hover:bg-blue-100 active:bg-blue-200 text-blue-600 font-bold rounded-2xl text-xs transition cursor-pointer shadow-2xs';
 
         container.innerHTML += `
           <div class="bg-white rounded-3xl border border-slate-200 shadow-xs hover:shadow-md transition duration-200 overflow-hidden flex flex-col justify-between">
             <div>
-              <div class="relative h-56 w-full overflow-hidden bg-slate-100">
+              <div class="relative h-48 sm:h-56 w-full overflow-hidden bg-slate-100">
                 <img src="${room.images[0]}" alt="${room.name}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/800x400/e2e8f0/64748b?text=Ruangan'">
-                <span class="absolute top-4 right-4 bg-white/90 backdrop-blur-md text-slate-800 text-xs font-semibold px-3.5 py-1.5 rounded-full shadow-sm"><i class="fa-solid fa-users text-blue-600 mr-2"></i> ${room.capacity}</span>
-                <span class="absolute top-4 left-4 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full">${room.unit || 'Umum'}</span>
+                <span class="absolute top-3 right-3 sm:top-4 sm:right-4 bg-white/90 backdrop-blur-md text-slate-800 text-[11px] sm:text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm"><i class="fa-solid fa-users text-blue-600 mr-1.5"></i> ${room.capacity}</span>
+                <span class="absolute top-3 left-3 sm:top-4 sm:left-4 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full">${room.unit || 'Umum'}</span>
               </div>
-              <div class="p-6 space-y-3">
-                <h4 class="text-lg font-bold text-slate-900">${room.name}</h4>
-                <p class="text-xs text-slate-500 leading-relaxed">${room.description}</p>
+              <div class="p-4 sm:p-6 space-y-2.5">
+                <h4 class="text-base sm:text-lg font-bold text-slate-900">${room.name}</h4>
+                <p class="text-[11px] sm:text-xs text-slate-500 leading-relaxed">${room.description}</p>
                 <div class="flex flex-wrap pt-1">${featuresHtml}</div>
               </div>
             </div>
-            <div class="p-6 pt-0 flex items-center justify-between border-t border-slate-100 mt-3 pt-4">
-              <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold border ${room.badgeClass}"><i class="fa-solid ${room.icon} mr-1.5"></i> ${room.statusText}</span>
+            <div class="p-4 sm:p-6 pt-0 flex items-center justify-between border-t border-slate-100 mt-2 pt-3 sm:pt-4">
+              <span class="inline-flex items-center px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-bold border ${room.badgeClass}"><i class="fa-solid ${room.icon} mr-1.5"></i> ${room.statusText}</span>
               <button ${btnDisabledAttr} onclick="openBookingModalForRoom('${room.name}')" class="${btnClass}">Pinjam Ruangan</button>
             </div>
           </div>`;
@@ -770,11 +800,11 @@
         let statusBadge = item.status === 'Disetujui' ? `<span class="bg-emerald-50 text-emerald-700 border px-3 py-1 rounded-full text-xs font-bold">Disetujui</span>` : item.status === 'Menunggu' ? `<span class="bg-amber-50 text-amber-700 border px-3 py-1 rounded-full text-xs font-bold">Menunggu</span>` : `<span class="bg-rose-50 text-rose-700 border px-3 py-1 rounded-full text-xs font-bold">${item.status}</span>`;
         tbody.innerHTML += `
           <tr class="hover:bg-slate-50/80 transition">
-            <td class="p-4 pl-6"><span class="font-bold text-blue-600">${item.id}</span><div class="text-[11px] text-slate-400">${item.pemohon}</div></td>
-            <td class="p-4 font-bold text-slate-800">${item.kegiatan}</td>
-            <td class="p-4 text-slate-600 font-medium">${item.ruangan}</td>
-            <td class="p-4"><div class="font-medium text-slate-700">${item.tanggal}</div><div class="text-[11px] text-slate-400">${item.jam}</div></td>
-            <td class="p-4 pr-6">${statusBadge}</td>
+            <td class="p-3 sm:p-4 pl-5 sm:pl-6"><span class="font-bold text-blue-600">${item.id}</span><div class="text-[11px] text-slate-400">${item.pemohon}</div></td>
+            <td class="p-3 sm:p-4 font-bold text-slate-800">${item.kegiatan}</td>
+            <td class="p-3 sm:p-4 text-slate-600 font-medium">${item.ruangan}</td>
+            <td class="p-3 sm:p-4"><div class="font-medium text-slate-700">${item.tanggal}</div><div class="text-[11px] text-slate-400">${item.jam}</div></td>
+            <td class="p-3 sm:p-4 pr-5 sm:pr-6">${statusBadge}</td>
           </tr>`;
       });
     }
@@ -800,7 +830,7 @@
 
       filteredRooms.forEach(room => {
         container.innerHTML += `
-          <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
+          <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-3">
             <div class="flex items-center justify-between">
               <div><h4 class="font-bold text-xs text-slate-900">${room.name}</h4><p class="text-[10px] text-slate-500">Unit: ${room.unit || 'Umum'} | Kapasitas: ${room.capacity}</p></div>
               <span class="inline-flex items-center text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${room.badgeClass}"><i class="fa-solid ${room.icon} mr-1"></i> ${room.statusText}</span>
@@ -834,12 +864,12 @@
         let statusTag = item.status === 'Disetujui' ? `<span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full text-[10px] font-bold">Disetujui</span>` : item.status === 'Menunggu' ? `<span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full text-[10px] font-bold">Menunggu</span>` : `<span class="bg-rose-100 text-rose-800 px-2.5 py-1 rounded-full text-[10px] font-bold">${item.status}</span>`;
         tbody.innerHTML += `
           <tr class="hover:bg-slate-50 transition">
-            <td class="p-4 pl-5"><span class="font-bold text-blue-600">${item.id}</span><div class="text-[11px] text-slate-600">${item.pemohon}</div></td>
-            <td class="p-4 font-bold text-slate-800">${item.kegiatan}</td>
-            <td class="p-4 text-slate-700">${item.ruangan}</td>
-            <td class="p-4"><div class="font-semibold text-slate-800">${item.tanggal}</div><div class="text-[10px] text-slate-400">${item.jam}</div></td>
-            <td class="p-4">${statusTag}</td>
-            <td class="p-4 pr-5 text-center"><button onclick="updateBookingStatusInCloud('${item.id}', 'Disetujui')" class="px-3 py-1.5 bg-emerald-50 text-emerald-700 font-bold rounded-xl text-[11px] cursor-pointer mr-1">Setujui</button><button onclick="updateBookingStatusInCloud('${item.id}', 'Ditolak')" class="px-3 py-1.5 bg-rose-50 text-rose-700 font-bold rounded-xl text-[11px] cursor-pointer">Tolak</button></td>
+            <td class="p-3 sm:p-4 pl-5"><span class="font-bold text-blue-600">${item.id}</span><div class="text-[11px] text-slate-600">${item.pemohon}</div></td>
+            <td class="p-3 sm:p-4 font-bold text-slate-800">${item.kegiatan}</td>
+            <td class="p-3 sm:p-4 text-slate-700">${item.ruangan}</td>
+            <td class="p-3 sm:p-4"><div class="font-semibold text-slate-800">${item.tanggal}</div><div class="text-[10px] text-slate-400">${item.jam}</div></td>
+            <td class="p-3 sm:p-4">${statusTag}</td>
+            <td class="p-3 sm:p-4 pr-5 text-center"><button onclick="updateBookingStatusInCloud('${item.id}', 'Disetujui')" class="px-3 py-1.5 bg-emerald-50 text-emerald-700 font-bold rounded-xl text-[11px] cursor-pointer mr-1">Setujui</button><button onclick="updateBookingStatusInCloud('${item.id}', 'Ditolak')" class="px-3 py-1.5 bg-rose-50 text-rose-700 font-bold rounded-xl text-[11px] cursor-pointer">Tolak</button></td>
           </tr>`;
       });
     }
@@ -960,7 +990,6 @@
       if (editId !== '') {
         const roomIndex = appState.rooms.findIndex(r => r.id === editId);
         if (roomIndex !== -1) {
-          // Pertahankan properti lama yang tidak ada di form (seperti status, icon, badgeClass, images jika tidak diubah)
           const existingRoom = appState.rooms[roomIndex];
           appState.rooms[roomIndex] = {
             ...existingRoom,
@@ -1302,7 +1331,7 @@
       const container = document.getElementById('toastContainer');
       if (!container) return;
       const toast = document.createElement('div');
-      toast.className = `bg-white border shadow-lg rounded-2xl p-3.5 flex items-center space-x-3 text-xs font-semibold text-slate-800 transition transform translate-y-2 opacity-0`;
+      toast.className = `bg-white border shadow-lg rounded-2xl p-3.5 flex items-center space-x-3 text-xs font-semibold text-slate-800 transition transform translate-y-2 opacity-0 pointer-events-auto`;
       toast.innerHTML = `<i class="fa-solid fa-info-circle text-base shrink-0"></i><span class="flex-grow">${message}</span>`;
       container.appendChild(toast);
       setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 50);
