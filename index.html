@@ -41,7 +41,7 @@
 
       <div class="flex items-center space-x-3">
         <div class="hidden md:flex flex-col text-right border-r border-slate-200 pr-4">
-          <span id="liveClock" class="text-xs font-mono font-bold text-slate-800">17:01:20 WIB</span>
+          <span id="liveClock" class="text-xs font-mono font-bold text-slate-800">17:14:47 WIB</span>
           <span id="liveDate" class="text-[10px] text-slate-400 font-medium">Kamis, 20 Agustus 2026</span>
         </div>
 
@@ -568,6 +568,7 @@
       <div class="mb-5 space-y-1"><h3 id="roomModalTitle" class="text-base sm:text-lg font-black text-slate-900 tracking-tight">Tambah Ruangan Baru</h3></div>
       <form id="roomForm" onsubmit="handleRoomFormSubmit(event)" class="space-y-4 text-xs">
         <input type="hidden" id="editRoomId">
+        <input type="hidden" id="inputRoomExistingPhoto" value="">
         <div><label class="block font-bold text-slate-700 mb-1.5">Nama Ruangan</label><input type="text" id="inputRoomName" required placeholder="Contoh: Ruang Rapat Kartini" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none"></div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div><label class="block font-bold text-slate-700 mb-1.5">Kategori</label>
@@ -580,7 +581,19 @@
         <div><label class="block font-bold text-slate-700 mb-1.5">Dinas / Bidang Pengelola <span class="text-slate-400 font-normal">(Ketik Manual)</span></label><input type="text" id="inputRoomUnit" required placeholder="Contoh: Bagian Umum" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none"></div>
         <div><label class="block font-bold text-slate-700 mb-1.5">Fasilitas <span class="text-slate-400 font-normal">(pisahkan dengan koma)</span></label><input type="text" id="inputRoomFeatures" required placeholder="Contoh: Proyektor, AC" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none"></div>
         <div><label class="block font-bold text-slate-700 mb-1.5">Deskripsi</label><textarea id="inputRoomDesc" rows="2" required placeholder="Deskripsi..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none resize-none"></textarea></div>
-        <div><label class="block font-bold text-slate-700 mb-1.5">URL Foto Ruangan</label><input type="text" id="inputRoomPhoto" placeholder="https://..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none"></div>
+        
+        <!-- Kolom Upload Foto Ruangan Baru -->
+        <div>
+          <label class="block font-bold text-slate-700 mb-1.5">Upload Foto Ruangan <span class="text-rose-600">(JPG/PNG)</span></label>
+          <div class="flex items-center space-x-2 bg-slate-50 border border-slate-200 rounded-xl p-2">
+            <label class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-lg cursor-pointer text-[11px] transition">
+              Pilih Foto
+              <input type="file" id="inputRoomPhotoFile" accept="image/*" class="hidden" onchange="document.getElementById('roomPhotoNameSpan').innerText = this.files[0] ? this.files[0].name : 'Tidak ada foto dipilih'">
+            </label>
+            <span id="roomPhotoNameSpan" class="text-slate-400 text-[11px] truncate">Tidak ada foto dipilih</span>
+          </div>
+        </div>
+
         <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100">
           <button type="button" onclick="closeRoomModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition cursor-pointer">Batal</button>
           <button type="submit" id="submitRoomBtn" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition cursor-pointer flex items-center"><i class="fa-solid fa-floppy-disk mr-2"></i> Simpan Ruangan</button>
@@ -1145,6 +1158,8 @@
       document.getElementById('roomModalTitle').innerText = 'Tambah Ruangan Baru';
       document.getElementById('submitRoomBtn').innerHTML = '<i class="fa-solid fa-floppy-disk mr-2"></i> Simpan Ruangan';
       document.getElementById('roomForm').reset();
+      document.getElementById('roomPhotoNameSpan').innerText = 'Tidak ada foto dipilih';
+      document.getElementById('inputRoomExistingPhoto').value = '';
       
       const unitInput = document.getElementById('inputRoomUnit');
       if (unitInput && appState.currentAdmin && !appState.currentAdmin.isSuper) {
@@ -1169,8 +1184,12 @@
         document.getElementById('inputRoomUnit').value = room.unit || (appState.currentAdmin ? appState.currentAdmin.unit : 'Bagian Umum');
         document.getElementById('inputRoomFeatures').value = room.features ? room.features.join(', ') : '';
         document.getElementById('inputRoomDesc').value = room.description;
-        document.getElementById('inputRoomPhoto').value = (room.images && room.images[0]) ? room.images[0] : '';
         
+        const existingPhoto = (room.images && room.images[0]) ? room.images[0] : '';
+        document.getElementById('inputRoomExistingPhoto').value = existingPhoto;
+        document.getElementById('roomPhotoNameSpan').innerText = existingPhoto ? 'Foto tersimpan aktif' : 'Tidak ada foto dipilih';
+        
+        document.getElementById('roomModal').classList.add('hidden');
         document.getElementById('roomModal').classList.remove('hidden');
       }
     }
@@ -1202,47 +1221,63 @@
       const featuresRaw = document.getElementById('inputRoomFeatures').value;
       const features = featuresRaw ? featuresRaw.split(',').map(s => s.trim()).filter(s => s.length > 0) : ['Proyektor', 'AC'];
       const description = document.getElementById('inputRoomDesc').value.trim();
-      const photoInput = document.getElementById('inputRoomPhoto');
-      const photoUrl = (photoInput && photoInput.value.trim()) ? photoInput.value.trim() : 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80';
+      
+      const photoFileInput = document.getElementById('inputRoomPhotoFile');
+      const existingPhotoUrl = document.getElementById('inputRoomExistingPhoto').value;
 
-      let targetRoom;
-      if (editId !== '') {
-        const roomIndex = appState.rooms.findIndex(r => r.id === editId);
-        if (roomIndex !== -1) {
-          const existingRoom = appState.rooms[roomIndex];
+      const processRoomSave = async (photoUrl) => {
+        let targetRoom;
+        if (editId !== '') {
+          const roomIndex = appState.rooms.findIndex(r => r.id === editId);
+          if (roomIndex !== -1) {
+            const existingRoom = appState.rooms[roomIndex];
+            targetRoom = {
+              ...existingRoom,
+              name, category, capacity, unit, features, description,
+              statusText: existingRoom.statusText || 'Tersedia',
+              badgeClass: existingRoom.badgeClass || 'bg-emerald-50 text-emerald-700 border-emerald-200',
+              icon: existingRoom.icon || 'fa-circle-check',
+              images: [photoUrl, ...(existingRoom.images ? existingRoom.images.slice(1) : [])]
+            };
+            appState.rooms[roomIndex] = targetRoom;
+          }
+        } else {
           targetRoom = {
-            ...existingRoom,
-            name, category, capacity, unit, features, description,
-            statusText: existingRoom.statusText || 'Tersedia',
-            badgeClass: existingRoom.badgeClass || 'bg-emerald-50 text-emerald-700 border-emerald-200',
-            icon: existingRoom.icon || 'fa-circle-check',
-            images: [photoUrl, ...(existingRoom.images ? existingRoom.images.slice(1) : [])]
+            id: 'room-' + Date.now(),
+            name, category, capacity, unit,
+            available: true, statusText: 'Tersedia',
+            badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+            icon: 'fa-circle-check',
+            description, features, images: [photoUrl], currentImageIdx: 0
           };
-          appState.rooms[roomIndex] = targetRoom;
+          appState.rooms.push(targetRoom);
         }
-      } else {
-        targetRoom = {
-          id: 'room-' + Date.now(),
-          name, category, capacity, unit,
-          available: true, statusText: 'Tersedia',
-          badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-          icon: 'fa-circle-check',
-          description, features, images: [photoUrl], currentImageIdx: 0
+
+        showToast('Menyimpan ruangan ke Google Spreadsheet...', 'info');
+        await sendDataToDatabase('saveRoom', { room: targetRoom });
+
+        renderRoomCards();
+        renderAdminRoomList();
+        populateRoomOptions();
+        populateUnitFilterOptions();
+        updateDashboardCounts();
+        initAnalyticsCharts();
+        closeRoomModal();
+        showToast(`Ruangan ${name} berhasil disimpan!`, 'success');
+      };
+
+      if (photoFileInput && photoFileInput.files[0]) {
+        const file = photoFileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = async function(uploadEvent) {
+          const base64Photo = uploadEvent.target.result;
+          await processRoomSave(base64Photo);
         };
-        appState.rooms.push(targetRoom);
+        reader.readAsDataURL(file);
+      } else {
+        const fallbackPhoto = existingPhotoUrl || 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80';
+        await processRoomSave(fallbackPhoto);
       }
-
-      showToast('Menyimpan ruangan ke Google Spreadsheet...', 'info');
-      await sendDataToDatabase('saveRoom', { room: targetRoom });
-
-      renderRoomCards();
-      renderAdminRoomList();
-      populateRoomOptions();
-      populateUnitFilterOptions();
-      updateDashboardCounts();
-      initAnalyticsCharts();
-      closeRoomModal();
-      showToast(`Ruangan ${name} berhasil disimpan!`, 'success');
     }
 
     async function deleteRoom(roomId) {
