@@ -134,7 +134,7 @@
         <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h3 class="text-sm sm:text-base font-bold text-slate-900">Daftar & Riwayat Peminjaman Ruangan</h3>
-            <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Sinkronisasi langsung dengan sistem.</p>
+            <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Sinkronisasi langsung dengan Google Spreadsheet.</p>
           </div>
           <div class="relative w-full sm:w-72">
             <input type="text" id="searchTableInput" onkeyup="filterBookingTable()" placeholder="Cari pemohon / kegiatan..." class="w-full bg-slate-50 border border-slate-200 text-xs text-slate-700 rounded-full py-2.5 pl-9 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
@@ -443,14 +443,30 @@
     <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl text-center space-y-4">
       <div class="w-16 h-16 bg-amber-50 text-amber-600 rounded-3xl flex items-center justify-center mx-auto text-3xl shadow-sm border border-amber-100"><i class="fa-solid fa-triangle-exclamation"></i></div>
       <div class="space-y-1">
-        <h3 class="text-lg font-black text-slate-900 tracking-tight">Peringatan: Jadwal Bentrok!</h3>
+        <h3 class="text-lg font-black text-slate-900 tracking-tight">Peringatan: Jadwal Bentrok (Double Input)!</h3>
         <p id="doubleInputModalText" class="text-xs text-slate-500 leading-relaxed"></p>
       </div>
       <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3 text-left space-y-1 text-xs">
         <div class="font-bold text-slate-800"><i class="fa-solid fa-circle-info text-blue-600 mr-1"></i> Informasi Sistem:</div>
-        <p class="text-slate-600 text-[11px]">Sistem mendeteksi agenda lain yang sudah disetujui pada ruangan dan tanggal tersebut. Tidak dapat menyetujui dua peminjaman bersamaan pada ruangan yang sama.</p>
+        <p class="text-slate-600 text-[11px]">Sistem mendeteksi agenda lain yang sudah disetujui pada ruangan dan tanggal tersebut. Pengajuan tidak dapat disimpan.</p>
       </div>
       <button onclick="closeDoubleInputModal()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition cursor-pointer shadow-md">Saya Mengerti</button>
+    </div>
+  </div>
+
+  <!-- POP-UP NOTIFICATION: PAST TIME WARNING MODAL -->
+  <div id="pastTimeWarningModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl text-center space-y-4">
+      <div class="w-16 h-16 bg-rose-50 text-rose-600 rounded-3xl flex items-center justify-center mx-auto text-3xl shadow-sm border border-rose-100"><i class="fa-solid fa-clock-rotate-left"></i></div>
+      <div class="space-y-1">
+        <h3 class="text-lg font-black text-slate-900 tracking-tight">Waktu Peminjaman Telah Lewat!</h3>
+        <p id="pastTimeModalText" class="text-xs text-slate-500 leading-relaxed"></p>
+      </div>
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3 text-left space-y-1 text-xs">
+        <div class="font-bold text-slate-800"><i class="fa-solid fa-circle-info text-rose-600 mr-1"></i> Aturan Sistem:</div>
+        <p class="text-slate-600 text-[11px]">Anda tidak dapat melakukan booking untuk tanggal atau jam yang sudah berlalu / lampau. Silakan pilih waktu yang valid.</p>
+      </div>
+      <button onclick="closePastTimeModal()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition cursor-pointer shadow-md">Saya Mengerti</button>
     </div>
   </div>
 
@@ -575,14 +591,12 @@
 
   <script>
     const apiService = {
-      appsScriptUrl: 'https://script.google.com/macros/s/AKfycbzoFGWWQxV3p9LxV6mThJPvoRlY1rG1RvSiaQYhvMTVPa6w5ijFMdYj3Zl7G4QD0Db29Q/exec',
+      appsScriptUrl: 'https://script.google.com/macros/s/AKfycby.../exec',
 
-      async request(action, payload = {}) {
+      sendRequest: async function(action, payload = {}) {
         if (this.appsScriptUrl.includes('AKfycbz...')) {
-          console.warn("Menggunakan Local Mock Mode. Hubungkan URL deployment Google Apps Script untuk sinkronisasi cloud real-time.");
-          return { status: 'success', message: 'Mock success', ...payload };
+          return { status: 'success' };
         }
-
         try {
           const response = await fetch(this.appsScriptUrl, {
             method: 'POST',
@@ -591,52 +605,26 @@
           });
           return await response.json();
         } catch (err) {
-          console.error('API Error:', err);
+          console.error("API POST Error:", err);
           return { status: 'error', message: err.toString() };
         }
       },
 
-      async get(action) {
+      getData: async function(action) {
         if (this.appsScriptUrl.includes('AKfycbz...')) {
           return { status: 'success', bookings: [], rooms: [], admins: [] };
         }
-
         try {
           const response = await fetch(`${this.appsScriptUrl}?action=${action}`);
           return await response.json();
         } catch (err) {
-          console.error('API Get Error:', err);
+          console.error("API Get Error:", err);
           return { status: 'error', message: err.toString() };
         }
       },
 
-      async getAllData() {
-        return await this.get('getAllData');
-      },
-
-      async sendBooking(bookingData, base64File, fileName, mimeType) {
-        return await this.request('addBooking', {
-          ...bookingData,
-          fileBase64: base64File || '',
-          fileName: fileName || '',
-          fileMimeType: mimeType || ''
-        });
-      },
-
-      async updateStatus(id, status) {
-        return await this.request('updateStatus', { id, status });
-      },
-
-      async saveRoom(roomData) {
-        return await this.request('saveRoom', roomData);
-      },
-
-      async saveAdmin(adminData) {
-        return await this.request('saveAdmin', adminData);
-      },
-
-      async deleteAdmin(username) {
-        return await this.request('deleteAdmin', { username });
+      getAllData: async function() {
+        return await this.getData('getAllData');
       }
     };
 
@@ -703,10 +691,15 @@
           renderCalendar();
           renderAdminPendingTable();
           renderAdminAccountsList();
+          renderRoomCards();
         }
       } catch (err) {
-        console.warn("Real-time sync retry:", err);
+        console.warn("Real-time sync silent retry:", err);
       }
+    }
+
+    async function sendDataToDatabase(action, payload) {
+      return await apiService.sendRequest(action, payload);
     }
 
     function initClock() {
@@ -1155,9 +1148,9 @@
       }
       appState.adminAccounts = appState.adminAccounts.filter(a => a.username !== username);
       renderAdminAccountsList();
-      showToast('Menghapus akun admin dari cloud...', 'info');
-      await apiService.deleteAdmin(username);
-      showToast('Akun admin berhasil dihapus dan disinkronkan.', 'success');
+      showToast('Menghapus akun admin dari spreadsheet...', 'info');
+      await sendDataToDatabase('deleteAdmin', { username });
+      showToast('Akun admin berhasil dihapus.', 'info');
     }
 
     function openAddRoomModal() {
@@ -1203,9 +1196,9 @@
         room.icon = room.statusText === 'Tersedia' ? 'fa-circle-check' : 'fa-triangle-exclamation';
         renderAdminRoomList();
         renderRoomCards();
-        showToast('Menyinkronkan status ruangan...', 'info');
-        await apiService.saveRoom(room);
-        showToast(`Status ${room.name} disinkronkan menjadi: ${room.statusText}`, 'success');
+        showToast('Menyinkronkan status ruangan ke database...', 'info');
+        await sendDataToDatabase('saveRoom', { room });
+        showToast(`Status ${room.name} diubah menjadi: ${room.statusText}`, 'info');
       }
     }
 
@@ -1225,24 +1218,23 @@
       const photoInput = document.getElementById('inputRoomPhoto');
       const photoUrl = (photoInput && photoInput.value.trim()) ? photoInput.value.trim() : 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80';
 
-      let roomObj = {};
+      let targetRoom;
       if (editId !== '') {
         const roomIndex = appState.rooms.findIndex(r => r.id === editId);
         if (roomIndex !== -1) {
           const existingRoom = appState.rooms[roomIndex];
-          roomObj = {
+          targetRoom = {
             ...existingRoom,
-            name, category, capacity, unit,
-            features, description,
+            name, category, capacity, unit, features, description,
             statusText: existingRoom.statusText || 'Tersedia',
             badgeClass: existingRoom.badgeClass || 'bg-emerald-50 text-emerald-700 border-emerald-200',
             icon: existingRoom.icon || 'fa-circle-check',
             images: [photoUrl, ...(existingRoom.images ? existingRoom.images.slice(1) : [])]
           };
-          appState.rooms[roomIndex] = roomObj;
+          appState.rooms[roomIndex] = targetRoom;
         }
       } else {
-        roomObj = {
+        targetRoom = {
           id: 'room-' + Date.now(),
           name, category, capacity, unit,
           available: true, statusText: 'Tersedia',
@@ -1250,8 +1242,11 @@
           icon: 'fa-circle-check',
           description, features, images: [photoUrl], currentImageIdx: 0
         };
-        appState.rooms.push(roomObj);
+        appState.rooms.push(targetRoom);
       }
+
+      showToast('Menyimpan ruangan ke Google Spreadsheet...', 'info');
+      await sendDataToDatabase('saveRoom', { room: targetRoom });
 
       renderRoomCards();
       renderAdminRoomList();
@@ -1260,10 +1255,7 @@
       updateDashboardCounts();
       initAnalyticsCharts();
       closeRoomModal();
-
-      showToast('Menyinkronkan data ruangan ke Google Spreadsheet...', 'info');
-      await apiService.saveRoom(roomObj);
-      showToast('Ruangan berhasil disimpan & disinkronkan!', 'success');
+      showToast(`Ruangan ${name} berhasil disimpan!`, 'success');
     }
 
     async function deleteRoom(roomId) {
@@ -1274,9 +1266,9 @@
       populateUnitFilterOptions();
       updateDashboardCounts();
       initAnalyticsCharts();
-      showToast('Menghapus ruangan dari cloud...', 'info');
-      await apiService.saveRoom({ id: roomId, deleted: true });
-      showToast('Ruangan berhasil dihapus dan disinkronkan.', 'success');
+      showToast('Menghapus ruangan dari database...', 'info');
+      await sendDataToDatabase('deleteRoom', { id: roomId });
+      showToast('Ruangan berhasil dihapus.', 'info');
     }
 
     async function handleCreateAdminSubmit(e) {
@@ -1288,13 +1280,7 @@
       const isSuper = document.getElementById('newAdminLevel').value === 'super';
       const unit = document.getElementById('newAdminUnit').value.trim();
 
-      const adminObj = {
-        username,
-        name,
-        pass,
-        unit: isSuper ? 'Semua Dinas' : unit,
-        isSuper
-      };
+      const adminObj = { username, name, pass, unit: isSuper ? 'Semua Dinas' : unit, isSuper };
 
       if (editKey) {
         const acc = appState.adminAccounts.find(a => a.username === editKey);
@@ -1314,13 +1300,13 @@
         appState.adminAccounts.push(adminObj);
       }
 
+      showToast('Menyimpan akun admin ke Google Spreadsheet...', 'info');
+      await sendDataToDatabase('saveAdmin', { admin: adminObj });
+
       resetAdminForm();
       renderAdminAccountsList();
       e.target.reset();
-
-      showToast('Menyinkronkan akun admin ke Google Spreadsheet...', 'info');
-      await apiService.saveAdmin(adminObj);
-      showToast('Akun admin berhasil disimpan & disinkronkan!', 'success');
+      showToast(`Akun admin ${username} berhasil disimpan!`, 'success');
     }
 
     function toggleUnitDropdown() {
@@ -1345,6 +1331,16 @@
       const catatan = document.getElementById('inputCatatan').value;
       const berkasInput = document.getElementById('inputBerkas');
 
+      // VALIDASI WAKTU LAMPAU (PAST TIME)
+      const now = new Date();
+      const bookingEndDateTime = new Date(`${tanggal}T${jamSelesai}:00`);
+      if (bookingEndDateTime < now) {
+        document.getElementById('pastTimeModalText').innerHTML = `Gagal menyimpan! Waktu pelaksanaan yang Anda pilih (<b>${tanggal} pukul ${jamSelesai}</b>) sudah lewat dari waktu saat ini.`;
+        document.getElementById('pastTimeWarningModal').classList.remove('hidden');
+        return;
+      }
+
+      // VALIDASI DOUBLE INPUT (JADWAL BENTROK)
       const conflict = checkBookingConflict(ruangan, tanggal, null);
       if (conflict) {
         document.getElementById('doubleInputModalText').innerHTML = `Gagal mengirim pengajuan! Ruangan <b>${ruangan}</b> sudah memiliki jadwal aktif pada tanggal <b>${tanggal}</b> untuk kegiatan <b>"${conflict.kegiatan}"</b> (${conflict.jam}).`;
@@ -1368,14 +1364,19 @@
         berkasUrl: '#', status: 'Menunggu', tahun: 2026, timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16)
       };
 
-      showToast('Mengunggah berkas ke Google Drive & menyinkronkan data ke Spreadsheet...', 'info');
+      showToast('Mengirim dan menyinkronkan data & file ke Google Spreadsheet & Drive...', 'info');
 
       if (berkasInput && berkasInput.files[0]) {
         const file = berkasInput.files[0];
         const reader = new FileReader();
         reader.onload = async function(uploadEvent) {
           const base64String = uploadEvent.target.result.split(',')[1];
-          const result = await apiService.sendBooking(newBooking, base64String, file.name, file.type);
+          const result = await sendDataToDatabase('addBooking', {
+            ...newBooking,
+            fileBase64: base64String,
+            fileName: file.name,
+            fileMimeType: file.type
+          });
           if (result && result.berkasUrl) newBooking.berkasUrl = result.berkasUrl;
           
           appState.bookings.unshift(newBooking);
@@ -1383,7 +1384,7 @@
         };
         reader.readAsDataURL(file);
       } else {
-        await apiService.sendBooking(newBooking, '', '', '');
+        await sendDataToDatabase('addBooking', newBooking);
         appState.bookings.unshift(newBooking);
         postBookingSyncActions(newBooking.id);
       }
@@ -1428,12 +1429,16 @@
       initAnalyticsCharts();
 
       showToast(`Menyinkronkan status ${bookingId} ke database...`, 'info');
-      await apiService.updateStatus(bookingId, newStatus);
+      await sendDataToDatabase('updateStatus', { id: bookingId, status: newStatus });
       showToast(`Status peminjaman ${bookingId} diperbarui menjadi: ${newStatus}`, newStatus === 'Disetujui' ? 'success' : 'info');
     }
 
     function closeDoubleInputModal() {
       document.getElementById('doubleInputWarningModal').classList.add('hidden');
+    }
+
+    function closePastTimeModal() {
+      document.getElementById('pastTimeWarningModal').classList.add('hidden');
     }
 
     function checkBookingAvailability() {
@@ -1443,6 +1448,7 @@
       const conflictText = document.getElementById('bookingConflictText');
 
       if (!tanggal || !ruangan) return;
+
       const conflicting = checkBookingConflict(ruangan, tanggal);
 
       if (conflicting) {
