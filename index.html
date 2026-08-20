@@ -1023,6 +1023,9 @@
         if (item.status === 'Dibatalkan') statusTag = `<span class="bg-rose-100 text-rose-800 px-2.5 py-1 rounded-full text-[10px] font-bold inline-flex items-center"><i class="fa-solid fa-ban mr-1"></i> Dibatalkan</span>`;
         if (item.status === 'Ditolak') statusTag = `<span class="bg-rose-100 text-rose-800 px-2.5 py-1 rounded-full text-[10px] font-bold inline-flex items-center"><i class="fa-solid fa-xmark mr-1"></i> Ditolak</span>`;
 
+        const pdfUrl = (item.berkasUrl && item.berkasUrl !== '#') ? item.berkasUrl : '#';
+        const pdfBtnDisabled = pdfUrl === '#' ? 'opacity-40 cursor-not-allowed pointer-events-none' : 'hover:bg-blue-100 cursor-pointer';
+
         tbody.innerHTML += `
           <tr class="hover:bg-slate-50 transition">
             <td class="p-4 pl-5">
@@ -1038,7 +1041,10 @@
             </td>
             <td class="p-4">${statusTag}</td>
             <td class="p-4 pr-5 text-center">
-              <div class="inline-flex space-x-1.5">
+              <div class="inline-flex items-center space-x-1.5">
+                <a href="${pdfUrl}" target="_blank" title="Lihat Berkas PDF" class="px-2.5 py-1.5 bg-blue-50 ${pdfBtnDisabled} text-blue-700 font-bold rounded-xl text-[11px] transition inline-flex items-center border border-blue-200">
+                  <i class="fa-solid fa-file-pdf mr-1 text-xs text-rose-500"></i> PDF
+                </a>
                 <button onclick="updateBookingStatusInCloud('${item.id}', 'Disetujui')" class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-xl text-[11px] transition cursor-pointer border border-emerald-200">Setujui</button>
                 <button onclick="updateBookingStatusInCloud('${item.id}', 'Ditolak')" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-[11px] transition cursor-pointer border border-rose-200">Tolak</button>
               </div>
