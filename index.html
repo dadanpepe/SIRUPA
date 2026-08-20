@@ -4,7 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>SIRUPA - Sistem Informasi Ruangan dan Peminjaman</title>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -43,6 +45,7 @@
           <span id="liveDate" class="text-[10px] text-slate-400 font-medium">Rabu, 20 Agustus 2026</span>
         </div>
 
+        <!-- Desktop Nav -->
         <nav class="hidden sm:flex items-center bg-slate-100 p-1 rounded-full border border-slate-200 space-x-1">
           <button id="navDashboard" onclick="switchView('dashboard')" class="flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold transition-all bg-blue-600 text-white shadow-xs cursor-pointer">
             <i class="fa-solid fa-gauge-high mr-1.5"></i> Dashboard
@@ -58,7 +61,6 @@
     </div>
   </header>
 
-  <!-- Mobile Bottom Nav -->
   <div class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-6 py-2.5 flex justify-around items-center shadow-2xl">
     <button onclick="switchView('dashboard')" id="mobNavDashboard" class="flex flex-col items-center text-blue-600 space-y-0.5">
       <i class="fa-solid fa-gauge-high text-lg"></i>
@@ -76,6 +78,7 @@
 
   <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6 sm:space-y-8">
 
+    <!-- VIEW 1: DASHBOARD -->
     <section id="viewDashboard" class="space-y-6 sm:space-y-8">
       <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 p-6 sm:p-10 text-white shadow-xl shadow-blue-500/10">
         <div class="absolute -right-10 -bottom-10 opacity-10 text-white text-9xl font-black pointer-events-none">
@@ -154,6 +157,7 @@
       </div>
     </section>
 
+    <!-- VIEW 2: CHECK ROOM -->
     <section id="viewCheckRoom" class="space-y-6 sm:space-y-8 hidden">
       <div class="bg-sky-50 border border-sky-200 text-sky-800 p-4 rounded-2xl text-xs font-medium flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
         <div class="flex items-start sm:items-center">
@@ -209,6 +213,7 @@
       </div>
     </section>
 
+    <!-- VIEW 3: ADMIN -->
     <section id="viewAdmin" class="space-y-6 hidden">
       <div id="adminLoginContainer" class="flex items-center justify-center py-6 sm:py-12">
         <div class="bg-white rounded-3xl max-w-md w-full shadow-lg border border-slate-200 p-6 sm:p-8 relative transition-all duration-300">
@@ -332,6 +337,7 @@
     © 2026 SIRUPA - Sistem Informasi Ruangan dan Peminjaman.
   </footer>
 
+  <!-- MODAL: BOOKING -->
   <div id="bookingModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
     <div class="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-8 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto space-y-5">
       <button onclick="closeBookingModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
@@ -398,8 +404,8 @@
           <div>
             <label class="block font-bold text-slate-700 mb-1.5">Waktu / Jam Pelaksanaan</label>
             <div class="grid grid-cols-2 gap-2">
-              <input type="text" id="inputJamMulai" required onchange="checkBookingAvailability()" value="08:00" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-center outline-none">
-              <input type="text" id="inputJamSelesai" required onchange="checkBookingAvailability()" value="17:00" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-center outline-none">
+              <input type="text" id="inputJamMulai" required value="08:00" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-center outline-none">
+              <input type="text" id="inputJamSelesai" required value="17:00" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-center outline-none">
             </div>
           </div>
         </div>
@@ -441,9 +447,9 @@
       </div>
       <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3 text-left space-y-1 text-xs">
         <div class="font-bold text-slate-800"><i class="fa-solid fa-circle-info text-blue-600 mr-1"></i> Informasi Sistem:</div>
-        <p class="text-slate-600 text-[11px]">Sistem mendeteksi agenda lain yang sudah disetujui pada ruangan dan tanggal tersebut. Silakan pilih jam atau tanggal lain untuk menghindari bentrok.</p>
+        <p class="text-slate-600 text-[11px]">Sistem mendeteksi agenda lain yang sudah disetujui pada ruangan dan tanggal tersebut. Tidak dapat menyetujui dua peminjaman bersamaan pada ruangan yang sama.</p>
       </div>
-      <button onclick="closeDoubleInputModal()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition cursor-pointer shadow-md">Saya Mengerti & Ubah Jadwal</button>
+      <button onclick="closeDoubleInputModal()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition cursor-pointer shadow-md">Saya Mengerti</button>
     </div>
   </div>
 
@@ -584,7 +590,9 @@
         { id: 'room-2', name: 'Auditorium Gedung A', category: 'Auditorium', capacity: '150 Orang', unit: 'Bappeda & IT', available: true, statusText: 'Tersedia', badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200', icon: 'fa-circle-check', description: 'Aula luas untuk seminar, sosialisasi, dan diklat instansi.', features: ['Panggung Utama', 'Full Sound & Lighting'], images: ['https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=800&q=80'], currentImageIdx: 0 }
       ],
       bookings: [
-        { id: 'PMJ-1029', pemohon: 'Ahmad Fauzi', unit: 'Bagian Umum', kategori: 'Rapat Dinas', kegiatan: 'Rapat Koordinasi Triwulan', ruangan: 'Ruang Aula Besar', tanggal: '2026-08-15', jam: '08:00 - 17:00 WIB', peserta: 45, catatan: 'Mic wireless', berkasUrl: '#', status: 'Disetujui', tahun: 2026, timestamp: '2026-08-10 09:30' }
+        { id: 'PMJ-1029', pemohon: 'Ahmad Fauzi', unit: 'Bagian Umum', kategori: 'Rapat Dinas', kegiatan: 'Rapat Koordinasi Triwulan', ruangan: 'Ruang Aula Besar', tanggal: '2026-08-15', jam: '08:00 - 17:00 WIB', peserta: 45, catatan: 'Mic wireless', berkasUrl: '#', status: 'Disetujui', tahun: 2026, timestamp: '2026-08-10 09:30' },
+        { id: 'PMJ-5061', pemohon: 'Dadan', unit: 'Sekret', kategori: 'Rapat Dinas', kegiatan: 'MUSRENBANG', ruangan: 'Ruang Aula Besar', tanggal: '2026-08-20', jam: '08:00 - 17:00 WIB', peserta: 50, catatan: '', berkasUrl: '#', status: 'Menunggu', tahun: 2026, timestamp: '2026-08-18 10:00' },
+        { id: 'PMJ-7643', pemohon: 'Dadan', unit: 'Sekret', kategori: 'Workshop', kegiatan: 'UMKM', ruangan: 'Ruang Aula Besar', tanggal: '2026-08-20', jam: '08:00 - 17:00 WIB', peserta: 40, catatan: '', berkasUrl: '#', status: 'Menunggu', tahun: 2026, timestamp: '2026-08-18 11:00' }
       ]
     };
 
@@ -1229,32 +1237,6 @@
       else group.classList.remove('hidden');
     }
 
-    function checkBookingAvailability() {
-      const tanggal = document.getElementById('inputTanggal').value;
-      const ruangan = document.getElementById('inputRuangan').value;
-      const conflictBanner = document.getElementById('bookingConflictBanner');
-      const conflictText = document.getElementById('bookingConflictText');
-
-      if (!tanggal || !ruangan) return false;
-
-      const conflicting = appState.bookings.find(b => 
-        b.ruangan === ruangan && 
-        b.tanggal === tanggal && 
-        b.status === 'Disetujui'
-      );
-
-      if (conflicting) {
-        if (conflictBanner && conflictText) {
-          conflictText.innerText = `Ruangan "${ruangan}" sudah di-booking untuk kegiatan "${conflicting.kegiatan}" (${conflicting.jam}) pada tanggal ${tanggal}.`;
-          conflictBanner.classList.remove('hidden');
-        }
-        return conflicting;
-      } else {
-        if (conflictBanner) conflictBanner.classList.add('hidden');
-        return null;
-      }
-    }
-
     async function handleBookingSubmit(e) {
       e.preventDefault();
       const pemohon = document.getElementById('inputPemohon').value;
@@ -1269,7 +1251,7 @@
       const peserta = parseInt(document.getElementById('inputPeserta').value);
       const catatan = document.getElementById('inputCatatan').value;
 
-      const conflict = checkBookingAvailability();
+      const conflict = checkBookingConflict(ruangan, tanggal, null);
       if (conflict) {
         document.getElementById('doubleInputModalText').innerHTML = `Gagal mengirim pengajuan! Ruangan <b>${ruangan}</b> sudah memiliki jadwal aktif pada tanggal <b>${tanggal}</b> untuk kegiatan <b>"${conflict.kegiatan}"</b> (${conflict.jam}).`;
         document.getElementById('doubleInputWarningModal').classList.remove('hidden');
@@ -1280,7 +1262,7 @@
       if (currentRoom) {
         const maxCapNum = parseInt(currentRoom.capacity) || 100;
         if (peserta > maxCapNum) {
-          document.getElementById('popupCapacityText').innerText = `Jumlah peserta (${peserta}) melebihi kapasitas maksimal ruangan ${ruangan} (${currentRoom.capacity}). Harap kurangi jumlah peserta atau pilih ruangan lain.`;
+          document.getElementById('popupCapacityText').innerText = `Jumlah peserta (${peserta}) melebihi kapasitas maksimal ruangan ${ruangan} (${currentRoom.capacity}).`;
           document.getElementById('capacityPopupModal').classList.remove('hidden');
           return;
         }
@@ -1301,19 +1283,58 @@
       showToast(`Peminjaman berhasil dikirim dengan ID: ${newBooking.id}!`, 'success');
     }
 
-    function closeDoubleInputModal() {
-      document.getElementById('doubleInputWarningModal').classList.add('hidden');
+    function checkBookingConflict(ruangan, tanggal, excludeId = null) {
+      return appState.bookings.find(b => 
+        b.ruangan === ruangan && 
+        b.tanggal === tanggal && 
+        b.status === 'Disetujui' &&
+        b.id !== excludeId
+      );
     }
 
     function updateBookingStatusInCloud(bookingId, newStatus) {
       const item = appState.bookings.find(b => b.id === bookingId);
-      if (item) {
-        item.status = newStatus;
-        renderAdminPendingTable();
-        renderBookingTable();
-        updateDashboardCounts();
-        renderCalendar();
-        showToast(`Status peminjaman ${bookingId} diperbarui menjadi: ${newStatus}`, 'success');
+      if (!item) return;
+
+      if (newStatus === 'Disetujui') {
+        const conflict = checkBookingConflict(item.ruangan, item.tanggal, item.id);
+        if (conflict) {
+          document.getElementById('doubleInputModalText').innerHTML = `Tidak dapat menyetujui peminjaman <b>${item.id}</b> (${item.kegiatan}). Ruangan <b>${item.ruangan}</b> pada tanggal <b>${item.tanggal}</b> sudah disetujui untuk agenda <b>"${conflict.kegiatan}"</b> (${conflict.id}).`;
+          document.getElementById('doubleInputWarningModal').classList.remove('hidden');
+          return;
+        }
+      }
+
+      item.status = newStatus;
+      renderAdminPendingTable();
+      renderBookingTable();
+      updateDashboardCounts();
+      renderCalendar();
+      initAnalyticsCharts();
+      showToast(`Status peminjaman ${bookingId} diperbarui menjadi: ${newStatus}`, newStatus === 'Disetujui' ? 'success' : 'info');
+    }
+
+    function closeDoubleInputModal() {
+      document.getElementById('doubleInputWarningModal').classList.add('hidden');
+    }
+
+    function checkBookingAvailability() {
+      const tanggal = document.getElementById('inputTanggal').value;
+      const ruangan = document.getElementById('inputRuangan').value;
+      const conflictBanner = document.getElementById('bookingConflictBanner');
+      const conflictText = document.getElementById('bookingConflictText');
+
+      if (!tanggal || !ruangan) return;
+
+      const conflicting = checkBookingConflict(ruangan, tanggal);
+
+      if (conflicting) {
+        if (conflictBanner && conflictText) {
+          conflictText.innerText = `Peringatan: Ruangan "${ruangan}" sudah di-booking untuk kegiatan "${conflicting.kegiatan}" (${conflicting.jam}) pada tanggal tersebut.`;
+          conflictBanner.classList.remove('hidden');
+        }
+      } else {
+        if (conflictBanner) conflictBanner.classList.add('hidden');
       }
     }
 
