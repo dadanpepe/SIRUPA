@@ -30,7 +30,6 @@
   <header class="bg-white/95 backdrop-blur-md sticky top-0 z-40 border-b border-slate-200 shadow-xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
       <div class="flex items-center space-x-3 cursor-pointer group" onclick="switchView('dashboard')">
-        <!-- CUSTOM SIRANTI LOGO IMAGE -->
         <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-2xl flex items-center justify-center shadow-md shadow-blue-500/10 shrink-0 transform group-hover:scale-105 transition duration-300 overflow-hidden border border-slate-100 p-1">
           <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=200&q=80" alt="SIRANTI Logo" class="w-full h-full object-cover rounded-xl" onerror="this.onerror=null; this.src='https://placehold.co/100x100/2563eb/ffffff?text=SR';">
         </div>
@@ -158,7 +157,6 @@
       </div>
     </section>
 
-    <!-- VIEW 2: CHECK ROOM -->
     <section id="viewCheckRoom" class="space-y-6 sm:space-y-8 hidden">
       <div class="bg-sky-50 border border-sky-200 text-sky-800 p-4 rounded-2xl text-xs font-medium flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
         <div class="flex items-start sm:items-center">
@@ -170,14 +168,15 @@
         </button>
       </div>
 
-      <div class="bg-white rounded-3xl border border-slate-200 p-4 sm:p-5 shadow-xs space-y-4 sm:space-y-6">
+      <!-- EXACT CALENDAR HEADER MATCHING REFERENCE IMAGE -->
+      <div class="bg-white rounded-3xl border border-slate-200 p-4 sm:p-6 shadow-xs space-y-4 sm:space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <h3 class="text-xs sm:text-sm font-black text-slate-900 tracking-wide uppercase">Cek Ruang</h3>
-          <span class="text-xs sm:text-sm font-black text-slate-800 tracking-wider" id="calendarMonthTitle">AGUSTUS 2026</span>
-          <div class="flex items-center justify-between sm:justify-end space-x-2">
-            <button onclick="changeMonth(-1)" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-bold transition cursor-pointer"><i class="fa-solid fa-chevron-left"></i></button>
-            <button id="nextMonthBtn" onclick="changeMonth(1)" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-sm cursor-pointer">September 2026</button>
-            <button onclick="changeMonth(1)" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-bold transition cursor-pointer"><i class="fa-solid fa-chevron-right"></i></button>
+          <h3 class="text-xs sm:text-sm font-black text-slate-900 tracking-wide uppercase">CEK RUANG</h3>
+          <span class="text-xs sm:text-sm font-black text-slate-900 tracking-wider text-center" id="calendarMonthTitle">AGUSTUS 2026</span>
+          <div class="flex items-center justify-end space-x-2">
+            <button onclick="changeMonth(-1)" class="w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center justify-center cursor-pointer shadow-xs"><i class="fa-solid fa-chevron-left"></i></button>
+            <button id="nextMonthBtn" onclick="changeMonth(1)" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-sm cursor-pointer">September 2026</button>
+            <button onclick="changeMonth(1)" class="w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center justify-center cursor-pointer shadow-xs"><i class="fa-solid fa-chevron-right"></i></button>
           </div>
         </div>
         <div class="overflow-x-auto border border-slate-200 rounded-2xl">
@@ -201,8 +200,8 @@
       <div class="space-y-4 pt-2">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h3 class="text-sm sm:text-lg font-bold text-slate-900">Daftar Ruangan Berdasarkan Dinas/Bidang</h3>
-            <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Filter fasilitas ruangan sesuai instansi/bidang pengelola.</p>
+            <h3 class="text-sm sm:text-lg font-bold text-slate-900">Daftar Ruangan & Fasilitas</h3>
+            <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Informasi fasilitas dan status operasional ruangan terkini. Klik "Pinjam Ruangan" di bawah kartu.</p>
           </div>
           <div class="w-full sm:w-64">
             <select id="filterUnitSelect" onchange="renderRoomCards()" class="w-full bg-white border border-slate-200 text-xs font-bold text-slate-700 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-2xs">
@@ -210,11 +209,10 @@
             </select>
           </div>
         </div>
-        <div id="roomCardsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6"></div>
+        <div id="roomCardsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6"></div>
       </div>
     </section>
 
-    <!-- VIEW 3: ADMIN -->
     <section id="viewAdmin" class="space-y-6 hidden">
       <div id="adminLoginContainer" class="flex items-center justify-center py-6 sm:py-12">
         <div class="bg-white rounded-3xl max-w-md w-full shadow-lg border border-slate-200 p-6 sm:p-8 relative transition-all duration-300">
@@ -338,6 +336,155 @@
     © 2026 SIRANTI - Sistem Informasi Ruangan Terpadu.
   </footer>
 
+  <div id="bookingModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-8 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto space-y-5">
+      <button onclick="closeBookingModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
+      
+      <div class="space-y-1">
+        <span id="bookingRoomContextBadge" class="inline-block px-3 py-1 bg-blue-50 text-blue-600 border border-blue-200 rounded-full text-[11px] font-bold">Pilihan Ruangan: Ruang Rapat Utama</span>
+        <h3 id="bookingModalMainTitle" class="text-base sm:text-lg font-black text-slate-900 tracking-tight">Formulir Peminjaman Ruangan</h3>
+      </div>
+
+      <div id="bookingConflictBanner" class="hidden bg-amber-50 border border-amber-200 rounded-2xl p-3.5 text-xs text-amber-800 space-y-1">
+        <div class="font-bold flex items-center"><i class="fa-solid fa-triangle-exclamation mr-1.5 text-amber-600"></i> Jadwal Bentrok!</div>
+        <p id="bookingConflictText"></p>
+      </div>
+
+      <div id="capacityWarningBanner" class="hidden bg-rose-50 border border-rose-200 rounded-2xl p-3.5 text-xs text-rose-800 space-y-1">
+        <div class="font-bold flex items-center"><i class="fa-solid fa-triangle-exclamation mr-1.5 text-rose-600"></i> Melebihi Kapasitas Maksimal!</div>
+        <p id="capacityWarningText"></p>
+      </div>
+
+      <form id="bookingForm" onsubmit="handleBookingSubmit(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1.5">Pilih Ruangan</label>
+          <select id="inputRuangan" onchange="checkBookingAvailability(); checkCapacityLimit();" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none font-medium cursor-pointer">
+          </select>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1.5">Nama Pemohon</label>
+            <input type="text" id="inputPemohon" required placeholder="Contoh: Ahmad Fauzi" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1.5">Bidang / Unit Kerja</label>
+            <input type="text" id="inputUnit" required placeholder="Contoh: Bagian Umum" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1.5">Kategori Kegiatan</label>
+            <select id="inputKategori" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none cursor-pointer">
+              <option value="Rapat Dinas">Rapat Dinas</option>
+              <option value="Seminar / Sosialisasi">Seminar / Sosialisasi</option>
+              <option value="Workshop">Workshop</option>
+              <option value="Diklat / Pelatihan">Diklat / Pelatihan</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1.5">Jumlah Peserta</label>
+            <input type="number" id="inputPeserta" required value="25" min="1" oninput="checkCapacityLimit()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1.5">Nama Kegiatan</label>
+          <input type="text" id="inputKegiatan" required placeholder="Contoh: Rapat Koordinasi Triwulan" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1.5">Tanggal Pelaksanaan</label>
+            <input type="date" id="inputTanggal" required onchange="checkBookingAvailability()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none font-medium">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1.5">Waktu / Jam Pelaksanaan</label>
+            <div class="grid grid-cols-2 gap-2">
+              <input type="text" id="inputJamMulai" required value="08:00" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-center outline-none">
+              <input type="text" id="inputJamSelesai" required value="17:00" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-center outline-none">
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1.5">Upload Berkas / Surat Izin <span class="text-rose-600">(PDF)</span></label>
+          <div class="flex items-center space-x-2 bg-slate-50 border border-slate-200 rounded-xl p-2">
+            <label class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-lg cursor-pointer text-[11px] transition">
+              Pilih Berkas
+              <input type="file" id="inputBerkas" accept=".pdf" class="hidden" onchange="document.getElementById('fileNameSpan').innerText = this.files[0] ? this.files[0].name : 'Tidak ada berkas dipilih'">
+            </label>
+            <span id="fileNameSpan" class="text-slate-400 text-[11px] truncate">Tidak ada berkas dipilih</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1.5">Catatan Tambahan <span class="text-slate-400 font-normal">(Opsional)</span></label>
+          <textarea id="inputCatatan" rows="2" placeholder="Catatan khusus fasilitas..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none resize-none"></textarea>
+        </div>
+
+        <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closeBookingModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition cursor-pointer">Batal</button>
+          <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition cursor-pointer flex items-center space-x-2">
+            <i class="fa-solid fa-paper-plane text-xs"></i>
+            <span>Kirim Pengajuan</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: BOOKING DETAILS -->
+  <div id="bookingDetailsModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-8 shadow-2xl relative space-y-4 my-auto">
+      <button onclick="closeBookingDetailsModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
+      <h3 id="modalDetailTitle" class="text-base font-black text-slate-900">Detail Jadwal Ruangan</h3>
+      <div id="modalDetailContent" class="space-y-3 text-xs max-h-96 overflow-y-auto pr-1"></div>
+      <div class="flex justify-end pt-2">
+        <button type="button" onclick="closeBookingDetailsModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition cursor-pointer text-xs">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CAPACITY EXCEEDED WARNING -->
+  <div id="capacityPopupModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center space-y-4">
+      <div class="w-14 h-14 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-sm"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <h3 class="text-base font-black text-slate-900">Kapasitas Ruangan Terlampaui</h3>
+      <p id="popupCapacityText" class="text-xs text-slate-500 leading-relaxed"></p>
+      <button onclick="closeCapacityPopup()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition cursor-pointer">Mengerti</button>
+    </div>
+  </div>
+
+  <!-- MODAL: CANCEL BOOKING -->
+  <div id="cancelBookingModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-8 shadow-2xl relative space-y-5 my-auto">
+      <button onclick="closeCancelModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
+      <div class="space-y-1">
+        <span class="text-[10px] font-extrabold text-rose-600 uppercase tracking-wider block">PEMBATALAN JADWAL</span>
+        <h3 class="text-base font-black text-slate-900">Batalkan Peminjaman</h3>
+      </div>
+      <form onsubmit="handleCancelBookingSubmit(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1.5">ID Peminjaman</label>
+          <input type="text" id="cancelBookingId" required placeholder="CONTOH: PMJ-1029" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none font-mono font-bold uppercase">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1.5">Alasan Pembatalan</label>
+          <textarea id="cancelReason" rows="3" required placeholder="Tuliskan alasan..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none resize-none"></textarea>
+        </div>
+        <div class="flex items-center justify-end space-x-3 pt-2">
+          <button type="button" onclick="closeCancelModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition cursor-pointer">Tutup</button>
+          <button type="submit" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl shadow-md transition cursor-pointer flex items-center space-x-2">
+            <i class="fa-solid fa-ban text-xs"></i>
+            <span>Konfirmasi Batal</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- MODAL: SUPER ADMIN & EDIT ADMIN -->
   <div id="superAdminModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
     <div class="bg-white rounded-3xl max-w-2xl w-full p-5 sm:p-8 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto space-y-6">
@@ -350,14 +497,14 @@
         <input type="hidden" id="editAdminUsernameKey">
         <h4 id="adminFormTitle" class="font-bold text-slate-900 flex items-center"><i class="fa-solid fa-user-plus mr-2 text-purple-600"></i> Tambah Akun Admin Baru</h4>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div><label class="block font-bold text-slate-700 mb-1">Nama Admin</label><input type="text" id="newAdminName" required placeholder="Contoh: Budi Santoso" class="w-full bg-white border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-purple-500"></div>
-          <div><label class="block font-bold text-slate-700 mb-1">Username</label><input type="text" id="newAdminUsername" required placeholder="Contoh: admin_umum" class="w-full bg-white border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-purple-500 font-mono"></div>
+          <div><label class="block font-bold text-slate-700 mb-1">Nama Admin</label><input type="text" id="newAdminName" required placeholder="Contoh: Budi Santoso" class="w-full bg-white border border-slate-200 rounded-xl p-3 outline-none"></div>
+          <div><label class="block font-bold text-slate-700 mb-1">Username</label><input type="text" id="newAdminUsername" required placeholder="Contoh: admin_umum" class="w-full bg-white border border-slate-200 rounded-xl p-3 outline-none font-mono"></div>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div><label class="block font-bold text-slate-700 mb-1">Password</label><input type="text" id="newAdminPassword" required placeholder="••••••••" class="w-full bg-white border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-purple-500"></div>
+          <div><label class="block font-bold text-slate-700 mb-1">Password</label><input type="text" id="newAdminPassword" required placeholder="••••••••" class="w-full bg-white border border-slate-200 rounded-xl p-3 outline-none"></div>
           <div>
             <label class="block font-bold text-slate-700 mb-1">Level Akses Admin</label>
-            <select id="newAdminLevel" onchange="toggleUnitDropdown()" class="w-full bg-white border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer font-bold text-purple-700">
+            <select id="newAdminLevel" onchange="toggleUnitDropdown()" class="w-full bg-white border border-slate-200 rounded-xl p-3 outline-none cursor-pointer font-bold text-purple-700">
               <option value="dinas">Admin Dinas / Bidang</option>
               <option value="super">Super Administrator</option>
             </select>
@@ -365,7 +512,7 @@
         </div>
         <div id="unitSelectionGroup">
           <label class="block font-bold text-slate-700 mb-1">Nama Dinas / Instansi / Bidang <span class="text-slate-400 font-normal">(Ketik Manual)</span></label>
-          <input type="text" id="newAdminUnit" placeholder="Contoh: Bagian Umum / Dinas Pendidikan" class="w-full bg-white border border-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-purple-500">
+          <input type="text" id="newAdminUnit" placeholder="Contoh: Bagian Umum / Dinas Pendidikan" class="w-full bg-white border border-slate-200 rounded-xl p-3 outline-none">
         </div>
         <div class="flex items-center justify-end space-x-2 pt-1">
           <button type="button" id="cancelEditAdminBtn" onclick="resetAdminForm()" class="hidden px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl transition cursor-pointer">Batal</button>
@@ -407,7 +554,6 @@
     </div>
   </div>
 
-  <!-- JAVASCRIPT LOGIC & API INTEGRATION -->
   <script>
     const appState = {
       isAdminLoggedIn: false,
@@ -415,18 +561,18 @@
       activeView: 'dashboard',
       totpTimer: 30,
       currentYear: 2026,
-      currentMonth: 7,
+      currentMonth: 7, // August
       adminAccounts: [
         { username: 'superadmin', name: 'Super Administrator', pass: 'admin123', unit: 'Semua Dinas', isSuper: true },
         { username: 'admin_umum', name: 'Budi Santoso', pass: 'admin123', unit: 'Bagian Umum', isSuper: false },
         { username: 'admin_it', name: 'Siti Rahma', pass: 'admin123', unit: 'Bappeda & IT', isSuper: false }
       ],
       rooms: [
-        { id: 'room-1', name: 'Ruang Rapat Utama', category: 'Rapat', capacity: '50 Orang', unit: 'Bagian Umum', available: false, statusText: 'Sedang Perbaikan', badgeClass: 'bg-amber-50 text-amber-700 border-amber-200', icon: 'fa-triangle-exclamation', description: 'Ruangan representatif untuk rapat paripurna dan pertemuan besar.', features: ['Proyektor 4K', 'Sound System', 'AC Sentral'], images: ['https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80'], currentImageIdx: 0 },
+        { id: 'room-1', name: 'Ruang Aula Besar', category: 'Auditorium', capacity: '100 Orang', unit: 'INSPEKTORAT', available: true, statusText: 'Tersedia', badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200', icon: 'fa-circle-check', description: 'Ruangan representatif untuk rapat paripurna dan pertemuan besar.', features: ['Proyektor 4K', 'Sound System', 'AC Sentral'], images: ['https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80'], currentImageIdx: 0 },
         { id: 'room-2', name: 'Auditorium Gedung A', category: 'Auditorium', capacity: '150 Orang', unit: 'Bappeda & IT', available: true, statusText: 'Tersedia', badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200', icon: 'fa-circle-check', description: 'Aula luas untuk seminar, sosialisasi, dan diklat instansi.', features: ['Panggung Utama', 'Full Sound & Lighting'], images: ['https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=800&q=80'], currentImageIdx: 0 }
       ],
       bookings: [
-        { id: 'PMJ-1029', pemohon: 'Ahmad Fauzi', unit: 'Bagian Umum', kategori: 'Rapat Dinas', kegiatan: 'Rapat Koordinasi Triwulan', ruangan: 'Ruang Rapat Utama', tanggal: '2026-08-15', jam: '08:00 - 17:00 WIB', peserta: 45, catatan: 'Mic wireless', berkasUrl: '#', status: 'Disetujui', tahun: 2026, timestamp: '2026-08-10 09:30' }
+        { id: 'PMJ-1029', pemohon: 'Ahmad Fauzi', unit: 'Bagian Umum', kategori: 'Rapat Dinas', kegiatan: 'Rapat Koordinasi Triwulan', ruangan: 'Ruang Aula Besar', tanggal: '2026-08-15', jam: '08:00 - 17:00 WIB', peserta: 45, catatan: 'Mic wireless', berkasUrl: '#', status: 'Disetujui', tahun: 2026, timestamp: '2026-08-10 09:30' }
       ]
     };
 
@@ -434,7 +580,6 @@
 
     window.onload = async function() {
       initClock();
-      
       populateRoomOptions();
       populateUnitFilterOptions();
       
@@ -479,7 +624,6 @@
     function populateUnitFilterOptions() {
       const select = document.getElementById('filterUnitSelect');
       if (!select) return;
-      
       const units = [...new Set(appState.rooms.map(r => r.unit || 'Umum'))];
       select.innerHTML = '<option value="Semua">Semua Dinas / Bidang</option>';
       units.forEach(u => {
@@ -656,7 +800,7 @@
       }
 
       if (filteredRooms.length === 0) {
-        container.innerHTML = `<div class="col-span-3 py-12 text-center text-slate-400 font-medium bg-white rounded-3xl border border-slate-200">Tidak ada ruangan untuk unit / dinas "${selectedUnit}".</div>`;
+        container.innerHTML = `<div class="col-span-2 py-12 text-center text-slate-400 font-medium bg-white rounded-3xl border border-slate-200">Tidak ada ruangan untuk unit / dinas "${selectedUnit}".</div>`;
         return;
       }
 
@@ -667,7 +811,7 @@
         const btnDisabledAttr = isUnderMaintenance ? 'disabled' : '';
         const btnClass = isUnderMaintenance 
           ? 'bg-slate-200 text-slate-400 cursor-not-allowed px-4 py-2.5 rounded-2xl text-xs font-bold' 
-          : 'bg-blue-50 hover:bg-blue-100 active:bg-blue-200 text-blue-600 font-bold rounded-2xl text-xs transition cursor-pointer shadow-2xs';
+          : 'bg-transparent text-blue-600 hover:underline font-bold text-xs transition cursor-pointer';
 
         const photo = (room.images && room.images[0]) ? room.images[0] : 'https://placehold.co/800x400/e2e8f0/64748b?text=Ruangan';
 
@@ -676,8 +820,8 @@
             <div>
               <div class="relative h-48 sm:h-56 w-full overflow-hidden bg-slate-100">
                 <img src="${photo}" alt="${room.name}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/800x400/e2e8f0/64748b?text=Ruangan'">
-                <span class="absolute top-3 right-3 sm:top-4 sm:right-4 bg-white/90 backdrop-blur-md text-slate-800 text-[11px] sm:text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm"><i class="fa-solid fa-users text-blue-600 mr-1.5"></i> ${room.capacity}</span>
-                <span class="absolute top-3 left-3 sm:top-4 sm:left-4 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full">${room.unit || 'Umum'}</span>
+                <span class="absolute top-3 right-3 sm:top-4 sm:right-4 bg-white/90 backdrop-blur-md text-slate-800 text-[11px] sm:text-xs font-semibold px-3.5 py-1.5 rounded-full shadow-sm flex items-center"><i class="fa-solid fa-users text-blue-600 mr-1.5"></i> ${room.capacity}</span>
+                <span class="absolute top-3 left-3 sm:top-4 sm:left-4 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">${room.unit || 'Umum'}</span>
               </div>
               <div class="p-4 sm:p-6 space-y-2.5">
                 <h4 class="text-base sm:text-lg font-bold text-slate-900">${room.name}</h4>
@@ -1003,7 +1147,6 @@
         showToast(`Ruangan ${name} berhasil ditambahkan!`, 'success');
       }
 
-      // Immediately re-render all room displays and update state options
       renderRoomCards();
       renderAdminRoomList();
       populateRoomOptions();
@@ -1083,7 +1226,6 @@
       const jam = `${jamMulai} - ${jamSelesai} WIB`;
       const peserta = parseInt(document.getElementById('inputPeserta').value);
       const catatan = document.getElementById('inputCatatan').value;
-      const berkasInput = document.getElementById('inputBerkas');
 
       const currentRoom = appState.rooms.find(r => r.name === ruangan);
       if (currentRoom) {
