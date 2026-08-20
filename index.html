@@ -575,11 +575,10 @@
 
   <script>
     const apiService = {
-  appsScriptUrl: 'https://script.google.com/macros/s/AKfycbzoFGWWQxV3p9LxV6mThJPvoRlY1rG1RvSiaQYhvMTVPa6w5ijFMdYj3Zl7G4QD0Db29Q/exec', // Ganti dengan URL /exec Anda
+  appsScriptUrl: 'MASUKKAN_URL_WEB_APP_ANDA_DISINI', // Ganti dengan URL /exec Anda
 
   async request(action, payload = {}) {
     if (this.appsScriptUrl.includes('AKfycbz...')) {
-      console.warn("API URL masih menggunakan placeholder!");
       return { status: 'success' };
     }
     try {
@@ -595,7 +594,8 @@
     }
   },
 
-  async get(action) {
+  // Perbaikan: Ubah 'get(action)' menjadi 'fetchData(action)' atau pastikan sintaksis fungsi benar
+  async fetchData(action) {
     if (this.appsScriptUrl.includes('AKfycbz...')) {
       return { status: 'success', bookings: [], rooms: [], admins: [] };
     }
@@ -609,7 +609,7 @@
   },
 
   async getAllData() {
-    return await this.get('getAllData');
+    return await this.fetchData('getAllData');
   }
 };
 
