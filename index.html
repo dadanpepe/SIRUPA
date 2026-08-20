@@ -631,12 +631,10 @@
 
   <script>
     const apiService = {
+      // Masukkan URL Web App Google Apps Script Anda di sini
       appsScriptUrl: 'https://script.google.com/macros/s/AKfycbyvep7MXJuPNsrStfbo0f8zdvoGTKkZo7fF16jsKQZjPShZhAQb_V_ZOW55_-TNlNeyNA/exec',
 
       sendRequest: async function(action, payload = {}) {
-        if (this.appsScriptUrl.includes('AKfycbz...')) {
-          return { status: 'success' };
-        }
         try {
           const response = await fetch(this.appsScriptUrl, {
             method: 'POST',
@@ -651,7 +649,16 @@
       },
 
       getAllData: async function() {
-        return await this.sendRequest('getAllData');
+        try {
+          const response = await fetch(`${this.appsScriptUrl}?action=getAllData`, {
+            method: 'GET',
+            cache: 'no-store'
+          });
+          return await response.json();
+        } catch (err) {
+          console.error("API GET Error:", err);
+          return { status: 'error', message: err.toString() };
+        }
       }
     };
 
@@ -661,7 +668,7 @@
       activeView: 'dashboard',
       totpTimer: 30,
       currentYear: 2026,
-      currentMonth: 7, // August
+      currentMonth: 7,
       adminAccounts: [
         { username: 'superadmin', name: 'Super Administrator', pass: 'admin123', unit: 'Semua Dinas', isSuper: true },
         { username: 'admin_umum', name: 'Budi Santoso', pass: 'admin123', unit: 'Bagian Umum', isSuper: false },
@@ -690,8 +697,11 @@
         dateInput.value = todayStr;
       }
 
+      // Sinkronisasi awal saat halaman dimuat
       await syncDataFromDatabase();
-      setInterval(syncDataFromDatabase, 5000);
+      
+      // Sinkronisasi otomatis setiap 4 detik untuk real-time lintas pengguna/admin
+      setInterval(syncDataFromDatabase, 4000);
 
       renderRoomCards();
       renderBookingTable();
@@ -706,7 +716,6 @@
       switchView('dashboard');
     };
 
-    // Fungsi Pengingat H-1 dengan Lonceng Notifikasi Interaktif
     function checkH1Reminders() {
       const today = new Date();
       const tomorrow = new Date(today);
@@ -752,29 +761,33 @@
       try {
         const json = await apiService.getAllData();
         if (json && json.status === 'success') {
-          if (json.bookings && Array.isArray(json.bookings) && json.bookings.length > 0) appState.bookings = json.bookings;
-          if (json.rooms && Array.isArray(json.rooms) && json.rooms.length > 0) appState.rooms = json.rooms;
-          if (json.admins && Array.isArray(json.admins) && json.admins.length > 0) appState.adminAccounts = json.admins;
+          if (json.bookings && Array.isArray(json.bookings)) appState.bookings = json.bookings;
+          if (json.rooms && Array.isArray(json.rooms)) appState.rooms = json.rooms;
+          if (json.admins && Array.isArray(json.admins)) appState.adminAccounts = json.admins;
           
           renderBookingTable();
           updateDashboardCounts();
           renderCalendar();
-          renderAdminPendingTable();
-          renderAdminAccountsList();
+          if (appState.isAdminLoggedIn) {
+            renderAdminPendingTable();
+            renderAdminRoomList();
+            renderAdminAccountsList();
+          }
           renderRoomCards();
           checkH1Reminders();
         }
       } catch (err) {
-        console.warn("Real-time sync silent retry:", err);
+        console.warn("Background sync retry:", err);
       }
     }
 
+    // Tombol sinkronisasi real-time instan khusus pada panel admin
     async function handleAdminRefresh() {
-      showToast('Memuat ulang data dari database...', 'info');
+      showToast('Menyinkronkan data secara real-time dari database...', 'info');
       await syncDataFromDatabase();
       renderAdminPendingTable();
       renderAdminRoomList();
-      showToast('Data berhasil diperbarui.', 'success');
+      showToast('Panel admin berhasil disinkronkan!', 'success');
     }
 
     async function sendDataToDatabase(action, payload) {
