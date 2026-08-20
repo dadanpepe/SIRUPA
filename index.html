@@ -27,27 +27,14 @@
 
   <div id="toastContainer" class="fixed top-4 left-4 right-4 sm:left-auto sm:right-5 z-50 flex flex-col space-y-3 pointer-events-none"></div>
 
-  <!-- BANNER NOTIFIKASI H-1 (UI/UX MODERN & ELEGAN) -->
-  <div id="h1ReminderBanner" class="hidden relative overflow-hidden bg-gradient-to-r from-amber-500 via-orange-500 to-rose-600 text-white px-4 py-3.5 shadow-lg z-40 sticky top-0 border-b border-orange-400/30 backdrop-blur-md">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5">
-      <div class="flex items-center space-x-3">
-        <div class="w-9 h-9 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center text-white shrink-0 live-pulse shadow-inner">
-          <i class="fa-solid fa-bell text-sm"></i>
-        </div>
-        <div>
-          <div class="text-[10px] uppercase font-black tracking-widest text-amber-100">Pengingat Otomatis H-1</div>
-          <p id="h1ReminderText" class="text-xs sm:text-sm font-bold tracking-tight">Terdapat jadwal penggunaan ruangan yang akan berlangsung besok.</p>
-        </div>
-      </div>
-      <div class="flex items-center space-x-2 shrink-0">
-        <button onclick="switchView('checkRoom')" class="px-3.5 py-1.5 bg-white text-orange-700 hover:bg-orange-50 font-black rounded-xl text-xs transition shadow-sm cursor-pointer flex items-center space-x-1">
-          <i class="fa-solid fa-calendar-day text-[10px]"></i><span>Cek Jadwal</span>
-        </button>
-        <button onclick="document.getElementById('h1ReminderBanner').classList.add('hidden')" class="w-7 h-7 bg-black/10 hover:bg-black/20 text-white rounded-full flex items-center justify-center transition cursor-pointer">
-          <i class="fa-solid fa-xmark text-xs"></i>
-        </button>
-      </div>
+  <!-- PAPAN BERJALAN (MARQUEE) UNTUK INFORMASI TAMBAHAN -->
+  <div class="bg-slate-900 text-slate-200 text-xs py-2 px-4 overflow-hidden whitespace-nowrap border-b border-slate-800 flex items-center shadow-inner">
+    <div class="bg-blue-600 text-white font-bold px-2 py-0.5 rounded text-[10px] mr-3 shrink-0 flex items-center shadow-xs">
+      <i class="fa-solid fa-bullhorn mr-1"></i> PENGUMUMAN
     </div>
+    <marquee scrollamount="5" class="font-medium text-slate-300">
+      Selamat datang di Sistem Informasi Ruangan dan Peminjaman (SIRUPA). Mohon unggah berkas surat izin berformat PDF saat melakukan pengajuan peminjaman ruangan. Pastikan jadwal tidak bentrok dengan kegiatan instansi lain.
+    </marquee>
   </div>
 
   <header class="bg-white/95 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200 shadow-xs">
@@ -62,9 +49,30 @@
         </div>
       </div>
 
-      <div class="flex items-center space-x-3">
+      <div class="flex items-center space-x-3 sm:space-x-4">
+        <!-- FITUR LONCENG NOTIFIKASI INTERAKTIF -->
+        <div class="relative">
+          <button onclick="toggleNotificationDropdown()" class="w-10 h-10 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl flex items-center justify-center transition cursor-pointer relative shadow-xs border border-slate-200">
+            <i class="fa-solid fa-bell text-sm"></i>
+            <span id="notifBadge" class="hidden absolute -top-1 -right-1 w-5 h-5 bg-rose-600 text-white font-black text-[10px] rounded-full flex items-center justify-center live-pulse shadow-sm">0</span>
+          </button>
+          
+          <!-- Dropdown Box Notifikasi Lonceng -->
+          <div id="notifDropdown" class="hidden absolute right-0 mt-3 w-80 sm:w-96 bg-white rounded-3xl shadow-2xl border border-slate-200 p-4 z-50 space-y-3 transform transition-all">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+              <h4 class="font-black text-slate-900 text-xs uppercase tracking-wider flex items-center">
+                <i class="fa-solid fa-bell mr-1.5 text-blue-600"></i> Notifikasi & Pengingat H-1
+              </h4>
+              <button onclick="toggleNotificationDropdown()" class="text-slate-400 hover:text-slate-600 text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="notifListContainer" class="space-y-2 max-h-64 overflow-y-auto pr-1">
+              <div class="text-center py-6 text-slate-400 text-xs font-medium">Tidak ada pemberitahuan baru.</div>
+            </div>
+          </div>
+        </div>
+
         <div class="hidden md:flex flex-col text-right border-r border-slate-200 pr-4">
-          <span id="liveClock" class="text-xs font-mono font-bold text-slate-800">17:46:57 WIB</span>
+          <span id="liveClock" class="text-xs font-mono font-bold text-slate-800">17:52:30 WIB</span>
           <span id="liveDate" class="text-[10px] text-slate-400 font-medium">Kamis, 20 Agustus 2026</span>
         </div>
 
@@ -627,7 +635,7 @@
 
   <script>
     const apiService = {
-      appsScriptUrl: 'https://script.google.com/macros/s/AKfycbx1lLrbsuXLHYlIlNOc9drQEB7S6k3ruYJmX79OGZyK_ZfLlSCfd6yFA6wW00gL6Z_s1g/exec',
+      appsScriptUrl: 'https://script.google.com/macros/s/AKfycby.../exec',
 
       sendRequest: async function(action, payload = {}) {
         if (this.appsScriptUrl.includes('AKfycbz...')) {
@@ -702,6 +710,7 @@
       switchView('dashboard');
     };
 
+    // Fungsi Pengingat H-1 dengan Lonceng Notifikasi Interaktif
     function checkH1Reminders() {
       const today = new Date();
       const tomorrow = new Date(today);
@@ -709,17 +718,38 @@
       const tomorrowStr = tomorrow.toISOString().split('T')[0];
 
       const h1Bookings = appState.bookings.filter(b => b.tanggal === tomorrowStr && b.status === 'Disetujui');
+      const badge = document.getElementById('notifBadge');
+      const container = document.getElementById('notifListContainer');
+
       if (h1Bookings.length > 0) {
-        const banner = document.getElementById('h1ReminderBanner');
-        const textEl = document.getElementById('h1ReminderText');
-        if (banner && textEl) {
-          textEl.innerHTML = `PENGINGAT H-1: Terdapat <b>${h1Bookings.length} agenda</b> peminjaman ruangan yang akan berlangsung BESOK (${tomorrowStr}).`;
-          banner.classList.remove('hidden');
+        if (badge) {
+          badge.innerText = h1Bookings.length;
+          badge.classList.remove('hidden');
         }
-        h1Bookings.forEach(b => {
-          showToast(`Pengingat H-1: Ruangan "${b.ruangan}" untuk kegiatan "${b.kegiatan}" akan digunakan besok!`, 'warning');
-        });
+        if (container) {
+          container.innerHTML = '';
+          h1Bookings.forEach(b => {
+            container.innerHTML += `
+              <div class="bg-amber-50 border border-amber-200 p-3 rounded-2xl space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-extrabold text-amber-800 uppercase tracking-wider">H-1 Penggunaan</span>
+                  <span class="text-[10px] font-bold text-slate-500">${b.jam}</span>
+                </div>
+                <div class="font-bold text-slate-900 text-xs">${b.kegiatan}</div>
+                <div class="text-[11px] text-slate-600">Ruangan: <b>${b.ruangan}</b></div>
+                <div class="text-[10px] text-slate-400">Pemohon: ${b.pemohon} (${b.unit})</div>
+              </div>`;
+          });
+        }
+      } else {
+        if (badge) badge.classList.add('hidden');
+        if (container) container.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs font-medium">Tidak ada pengingat H-1 aktif saat ini.</div>`;
       }
+    }
+
+    function toggleNotificationDropdown() {
+      const dropdown = document.getElementById('notifDropdown');
+      if (dropdown) dropdown.classList.toggle('hidden');
     }
 
     async function syncDataFromDatabase() {
