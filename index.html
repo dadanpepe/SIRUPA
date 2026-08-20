@@ -575,7 +575,7 @@
 
   <script>
     const apiService = {
-  appsScriptUrl: 'MASUKKAN_URL_WEB_APP_ANDA_DISINI', // Ganti dengan URL /exec Anda
+  appsScriptUrl: 'https://script.google.com/macros/s/AKfycbzoFGWWQxV3p9LxV6mThJPvoRlY1rG1RvSiaQYhvMTVPa6w5ijFMdYj3Zl7G4QD0Db29Q/exec', // Ganti dengan URL /exec Anda
 
   async request(action, payload = {}) {
     if (this.appsScriptUrl.includes('AKfycbz...')) {
@@ -708,23 +708,30 @@
     };
 
     async function syncDataFromDatabase() {
-      try {
-        const json = await apiService.getAllData();
-        if (json && json.status === 'success') {
-          if (json.bookings && Array.isArray(json.bookings) && json.bookings.length > 0) appState.bookings = json.bookings;
-          if (json.rooms && Array.isArray(json.rooms) && json.rooms.length > 0) appState.rooms = json.rooms;
-          if (json.admins && Array.isArray(json.admins) && json.admins.length > 0) appState.adminAccounts = json.admins;
-          
-          renderBookingTable();
-          updateDashboardCounts();
-          renderCalendar();
-          renderAdminPendingTable();
-          renderAdminAccountsList();
-        }
-      } catch (err) {
-        console.warn("Real-time sync retry:", err);
+  try {
+    const json = await apiService.getAllData();
+    if (json && json.status === 'success') {
+      if (json.bookings && Array.isArray(json.bookings) && json.bookings.length > 0) {
+        appState.bookings = json.bookings;
       }
+      if (json.rooms && Array.isArray(json.rooms) && json.rooms.length > 0) {
+        appState.rooms = json.rooms;
+      }
+      if (json.admins && Array.isArray(json.admins) && json.admins.length > 0) {
+        appState.adminAccounts = json.admins;
+      }
+      
+      // Render ulang tampilan setelah data ditarik
+      renderBookingTable();
+      updateDashboardCounts();
+      renderCalendar();
+      renderAdminPendingTable();
+      renderAdminAccountsList();
     }
+  } catch (err) {
+    console.warn("Gagal menyinkronkan data:", err);
+  }
+}
 
     function initClock() {
       setInterval(() => {
