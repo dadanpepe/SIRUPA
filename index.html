@@ -61,16 +61,17 @@
     </div>
   </header>
 
+  <!-- Mobile Bottom Nav -->
   <div class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-6 py-2.5 flex justify-around items-center shadow-2xl">
-    <button onclick="switchView('dashboard')" id="mobNavDashboard" class="flex flex-col items-center text-blue-600 space-y-0.5">
+    <button onclick="switchView('dashboard')" id="mobNavDashboard" class="flex flex-col items-center text-blue-600 space-y-0.5 cursor-pointer">
       <i class="fa-solid fa-gauge-high text-lg"></i>
       <span class="text-[10px] font-bold">Dashboard</span>
     </button>
-    <button onclick="switchView('checkRoom')" id="mobNavCheckRoom" class="flex flex-col items-center text-slate-400 space-y-0.5">
+    <button onclick="switchView('checkRoom')" id="mobNavCheckRoom" class="flex flex-col items-center text-slate-400 space-y-0.5 cursor-pointer">
       <i class="fa-solid fa-magnifying-glass-chart text-lg"></i>
       <span class="text-[10px] font-bold">Cek Ruang</span>
     </button>
-    <button onclick="switchView('admin')" id="mobNavAdmin" class="flex flex-col items-center text-slate-400 space-y-0.5">
+    <button onclick="switchView('admin')" id="mobNavAdmin" class="flex flex-col items-center text-slate-400 space-y-0.5 cursor-pointer">
       <i class="fa-solid fa-user-shield text-lg"></i>
       <span class="text-[10px] font-bold">Admin</span>
     </button>
@@ -78,7 +79,7 @@
 
   <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6 sm:space-y-8">
 
-    <!-- VIEW 1: DASHBOARD -->
+    <!-- Dashboard View -->
     <section id="viewDashboard" class="space-y-6 sm:space-y-8">
       <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 p-6 sm:p-10 text-white shadow-xl shadow-blue-500/10">
         <div class="absolute -right-10 -bottom-10 opacity-10 text-white text-9xl font-black pointer-events-none">
@@ -89,6 +90,10 @@
             <h2 class="text-xl sm:text-3xl lg:text-4xl font-black tracking-tight leading-tight">Dashboard & Statistik Ruangan</h2>
             <p class="text-blue-100 text-xs sm:text-sm leading-relaxed opacity-90">Pantau ketersediaan jadwal ruangan, analisis penggunaan fasilitas, dan status operasional secara real-time.</p>
           </div>
+          <button onclick="openBookingModal()" class="px-5 py-3 bg-white text-blue-700 hover:bg-blue-50 font-bold rounded-2xl text-xs shadow-lg transition duration-200 cursor-pointer shrink-0 flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-plus-circle text-sm"></i>
+            <span>Ajukan Peminjaman Baru</span>
+          </button>
         </div>
       </div>
 
@@ -157,7 +162,7 @@
       </div>
     </section>
 
-    <!-- VIEW 2: CHECK ROOM -->
+    <!-- Check Room View -->
     <section id="viewCheckRoom" class="space-y-6 sm:space-y-8 hidden">
       <div class="bg-sky-50 border border-sky-200 text-sky-800 p-4 rounded-2xl text-xs font-medium flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
         <div class="flex items-start sm:items-center">
@@ -213,7 +218,7 @@
       </div>
     </section>
 
-    <!-- VIEW 3: ADMIN -->
+    <!-- Admin View -->
     <section id="viewAdmin" class="space-y-6 hidden">
       <div id="adminLoginContainer" class="flex items-center justify-center py-6 sm:py-12">
         <div class="bg-white rounded-3xl max-w-md w-full shadow-lg border border-slate-200 p-6 sm:p-8 relative transition-all duration-300">
