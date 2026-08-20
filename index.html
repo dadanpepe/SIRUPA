@@ -4,9 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>SIRUPA - Sistem Informasi Ruangan dan Peminjaman</title>
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -45,7 +43,6 @@
           <span id="liveDate" class="text-[10px] text-slate-400 font-medium">Rabu, 20 Agustus 2026</span>
         </div>
 
-        <!-- Desktop Nav -->
         <nav class="hidden sm:flex items-center bg-slate-100 p-1 rounded-full border border-slate-200 space-x-1">
           <button id="navDashboard" onclick="switchView('dashboard')" class="flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold transition-all bg-blue-600 text-white shadow-xs cursor-pointer">
             <i class="fa-solid fa-gauge-high mr-1.5"></i> Dashboard
@@ -168,7 +165,6 @@
         </button>
       </div>
 
-      <!-- Calendar Header & Grid -->
       <div class="bg-white rounded-3xl border border-slate-200 p-4 sm:p-6 shadow-xs space-y-4 sm:space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <h3 class="text-xs sm:text-sm font-black text-slate-900 tracking-wide uppercase">CEK RUANG</h3>
@@ -445,7 +441,7 @@
       </div>
       <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3 text-left space-y-1 text-xs">
         <div class="font-bold text-slate-800"><i class="fa-solid fa-circle-info text-blue-600 mr-1"></i> Informasi Sistem:</div>
-        <p class="text-slate-600 text-[11px]">Sistem mendeteksi agenda lain yang sudah disetujui pada ruangan dan waktu tersebut. Silakan pilih jam atau tanggal lain untuk menghindari bentrok.</p>
+        <p class="text-slate-600 text-[11px]">Sistem mendeteksi agenda lain yang sudah disetujui pada ruangan dan tanggal tersebut. Silakan pilih jam atau tanggal lain untuk menghindari bentrok.</p>
       </div>
       <button onclick="closeDoubleInputModal()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition cursor-pointer shadow-md">Saya Mengerti & Ubah Jadwal</button>
     </div>
@@ -1236,14 +1232,11 @@
     function checkBookingAvailability() {
       const tanggal = document.getElementById('inputTanggal').value;
       const ruangan = document.getElementById('inputRuangan').value;
-      const jamMulai = document.getElementById('inputJamMulai').value;
-      const jamSelesai = document.getElementById('inputJamSelesai').value;
       const conflictBanner = document.getElementById('bookingConflictBanner');
       const conflictText = document.getElementById('bookingConflictText');
 
       if (!tanggal || !ruangan) return false;
 
-      // Cek apakah ada jadwal lain di ruangan dan tanggal yang sama
       const conflicting = appState.bookings.find(b => 
         b.ruangan === ruangan && 
         b.tanggal === tanggal && 
@@ -1276,7 +1269,6 @@
       const peserta = parseInt(document.getElementById('inputPeserta').value);
       const catatan = document.getElementById('inputCatatan').value;
 
-      // Validasi Double Input (Bentrok Jadwal) dengan Pop-Up Interaktif
       const conflict = checkBookingAvailability();
       if (conflict) {
         document.getElementById('doubleInputModalText').innerHTML = `Gagal mengirim pengajuan! Ruangan <b>${ruangan}</b> sudah memiliki jadwal aktif pada tanggal <b>${tanggal}</b> untuk kegiatan <b>"${conflict.kegiatan}"</b> (${conflict.jam}).`;
