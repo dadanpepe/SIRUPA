@@ -27,13 +27,13 @@
 
   <div id="toastContainer" class="fixed top-4 left-4 right-4 sm:left-auto sm:right-5 z-50 flex flex-col space-y-3 pointer-events-none"></div>
 
-  <!-- PAPAN BERJALAN (MARQUEE) UNTUK INFORMASI TAMBAHAN -->
+  <!-- PAPAN BERJALAN (MARQUEE) INFORMASI TAMBAHAN -->
   <div class="bg-slate-900 text-slate-200 text-xs py-2 px-4 overflow-hidden whitespace-nowrap border-b border-slate-800 flex items-center shadow-inner">
     <div class="bg-blue-600 text-white font-bold px-2 py-0.5 rounded text-[10px] mr-3 shrink-0 flex items-center shadow-xs">
       <i class="fa-solid fa-bullhorn mr-1"></i> PENGUMUMAN
     </div>
     <marquee scrollamount="5" class="font-medium text-slate-300">
-      Selamat datang di Sistem Informasi Ruangan dan Peminjaman (SIRUPA). Mohon unggah berkas surat izin berformat PDF saat melakukan pengajuan peminjaman ruangan. Pastikan jadwal tidak bentrok dengan kegiatan instansi lain.
+      Selamat datang di Sistem Informasi Ruangan dan Peminjaman (SIRUPA). Unggah berkas surat izin berformat PDF saat melakukan pengajuan peminjaman ruangan. Gunakan tombol sinkronisasi di samping lonceng untuk memperbarui data secara real-time.
     </marquee>
   </div>
 
@@ -50,6 +50,11 @@
       </div>
 
       <div class="flex items-center space-x-3 sm:space-x-4">
+        <!-- TOMBOL FITUR SINKRONISASI REAL-TIME -->
+        <button onclick="manualSyncDatabase()" title="Sinkronisasi Data Real-Time" class="w-10 h-10 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl flex items-center justify-center transition cursor-pointer relative shadow-xs border border-slate-200">
+          <i id="syncIcon" class="fa-solid fa-rotate text-sm"></i>
+        </button>
+
         <!-- FITUR LONCENG NOTIFIKASI INTERAKTIF -->
         <div class="relative">
           <button onclick="toggleNotificationDropdown()" class="w-10 h-10 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl flex items-center justify-center transition cursor-pointer relative shadow-xs border border-slate-200">
@@ -750,6 +755,18 @@
     function toggleNotificationDropdown() {
       const dropdown = document.getElementById('notifDropdown');
       if (dropdown) dropdown.classList.toggle('hidden');
+    }
+
+    // Fungsi Tombol Sinkronisasi Real-Time Manual
+    async function manualSyncDatabase() {
+      const icon = document.getElementById('syncIcon');
+      if (icon) icon.classList.add('fa-spin');
+      showToast('Menyelaraskan data dengan database Google Spreadsheet...', 'info');
+      
+      await syncDataFromDatabase();
+      
+      if (icon) icon.classList.remove('fa-spin');
+      showToast('Data aplikasi berhasil disinkronkan secara real-time!', 'success');
     }
 
     async function syncDataFromDatabase() {
@@ -1458,7 +1475,7 @@
       });
     }
 
-   async function handleBookingSubmit(e) {
+    async function handleBookingSubmit(e) {
       e.preventDefault();
       const pemohon = document.getElementById('inputPemohon').value;
       const email = document.getElementById('inputEmail').value;
@@ -1507,7 +1524,7 @@
 
       showToast('Mengirim dan menyinkronkan data & file ke Google Spreadsheet & Drive...', 'info');
 
-      // Masukkan langsung ke state lokal agar langsung tampil di UI tanpa menunggu fetch ulang
+      // Masukkan langsung ke state lokal agar langsung tampil di UI
       appState.bookings.unshift(newBooking);
       renderBookingTable();
       updateDashboardCounts();
@@ -1539,15 +1556,6 @@
       showToast(`Peminjaman berhasil dikirim & disimpan (ID: ${newBooking.id})! Email konfirmasi telah dikirim.`, 'success');
     }
 
-    function postBookingSyncActions(bookingId) {
-      renderBookingTable();
-      updateDashboardCounts();
-      renderAdminPendingTable();
-      renderCalendar();
-      closeBookingModal();
-      showToast(`Peminjaman berhasil dikirim & disinkronkan (ID: ${bookingId})! Email konfirmasi telah dikirim.`, 'success');
-    }
-
     async function updateBookingStatusInCloud(bookingId, newStatus) {
       const item = appState.bookings.find(b => b.id === bookingId);
       if (!item) return;
@@ -1569,7 +1577,6 @@
       renderBookingTable();
       updateDashboardCounts();
       renderCalendar();
-      initAnalyticsCharts();
       checkH1Reminders();
 
       showToast(`Menyinkronkan status ${bookingId} ke database...`, 'info');
