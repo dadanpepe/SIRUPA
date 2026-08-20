@@ -33,7 +33,7 @@
       <i class="fa-solid fa-bullhorn mr-1"></i> PENGUMUMAN
     </div>
     <marquee scrollamount="5" class="font-medium text-slate-300">
-      Sistem Informasi Ruangan dan Peminjaman (SIRUPA) aktif. Proteksi anti double-input real-time, pengingat H-1 otomatis, & validasi ketat jadwal operasional.
+      Sistem Informasi Ruangan dan Peminjaman (SIRUPA) aktif. Proteksi anti double-input server-side & real-time sync, pengingat H-1 otomatis, & validasi jadwal ketat.
     </marquee>
   </div>
 
@@ -73,7 +73,7 @@
 
         <div class="hidden md:flex flex-col text-right border-r border-slate-200 pr-4">
           <span id="liveClock" class="text-xs font-mono font-bold text-slate-800">17:52:30 WIB</span>
-          <span id="liveDate" class="text-[10px] text-slate-400 font-medium">Kamis, 20 Agustus 2026</span>
+          <span id="liveDate" class="text-[10px] text-slate-400 font-medium">Jumat, 21 Agustus 2026</span>
         </div>
 
         <nav class="hidden sm:flex items-center bg-slate-100 p-1 rounded-full border border-slate-200 space-x-1">
@@ -1509,7 +1509,6 @@
       });
     }
 
-    // FOOLPROOF SUBMIT: Pop-up double input tampil saat tombol "Kirim Pengajuan" diklik jika bentrok
     async function handleBookingSubmit(e) {
       e.preventDefault();
       const pemohon = document.getElementById('inputPemohon').value;
@@ -1534,13 +1533,16 @@
         return;
       }
 
-      // VALIDASI KETAT DOUBLE INPUT / BENTROK JADWAL SAAT TOMBOL KIRIM DIKLIK
+      showToast('Memeriksa ketersediaan real-time ke database...', 'info');
+      await syncDataFromDatabase();
+
+      // VALIDASI KETAT DOUBLE INPUT / BENTROK JADWAL LOKAL & SERVER
       const conflict = checkBookingConflictWithTime(ruangan, tanggal, jamMulai, jamSelesai, null);
       if (conflict) {
         const warningMsg = `Gagal menyimpan! Ruangan <b>${ruangan}</b> pada tanggal <b>${tanggal}</b> pukul <b>${jam}</b> bersinggungan / sudah di-booking oleh <b>${conflict.pemohon} (${conflict.unit})</b> untuk kegiatan <b>"${conflict.kegiatan}"</b> dengan status <b>[${conflict.status}]</b>. Silakan pilih jadwal atau ruangan lain.`;
         document.getElementById('doubleInputModalText').innerHTML = warningMsg;
         document.getElementById('doubleInputWarningModal').classList.remove('hidden');
-        return; // Hentikan total proses agar tidak terjadi double input
+        return;
       }
 
       const currentRoom = appState.rooms.find(r => r.name === ruangan);
