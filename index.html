@@ -1014,11 +1014,24 @@
             unit,
             features,
             description,
-            images: [photoUrl, ...(existingRoom.images.slice(1))]
+            statusText: existingRoom.statusText || 'Tersedia',
+            badgeClass: existingRoom.badgeClass || 'bg-emerald-50 text-emerald-700 border-emerald-200',
+            icon: existingRoom.icon || 'fa-circle-check',
+            images: [photoUrl, ...(existingRoom.images ? existingRoom.images.slice(1) : [])]
           };
           showToast(`Ruangan ${name} berhasil diperbarui!`, 'success');
         } else {
-          showToast('Data ruangan tidak ditemukan untuk diperbarui.', 'error');
+          // Fallback if ID wasn't found, append as new
+          const newRoom = {
+            id: 'room-' + (appState.rooms.length + 1) + '-' + Math.floor(Math.random() * 1000),
+            name, category, capacity, unit,
+            available: true, statusText: 'Tersedia',
+            badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+            icon: 'fa-circle-check',
+            description, features, images: [photoUrl], currentImageIdx: 0
+          };
+          appState.rooms.push(newRoom);
+          showToast(`Ruangan ${name} berhasil ditambahkan!`, 'success');
         }
       } else {
         const newRoom = {
