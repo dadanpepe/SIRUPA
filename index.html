@@ -61,6 +61,7 @@
     </div>
   </header>
 
+  <!-- Mobile Bottom Nav -->
   <div class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-6 py-2.5 flex justify-around items-center shadow-2xl">
     <button onclick="switchView('dashboard')" id="mobNavDashboard" class="flex flex-col items-center text-blue-600 space-y-0.5">
       <i class="fa-solid fa-gauge-high text-lg"></i>
@@ -78,7 +79,6 @@
 
   <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6 sm:space-y-8">
 
-    <!-- VIEW 1: DASHBOARD -->
     <section id="viewDashboard" class="space-y-6 sm:space-y-8">
       <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 p-6 sm:p-10 text-white shadow-xl shadow-blue-500/10">
         <div class="absolute -right-10 -bottom-10 opacity-10 text-white text-9xl font-black pointer-events-none">
@@ -157,7 +157,6 @@
       </div>
     </section>
 
-    <!-- VIEW 2: CHECK ROOM -->
     <section id="viewCheckRoom" class="space-y-6 sm:space-y-8 hidden">
       <div class="bg-sky-50 border border-sky-200 text-sky-800 p-4 rounded-2xl text-xs font-medium flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
         <div class="flex items-start sm:items-center">
@@ -169,6 +168,7 @@
         </button>
       </div>
 
+      <!-- Calendar Header & Grid -->
       <div class="bg-white rounded-3xl border border-slate-200 p-4 sm:p-6 shadow-xs space-y-4 sm:space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <h3 class="text-xs sm:text-sm font-black text-slate-900 tracking-wide uppercase">CEK RUANG</h3>
@@ -213,7 +213,6 @@
       </div>
     </section>
 
-    <!-- VIEW 3: ADMIN -->
     <section id="viewAdmin" class="space-y-6 hidden">
       <div id="adminLoginContainer" class="flex items-center justify-center py-6 sm:py-12">
         <div class="bg-white rounded-3xl max-w-md w-full shadow-lg border border-slate-200 p-6 sm:p-8 relative transition-all duration-300">
@@ -337,7 +336,6 @@
     © 2026 SIRUPA - Sistem Informasi Ruangan dan Peminjaman.
   </footer>
 
-  <!-- MODAL: BOOKING FORM -->
   <div id="bookingModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
     <div class="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-8 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto space-y-5">
       <button onclick="closeBookingModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
@@ -347,28 +345,38 @@
         <h3 id="bookingModalMainTitle" class="text-base sm:text-lg font-black text-slate-900 tracking-tight">Formulir Peminjaman Ruangan</h3>
       </div>
 
+      <div id="bookingConflictBanner" class="hidden bg-amber-50 border border-amber-200 rounded-2xl p-3.5 text-xs text-amber-800 space-y-1">
+        <div class="font-bold flex items-center"><i class="fa-solid fa-triangle-exclamation mr-1.5 text-amber-600"></i> Jadwal Bentrok!</div>
+        <p id="bookingConflictText"></p>
+      </div>
+
+      <div id="capacityWarningBanner" class="hidden bg-rose-50 border border-rose-200 rounded-2xl p-3.5 text-xs text-rose-800 space-y-1">
+        <div class="font-bold flex items-center"><i class="fa-solid fa-triangle-exclamation mr-1.5 text-rose-600"></i> Melebihi Kapasitas Maksimal!</div>
+        <p id="capacityWarningText"></p>
+      </div>
+
       <form id="bookingForm" onsubmit="handleBookingSubmit(event)" class="space-y-4 text-xs">
         <div>
-          <label class="block font-bold text-slate-700 mb-1.5">Pilih Ruangan <span class="text-rose-500">*</span></label>
-          <select id="inputRuangan" required onchange="checkBookingAvailability()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none font-medium cursor-pointer">
+          <label class="block font-bold text-slate-700 mb-1.5">Pilih Ruangan</label>
+          <select id="inputRuangan" onchange="checkBookingAvailability(); checkCapacityLimit();" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none font-medium cursor-pointer">
           </select>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block font-bold text-slate-700 mb-1.5">Nama Pemohon <span class="text-rose-500">*</span></label>
+            <label class="block font-bold text-slate-700 mb-1.5">Nama Pemohon</label>
             <input type="text" id="inputPemohon" required placeholder="Contoh: Ahmad Fauzi" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none">
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1.5">Bidang / Unit Kerja <span class="text-rose-500">*</span></label>
+            <label class="block font-bold text-slate-700 mb-1.5">Bidang / Unit Kerja</label>
             <input type="text" id="inputUnit" required placeholder="Contoh: Bagian Umum" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none">
           </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block font-bold text-slate-700 mb-1.5">Kategori Kegiatan <span class="text-rose-500">*</span></label>
-            <select id="inputKategori" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none cursor-pointer">
+            <label class="block font-bold text-slate-700 mb-1.5">Kategori Kegiatan</label>
+            <select id="inputKategori" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none cursor-pointer">
               <option value="Rapat Dinas">Rapat Dinas</option>
               <option value="Seminar / Sosialisasi">Seminar / Sosialisasi</option>
               <option value="Workshop">Workshop</option>
@@ -376,36 +384,36 @@
             </select>
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1.5">Jumlah Peserta <span class="text-rose-500">*</span></label>
-            <input type="number" id="inputPeserta" required value="25" min="1" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none">
+            <label class="block font-bold text-slate-700 mb-1.5">Jumlah Peserta</label>
+            <input type="number" id="inputPeserta" required value="25" min="1" oninput="checkCapacityLimit()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none">
           </div>
         </div>
 
         <div>
-          <label class="block font-bold text-slate-700 mb-1.5">Nama Kegiatan <span class="text-rose-500">*</span></label>
+          <label class="block font-bold text-slate-700 mb-1.5">Nama Kegiatan</label>
           <input type="text" id="inputKegiatan" required placeholder="Contoh: Rapat Koordinasi Triwulan" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none">
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block font-bold text-slate-700 mb-1.5">Tanggal Pelaksanaan <span class="text-rose-500">*</span></label>
+            <label class="block font-bold text-slate-700 mb-1.5">Tanggal Pelaksanaan</label>
             <input type="date" id="inputTanggal" required onchange="checkBookingAvailability()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none font-medium">
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1.5">Waktu / Jam Pelaksanaan <span class="text-rose-500">*</span></label>
+            <label class="block font-bold text-slate-700 mb-1.5">Waktu / Jam Pelaksanaan</label>
             <div class="grid grid-cols-2 gap-2">
-              <input type="text" id="inputJamMulai" required value="08:00" onchange="checkBookingAvailability()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-center outline-none">
-              <input type="text" id="inputJamSelesai" required value="17:00" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-center outline-none">
+              <input type="text" id="inputJamMulai" required onchange="checkBookingAvailability()" value="08:00" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-center outline-none">
+              <input type="text" id="inputJamSelesai" required onchange="checkBookingAvailability()" value="17:00" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-center outline-none">
             </div>
           </div>
         </div>
 
         <div>
-          <label class="block font-bold text-slate-700 mb-1.5">Upload Berkas / Surat Izin <span class="text-rose-600">(PDF) *</span></label>
+          <label class="block font-bold text-slate-700 mb-1.5">Upload Berkas / Surat Izin <span class="text-rose-600">(PDF)</span></label>
           <div class="flex items-center space-x-2 bg-slate-50 border border-slate-200 rounded-xl p-2">
             <label class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-lg cursor-pointer text-[11px] transition">
               Pilih Berkas
-              <input type="file" id="inputBerkas" accept=".pdf" required class="hidden" onchange="document.getElementById('fileNameSpan').innerText = this.files[0] ? this.files[0].name : 'Tidak ada berkas dipilih'">
+              <input type="file" id="inputBerkas" accept=".pdf" class="hidden" onchange="document.getElementById('fileNameSpan').innerText = this.files[0] ? this.files[0].name : 'Tidak ada berkas dipilih'">
             </label>
             <span id="fileNameSpan" class="text-slate-400 text-[11px] truncate">Tidak ada berkas dipilih</span>
           </div>
@@ -427,13 +435,19 @@
     </div>
   </div>
 
-  <!-- MODAL: WARNING POPUP (Double Booking & Missing Fields) -->
-  <div id="timeWarningModal" class="fixed inset-0 z-50 bg-slate-950/70 modal-blur flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl text-center space-y-4">
-      <div id="warningIconContainer" class="w-14 h-14 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-sm"><i class="fa-solid fa-triangle-exclamation"></i></div>
-      <h3 id="warningModalTitle" class="text-base font-black text-slate-900">Peringatan Pengajuan</h3>
-      <div id="timeWarningText" class="text-xs text-slate-500 leading-relaxed text-left">Semua kolom wajib diisi termasuk Tanggal Pelaksanaan sebelum mengirim pengajuan.</div>
-      <button onclick="document.getElementById('timeWarningModal').classList.add('hidden')" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs cursor-pointer">Mengerti</button>
+  <!-- POP-UP NOTIFICATION: DOUBLE INPUT / CONFLICT WARNING MODAL -->
+  <div id="doubleInputWarningModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl text-center space-y-4">
+      <div class="w-16 h-16 bg-amber-50 text-amber-600 rounded-3xl flex items-center justify-center mx-auto text-3xl shadow-sm border border-amber-100"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <div class="space-y-1">
+        <h3 class="text-lg font-black text-slate-900 tracking-tight">Peringatan: Jadwal Bentrok!</h3>
+        <p id="doubleInputModalText" class="text-xs text-slate-500 leading-relaxed"></p>
+      </div>
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3 text-left space-y-1 text-xs">
+        <div class="font-bold text-slate-800"><i class="fa-solid fa-circle-info text-blue-600 mr-1"></i> Informasi Sistem:</div>
+        <p class="text-slate-600 text-[11px]">Sistem mendeteksi agenda lain yang sudah disetujui pada ruangan dan waktu tersebut. Silakan pilih jam atau tanggal lain untuk menghindari bentrok.</p>
+      </div>
+      <button onclick="closeDoubleInputModal()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition cursor-pointer shadow-md">Saya Mengerti & Ubah Jadwal</button>
     </div>
   </div>
 
@@ -850,16 +864,22 @@
       if (roomSelect) roomSelect.value = roomName;
       document.getElementById('bookingRoomContextBadge').innerText = `Pilihan Ruangan: ${roomName}`;
       document.getElementById('bookingModalMainTitle').innerText = `Peminjaman ${roomName}`;
+      checkBookingAvailability();
+      checkCapacityLimit();
     }
 
     function openBookingModal() {
       document.getElementById('bookingModal').classList.remove('hidden');
       populateRoomOptions();
+      checkBookingAvailability();
+      checkCapacityLimit();
     }
 
     function closeBookingModal() {
       document.getElementById('bookingModal').classList.add('hidden');
       document.getElementById('bookingForm').reset();
+      const conflictBanner = document.getElementById('bookingConflictBanner');
+      if (conflictBanner) conflictBanner.classList.add('hidden');
     }
 
     function renderBookingTable(filteredList = null) {
@@ -1213,66 +1233,57 @@
       else group.classList.remove('hidden');
     }
 
+    function checkBookingAvailability() {
+      const tanggal = document.getElementById('inputTanggal').value;
+      const ruangan = document.getElementById('inputRuangan').value;
+      const jamMulai = document.getElementById('inputJamMulai').value;
+      const jamSelesai = document.getElementById('inputJamSelesai').value;
+      const conflictBanner = document.getElementById('bookingConflictBanner');
+      const conflictText = document.getElementById('bookingConflictText');
+
+      if (!tanggal || !ruangan) return false;
+
+      // Cek apakah ada jadwal lain di ruangan dan tanggal yang sama
+      const conflicting = appState.bookings.find(b => 
+        b.ruangan === ruangan && 
+        b.tanggal === tanggal && 
+        b.status === 'Disetujui'
+      );
+
+      if (conflicting) {
+        if (conflictBanner && conflictText) {
+          conflictText.innerText = `Ruangan "${ruangan}" sudah di-booking untuk kegiatan "${conflicting.kegiatan}" (${conflicting.jam}) pada tanggal ${tanggal}.`;
+          conflictBanner.classList.remove('hidden');
+        }
+        return conflicting;
+      } else {
+        if (conflictBanner) conflictBanner.classList.add('hidden');
+        return null;
+      }
+    }
+
     async function handleBookingSubmit(e) {
       e.preventDefault();
-      
-      const ruangan = document.getElementById('inputRuangan').value.trim();
-      const pemohon = document.getElementById('inputPemohon').value.trim();
-      const unit = document.getElementById('inputUnit').value.trim();
-      const kategori = document.getElementById('inputKategori').value.trim();
-      const kegiatan = document.getElementById('inputKegiatan').value.trim();
-      const tanggal = document.getElementById('inputTanggal').value.trim();
-      const jamMulai = document.getElementById('inputJamMulai').value.trim();
-      const jamSelesai = document.getElementById('inputJamSelesai').value.trim();
-      const peserta = parseInt(document.getElementById('inputPeserta').value) || 0;
-      const catatan = document.getElementById('inputCatatan').value.trim();
-      const berkasInput = document.getElementById('inputBerkas');
+      const pemohon = document.getElementById('inputPemohon').value;
+      const unit = document.getElementById('inputUnit').value;
+      const kategori = document.getElementById('inputKategori').value;
+      const kegiatan = document.getElementById('inputKegiatan').value;
+      const ruangan = document.getElementById('inputRuangan').value;
+      const tanggal = document.getElementById('inputTanggal').value;
+      const jamMulai = document.getElementById('inputJamMulai').value;
+      const jamSelesai = document.getElementById('inputJamSelesai').value;
+      const jam = `${jamMulai} - ${jamSelesai} WIB`;
+      const peserta = parseInt(document.getElementById('inputPeserta').value);
+      const catatan = document.getElementById('inputCatatan').value;
 
-      // 1. Validasi Kolom Wajib Diisi (Termasuk Tanggal Pelaksanaan & Berkas PDF)
-      if (!ruangan || !pemohon || !unit || !kegiatan || !tanggal || !jamMulai || !jamSelesai || !berkasInput || !berkasInput.files[0]) {
-        document.getElementById('warningModalTitle').innerText = "Formulir Belum Lengkap";
-        document.getElementById('timeWarningText').innerHTML = "Peringatan Sistem: Semua kolom pada formulir (termasuk Ruangan, Nama Pemohon, Unit Kerja, Nama Kegiatan, Tanggal Pelaksanaan, Jam, dan Upload Surat Izin PDF) wajib diisi lengkap sebelum Anda mengirimkan pengajuan.";
-        document.getElementById('timeWarningModal').classList.remove('hidden');
+      // Validasi Double Input (Bentrok Jadwal) dengan Pop-Up Interaktif
+      const conflict = checkBookingAvailability();
+      if (conflict) {
+        document.getElementById('doubleInputModalText').innerHTML = `Gagal mengirim pengajuan! Ruangan <b>${ruangan}</b> sudah memiliki jadwal aktif pada tanggal <b>${tanggal}</b> untuk kegiatan <b>"${conflict.kegiatan}"</b> (${conflict.jam}).`;
+        document.getElementById('doubleInputWarningModal').classList.remove('hidden');
         return;
       }
 
-      // 2. Validasi Waktu Masa Lalu
-      const selectedDateTime = new Date(`${tanggal}T${jamMulai}:00`);
-      const now = new Date();
-
-      if (selectedDateTime < now) {
-        document.getElementById('warningModalTitle').innerText = "Batas Waktu Terlewati";
-        document.getElementById('timeWarningText').innerHTML = `Peringatan: Tanggal (${tanggal}) dan Jam (${jamMulai}) yang Anda pilih sudah melewati waktu saat ini. Peminjaman tidak dapat diproses.`;
-        document.getElementById('timeWarningModal').classList.remove('hidden');
-        return;
-      }
-
-      // 3. Validasi Double Input (Tanggal, Jam, dan Ruangan Sama)
-      const existingConflict = appState.bookings.find(b => {
-        const isSameRoom = b.ruangan.toLowerCase() === ruangan.toLowerCase();
-        const isSameDate = b.tanggal === tanggal;
-        const isSameTime = b.jam.toLowerCase().includes(jamMulai.toLowerCase());
-        const isActiveOrApproved = (b.status === 'Disetujui' || b.status === 'Menunggu');
-        return isSameRoom && isSameDate && isSameTime && isActiveOrApproved;
-      });
-
-      if (existingConflict) {
-        document.getElementById('warningModalTitle').innerText = "Peringatan: Double Booking Terdeteksi!";
-        document.getElementById('timeWarningText').innerHTML = `
-          <div class="space-y-2 text-left bg-rose-50 p-3 rounded-2xl border border-rose-200 text-rose-900 text-xs">
-            <p class="font-bold flex items-center"><i class="fa-solid fa-ban mr-1.5 text-rose-600"></i> Ruangan Tidak Tersedia Pada Waktu Tersebut</p>
-            <p><strong>Ruangan:</strong> ${ruangan}</p>
-            <p><strong>Tanggal:</strong> ${tanggal}</p>
-            <p><strong>Jam:</strong> ${jamMulai} - ${jamSelesai} WIB</p>
-            <hr class="border-rose-200 my-1">
-            <p class="text-[11px] text-rose-700">Sudah ada pengajuan aktif atau disetujui untuk kegiatan <strong>"${existingConflict.kegiatan}"</strong> oleh pemohon <strong>${existingConflict.pemohon}</strong>. Silakan pilih jadwal, jam, atau ruangan lain agar tidak terjadi double input.</p>
-          </div>
-        `;
-        document.getElementById('timeWarningModal').classList.remove('hidden');
-        return;
-      }
-
-      // 4. Validasi Kapasitas Ruangan
       const currentRoom = appState.rooms.find(r => r.name === ruangan);
       if (currentRoom) {
         const maxCapNum = parseInt(currentRoom.capacity) || 100;
@@ -1283,14 +1294,10 @@
         }
       }
 
-      const fileName = berkasInput.files[0].name;
-
       const newBooking = {
         id: 'PMJ-' + Math.floor(1000 + Math.random() * 9000),
-        pemohon, unit, kategori, kegiatan, ruangan, tanggal,
-        jam: `${jamMulai} - ${jamSelesai} WIB`, peserta, catatan,
-        berkasUrl: '#', status: 'Menunggu', tahun: new Date(tanggal).getFullYear(), fileName,
-        timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16)
+        pemohon, unit, kategori, kegiatan, ruangan, tanggal, jam, peserta, catatan,
+        berkasUrl: '#', status: 'Menunggu', tahun: 2026, timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16)
       };
 
       appState.bookings.unshift(newBooking);
@@ -1300,6 +1307,10 @@
       renderCalendar();
       closeBookingModal();
       showToast(`Peminjaman berhasil dikirim dengan ID: ${newBooking.id}!`, 'success');
+    }
+
+    function closeDoubleInputModal() {
+      document.getElementById('doubleInputWarningModal').classList.add('hidden');
     }
 
     function updateBookingStatusInCloud(bookingId, newStatus) {
@@ -1314,24 +1325,23 @@
       }
     }
 
-    function checkBookingAvailability() {
-      const tanggal = document.getElementById('inputTanggal').value;
+    function checkCapacityLimit() {
+      const pesertaInput = parseInt(document.getElementById('inputPeserta').value) || 0;
       const ruangan = document.getElementById('inputRuangan').value;
-      const jamMulai = document.getElementById('inputJamMulai').value;
+      const currentRoom = appState.rooms.find(r => r.name === ruangan);
+      const banner = document.getElementById('capacityWarningBanner');
+      const textEl = document.getElementById('capacityWarningText');
 
-      if (!tanggal || !jamMulai) return;
-
-      const conflicting = appState.bookings.find(b => 
-        b.ruangan.toLowerCase() === ruangan.toLowerCase() && 
-        b.tanggal === tanggal && 
-        b.jam.toLowerCase().includes(jamMulai.toLowerCase()) &&
-        (b.status === 'Disetujui' || b.status === 'Menunggu')
-      );
-
-      if (conflicting) {
-        document.getElementById('warningModalTitle').innerText = "Peringatan Bentrok Jadwal";
-        document.getElementById('timeWarningText').innerHTML = `Peringatan: Ruangan "${ruangan}" pada tanggal ${tanggal} jam ${jamMulai} sudah ter-booking untuk kegiatan "${conflicting.kegiatan}" oleh ${conflicting.pemohon}.`;
-        document.getElementById('timeWarningModal').classList.remove('hidden');
+      if (currentRoom) {
+        const maxCapNum = parseInt(currentRoom.capacity) || 100;
+        if (pesertaInput > maxCapNum) {
+          if (banner && textEl) {
+            textEl.innerText = `Peringatan: Jumlah peserta (${pesertaInput}) melebihi kapasitas maksimal ruangan (${currentRoom.capacity})!`;
+            banner.classList.remove('hidden');
+          }
+        } else {
+          if (banner) banner.classList.add('hidden');
+        }
       }
     }
 
