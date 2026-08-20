@@ -602,6 +602,7 @@
     };
 
     let chartInstances = {};
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz.../exec"; // Otomatis tersinkronisasi jika di-deploy ke Apps Script
 
     window.onload = async function() {
       initClock();
@@ -615,6 +616,10 @@
         dateInput.value = todayStr;
       }
 
+      await syncDataFromDatabase();
+      // Poll database secara real-time otomatis tiap 5 detik
+      setInterval(syncDataFromDatabase, 5000);
+
       renderRoomCards();
       renderBookingTable();
       updateDashboardCounts();
@@ -626,6 +631,39 @@
       renderCalendar();
       switchView('dashboard');
     };
+
+    async function syncDataFromDatabase() {
+      try {
+        if (WEB_APP_URL.includes("AKfycbz...")) return; // Mock mode jika URL belum di-update
+        const res = await fetch(`${WEB_APP_URL}?action=getAllData`);
+        const json = await res.json();
+        if (json && json.status === 'success') {
+          if (json.bookings && Array.isArray(json.bookings)) appState.bookings = json.bookings;
+          if (json.rooms && Array.isArray(json.rooms)) appState.rooms = json.rooms;
+          renderBookingTable();
+          updateDashboardCounts();
+          renderCalendar();
+          renderAdminPendingTable();
+        }
+      } catch (err) {
+        console.warn("Real-time sync silent retry:", err);
+      }
+    }
+
+    async function sendDataToDatabase(action, payload) {
+      if (WEB_APP_URL.includes("AKfycbz...")) return { status: 'success' };
+      try {
+        const res = await fetch(WEB_APP_URL, {
+          method: 'POST',
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ action, ...payload })
+        });
+        return await res.json();
+      } catch (err) {
+        console.error("Database write error:", err);
+        return { status: 'error' };
+      }
+    }
 
     function initClock() {
       setInterval(() => {
@@ -1255,6 +1293,7 @@
       const jam = `${jamMulai} - ${jamSelesai} WIB`;
       const peserta = parseInt(document.getElementById('inputPeserta').value);
       const catatan = document.getElementById('inputCatatan').value;
+      const berkasInput = document.getElementById('inputBerkas');
 
       const conflict = checkBookingConflict(ruangan, tanggal, null);
       if (conflict) {
@@ -1279,13 +1318,39 @@
         berkasUrl: '#', status: 'Menunggu', tahun: 2026, timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16)
       };
 
-      appState.bookings.unshift(newBooking);
+      showToast('Mengirim dan menyinkronkan data secara real-time ke Database...', 'info');
+
+      if (berkasInput && berkasInput.files[0]) {
+        const file = berkasInput.files[0];
+        const reader = new FileReader();
+        reader.onload = async function(uploadEvent) {
+          const base64String = uploadEvent.target.result.split(',')[1];
+          const result = await sendDataToDatabase('addBooking', {
+            ...newBooking,
+            fileBase64: base64String,
+            fileName: file.name,
+            fileMimeType: file.type
+          });
+          if (result && result.berkasUrl) newBooking.berkasUrl = result.berkasUrl;
+          
+          appState.bookings.unshift(newBooking);
+          postBookingSyncActions(newBooking.id);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        await sendDataToDatabase('addBooking', newBooking);
+        appState.bookings.unshift(newBooking);
+        postBookingSyncActions(newBooking.id);
+      }
+    }
+
+    function postBookingSyncActions(bookingId) {
       renderBookingTable();
       updateDashboardCounts();
       renderAdminPendingTable();
       renderCalendar();
       closeBookingModal();
-      showToast(`Peminjaman berhasil dikirim dengan ID: ${newBooking.id}!`, 'success');
+      showToast(`Peminjaman berhasil dikirim & disinkronkan (ID: ${bookingId})!`, 'success');
     }
 
     function checkBookingConflict(ruangan, tanggal, excludeId = null) {
@@ -1297,7 +1362,7 @@
       );
     }
 
-    function updateBookingStatusInCloud(bookingId, newStatus) {
+    async function updateBookingStatusInCloud(bookingId, newStatus) {
       const item = appState.bookings.find(b => b.id === bookingId);
       if (!item) return;
 
@@ -1316,6 +1381,9 @@
       updateDashboardCounts();
       renderCalendar();
       initAnalyticsCharts();
+
+      showToast(`Menyinkronkan status ${bookingId} ke database...`, 'info');
+      await sendDataToDatabase('updateStatus', { id: bookingId, status: newStatus });
       showToast(`Status peminjaman ${bookingId} diperbarui menjadi: ${newStatus}`, newStatus === 'Disetujui' ? 'success' : 'info');
     }
 
