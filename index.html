@@ -110,7 +110,6 @@
 
   <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6 sm:space-y-8">
 
-    <!-- Dashboard View -->
     <section id="viewDashboard" class="space-y-6 sm:space-y-8">
       <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 p-6 sm:p-10 text-white shadow-xl shadow-blue-500/10">
         <div class="absolute -right-10 -bottom-10 opacity-10 text-white text-9xl font-black pointer-events-none">
@@ -189,7 +188,6 @@
       </div>
     </section>
 
-    <!-- Check Room View -->
     <section id="viewCheckRoom" class="space-y-6 sm:space-y-8 hidden">
       <div class="bg-sky-50 border border-sky-200 text-sky-800 p-4 rounded-2xl text-xs font-medium flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
         <div class="flex items-start sm:items-center">
@@ -245,7 +243,6 @@
       </div>
     </section>
 
-    <!-- Admin View -->
     <section id="viewAdmin" class="space-y-6 hidden">
       <div id="adminLoginContainer" class="flex items-center justify-center py-6 sm:py-12">
         <div class="bg-white rounded-3xl max-w-md w-full shadow-lg border border-slate-200 p-6 sm:p-8 relative transition-all duration-300">
@@ -374,7 +371,6 @@
     © 2026 SIRUPA - Sistem Informasi Ruangan dan Peminjaman.
   </footer>
 
-  <!-- MODAL: BOOKING -->
   <div id="bookingModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
     <div class="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-8 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto space-y-5">
       <button onclick="closeBookingModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
@@ -1507,7 +1503,6 @@
 
       showToast('Mengirim dan menyinkronkan data & file ke Google Spreadsheet & Drive...', 'info');
 
-      // Masukkan langsung ke state lokal agar langsung tampil di UI tanpa menunggu fetch ulang
       appState.bookings.unshift(newBooking);
       renderBookingTable();
       updateDashboardCounts();
