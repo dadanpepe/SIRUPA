@@ -134,7 +134,7 @@
         <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h3 class="text-sm sm:text-base font-bold text-slate-900">Daftar & Riwayat Peminjaman Ruangan</h3>
-            <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Sinkronisasi langsung dengan sistem.</p>
+            <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Sinkronisasi langsung dengan Google Spreadsheet.</p>
           </div>
           <div class="relative w-full sm:w-72">
             <input type="text" id="searchTableInput" onkeyup="filterBookingTable()" placeholder="Cari pemohon / kegiatan..." class="w-full bg-slate-50 border border-slate-200 text-xs text-slate-700 rounded-full py-2.5 pl-9 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
@@ -596,7 +596,7 @@
     };
 
     let chartInstances = {};
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz.../exec"; // Otomatis tersinkronisasi jika di-deploy ke Apps Script
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz.../exec"; // Ganti dengan URL deployment Web App Google Apps Script Anda
 
     window.onload = async function() {
       initClock();
@@ -611,7 +611,6 @@
       }
 
       await syncDataFromDatabase();
-      // Poll database secara real-time otomatis tiap 5 detik
       setInterval(syncDataFromDatabase, 5000);
 
       renderRoomCards();
@@ -628,16 +627,18 @@
 
     async function syncDataFromDatabase() {
       try {
-        if (WEB_APP_URL.includes("AKfycbz...")) return; // Mock mode jika URL belum di-update
+        if (WEB_APP_URL.includes("AKfycbz...")) return;
         const res = await fetch(`${WEB_APP_URL}?action=getAllData`);
         const json = await res.json();
         if (json && json.status === 'success') {
           if (json.bookings && Array.isArray(json.bookings)) appState.bookings = json.bookings;
           if (json.rooms && Array.isArray(json.rooms)) appState.rooms = json.rooms;
+          if (json.admins && Array.isArray(json.admins)) appState.admins = json.admins;
           renderBookingTable();
           updateDashboardCounts();
           renderCalendar();
           renderAdminPendingTable();
+          renderAdminAccountsList();
         }
       } catch (err) {
         console.warn("Real-time sync silent retry:", err);
@@ -1098,14 +1099,15 @@
       document.getElementById('newAdminUnit').value = '';
     }
 
-    function deleteAdminAccount(username) {
+    async function deleteAdminAccount(username) {
       if (appState.adminAccounts.length <= 1) {
         showToast('Minimal harus ada satu akun admin di dalam sistem!', 'warning');
         return;
       }
       appState.adminAccounts = appState.adminAccounts.filter(a => a.username !== username);
       renderAdminAccountsList();
-      showToast('Akun admin berhasil dihapus.', 'info');
+      await sendDataToDatabase('deleteAdmin', { username });
+      showToast('Akun admin berhasil dihapus dan disinkronkan.', 'info');
     }
 
     function openAddRoomModal() {
@@ -1143,7 +1145,7 @@
       }
     }
 
-    function cycleRoomStatus(roomId) {
+    async function cycleRoomStatus(roomId) {
       const room = appState.rooms.find(r => r.id === roomId);
       if (room) {
         room.statusText = room.statusText === 'Tersedia' ? 'Sedang Perbaikan' : 'Tersedia';
@@ -1151,11 +1153,12 @@
         room.icon = room.statusText === 'Tersedia' ? 'fa-circle-check' : 'fa-triangle-exclamation';
         renderAdminRoomList();
         renderRoomCards();
-        showToast(`Status ${room.name} diubah menjadi: ${room.statusText}`, 'info');
+        await sendDataToDatabase('saveRoom', room);
+        showToast(`Status ${room.name} disinkronkan menjadi: ${room.statusText}`, 'info');
       }
     }
 
-    function handleRoomFormSubmit(e) {
+    async function handleRoomFormSubmit(e) {
       e.preventDefault();
       const editId = (document.getElementById('editRoomId').value || '').trim();
       const name = document.getElementById('inputRoomName').value.trim();
@@ -1171,38 +1174,24 @@
       const photoInput = document.getElementById('inputRoomPhoto');
       const photoUrl = (photoInput && photoInput.value.trim()) ? photoInput.value.trim() : 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80';
 
+      let roomObj = {};
       if (editId !== '') {
         const roomIndex = appState.rooms.findIndex(r => r.id === editId);
         if (roomIndex !== -1) {
           const existingRoom = appState.rooms[roomIndex];
-          appState.rooms[roomIndex] = {
+          roomObj = {
             ...existingRoom,
-            name,
-            category,
-            capacity,
-            unit,
-            features,
-            description,
+            name, category, capacity, unit,
+            features, description,
             statusText: existingRoom.statusText || 'Tersedia',
             badgeClass: existingRoom.badgeClass || 'bg-emerald-50 text-emerald-700 border-emerald-200',
             icon: existingRoom.icon || 'fa-circle-check',
             images: [photoUrl, ...(existingRoom.images ? existingRoom.images.slice(1) : [])]
           };
-          showToast(`Ruangan ${name} berhasil diperbarui!`, 'success');
-        } else {
-          const newRoom = {
-            id: 'room-' + Date.now(),
-            name, category, capacity, unit,
-            available: true, statusText: 'Tersedia',
-            badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-            icon: 'fa-circle-check',
-            description, features, images: [photoUrl], currentImageIdx: 0
-          };
-          appState.rooms.push(newRoom);
-          showToast(`Ruangan ${name} berhasil ditambahkan!`, 'success');
+          appState.rooms[roomIndex] = roomObj;
         }
       } else {
-        const newRoom = {
+        roomObj = {
           id: 'room-' + Date.now(),
           name, category, capacity, unit,
           available: true, statusText: 'Tersedia',
@@ -1210,8 +1199,7 @@
           icon: 'fa-circle-check',
           description, features, images: [photoUrl], currentImageIdx: 0
         };
-        appState.rooms.push(newRoom);
-        showToast(`Ruangan ${name} berhasil ditambahkan!`, 'success');
+        appState.rooms.push(roomObj);
       }
 
       renderRoomCards();
@@ -1221,9 +1209,13 @@
       updateDashboardCounts();
       initAnalyticsCharts();
       closeRoomModal();
+
+      showToast('Menyinkronkan data ruangan ke Google Spreadsheet...', 'info');
+      await sendDataToDatabase('saveRoom', roomObj);
+      showToast('Ruangan berhasil disimpan dan disinkronkan!', 'success');
     }
 
-    function deleteRoom(roomId) {
+    async function deleteRoom(roomId) {
       appState.rooms = appState.rooms.filter(r => r.id !== roomId);
       renderRoomCards();
       renderAdminRoomList();
@@ -1231,10 +1223,11 @@
       populateUnitFilterOptions();
       updateDashboardCounts();
       initAnalyticsCharts();
-      showToast('Ruangan berhasil dihapus.', 'info');
+      await sendDataToDatabase('saveRoom', { id: roomId, deleted: true });
+      showToast('Ruangan berhasil dihapus dan disinkronkan.', 'info');
     }
 
-    function handleCreateAdminSubmit(e) {
+    async function handleCreateAdminSubmit(e) {
       e.preventDefault();
       const editKey = document.getElementById('editAdminUsernameKey').value.trim();
       const name = document.getElementById('newAdminName').value.trim();
@@ -1243,34 +1236,39 @@
       const isSuper = document.getElementById('newAdminLevel').value === 'super';
       const unit = document.getElementById('newAdminUnit').value.trim();
 
+      const adminObj = {
+        username,
+        name,
+        pass,
+        unit: isSuper ? 'Semua Dinas' : unit,
+        isSuper
+      };
+
       if (editKey) {
         const acc = appState.adminAccounts.find(a => a.username === editKey);
         if (acc) {
           acc.name = name;
           acc.username = username;
           acc.pass = pass;
-          acc.unit = isSuper ? 'Semua Dinas' : unit;
+          acc.unit = adminObj.unit;
           acc.isSuper = isSuper;
         }
-        showToast(`Akun admin ${username} berhasil diperbarui!`, 'success');
       } else {
         const existing = appState.adminAccounts.find(a => a.username === username);
         if (existing) {
           showToast('Username sudah terdaftar! Gunakan username lain.', 'error');
           return;
         }
-        appState.adminAccounts.push({
-          username,
-          name,
-          pass,
-          unit: isSuper ? 'Semua Dinas' : unit,
-          isSuper
-        });
-        showToast(`Akun admin ${username} berhasil dibuat!`, 'success');
+        appState.adminAccounts.push(adminObj);
       }
+
       resetAdminForm();
       renderAdminAccountsList();
       e.target.reset();
+
+      showToast('Menyinkronkan akun admin ke Google Spreadsheet...', 'info');
+      await sendDataToDatabase('saveAdmin', adminObj);
+      showToast('Akun admin berhasil disimpan & disinkronkan!', 'success');
     }
 
     function toggleUnitDropdown() {
@@ -1318,7 +1316,7 @@
         berkasUrl: '#', status: 'Menunggu', tahun: 2026, timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16)
       };
 
-      showToast('Mengirim dan menyinkronkan data secara real-time ke Database...', 'info');
+      showToast('Mengunggah berkas ke Google Drive & menyinkronkan data ke Spreadsheet...', 'info');
 
       if (berkasInput && berkasInput.files[0]) {
         const file = berkasInput.files[0];
