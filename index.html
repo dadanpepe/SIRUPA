@@ -575,26 +575,43 @@
 
   <script>
     const apiService = {
-      appsScriptUrl: 'https://script.google.com/macros/s/AKfycbwwo7RF-VGA1PaCj-N4BCAg_sbYUgdBeUxpjsxSJWiwnWibufSfTY_xp4jN8udGkFiv_g/exec?action=getAllData',
+  appsScriptUrl: 'MASUKKAN_URL_WEB_APP_ANDA_DISINI', // Ganti dengan URL /exec Anda
 
-      async request(action, payload = {}) {
-        if (this.appsScriptUrl.includes('AKfycbz...')) {
-          console.warn("Menggunakan Local Mock Mode. Hubungkan URL deployment Google Apps Script untuk sinkronisasi cloud real-time.");
-          return { status: 'success', message: 'Mock success', ...payload };
-        }
+  async request(action, payload = {}) {
+    if (this.appsScriptUrl.includes('AKfycbz...')) {
+      console.warn("API URL masih menggunakan placeholder!");
+      return { status: 'success' };
+    }
+    try {
+      const response = await fetch(this.appsScriptUrl, {
+        method: 'POST',
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action, ...payload })
+      });
+      return await response.json();
+    } catch (err) {
+      console.error("API POST Error:", err);
+      return { status: 'error', message: err.toString() };
+    }
+  },
 
-        try {
-          const response = await fetch(this.appsScriptUrl, {
-            method: 'POST',
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify({ action, ...payload })
-          });
-          return await response.json();
-        } catch (err) {
-          console.error('API Error:', err);
-          return { status: 'error', message: err.toString() };
-        }
-      },
+  async get(action) {
+    if (this.appsScriptUrl.includes('AKfycbz...')) {
+      return { status: 'success', bookings: [], rooms: [], admins: [] };
+    }
+    try {
+      const response = await fetch(`${this.appsScriptUrl}?action=${action}`);
+      return await response.json();
+    } catch (err) {
+      console.error("API Get Error:", err);
+      return { status: 'error', message: err.toString() };
+    }
+  },
+
+  async getAllData() {
+    return await this.get('getAllData');
+  }
+};
 
       async get(action) {
         if (this.appsScriptUrl.includes('AKfycbz...')) {
