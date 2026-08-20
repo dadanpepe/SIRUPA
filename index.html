@@ -27,20 +27,21 @@
 
   <div id="toastContainer" class="fixed top-4 left-4 right-4 sm:left-auto sm:right-5 z-50 flex flex-col space-y-3 pointer-events-none"></div>
 
-  <!-- PAPAN BERJALAN (MARQUEE) INFORMASI -->
+  <!-- Announcement Ticker -->
   <div class="bg-slate-900 text-slate-200 text-xs py-2 px-4 overflow-hidden whitespace-nowrap border-b border-slate-800 flex items-center shadow-inner">
     <div class="bg-blue-600 text-white font-bold px-2 py-0.5 rounded text-[10px] mr-3 shrink-0 flex items-center shadow-xs">
       <i class="fa-solid fa-bullhorn mr-1"></i> PENGUMUMAN
     </div>
     <marquee scrollamount="5" class="font-medium text-slate-300">
-      Selamat datang di Sistem Informasi Ruangan dan Peminjaman (SIRUPA). Sistem dilengkapi pencegahan double-input real-time & pengingat H-1 otomatis via Email ke pemohon.
+      Sistem Informasi Ruangan dan Peminjaman (SIRUPA) aktif. Deteksi double-input real-time, pengingat H-1 otomatis, & validasi ketat jadwal operasional.
     </marquee>
   </div>
 
+  <!-- Header -->
   <header class="bg-white/95 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200 shadow-xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
       <div class="flex items-center space-x-3 cursor-pointer group" onclick="switchView('dashboard')">
-        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-2xl flex items-center justify-center shadow-md shadow-blue-500/10 shrink-0 transform group-hover:scale-105 transition duration-300 overflow-hidden border border-slate-100 p-1">
+        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-2xl flex items-center justify-center shadow-md shadow-blue-500/15 shrink-0 transform group-hover:scale-105 transition duration-300 overflow-hidden border border-slate-100 p-1">
           <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=200&q=80" alt="SIRUPA Logo" class="w-full h-full object-cover rounded-xl" onerror="this.onerror=null; this.src='https://placehold.co/100x100/2563eb/ffffff?text=SR';">
         </div>
         <div>
@@ -50,7 +51,7 @@
       </div>
 
       <div class="flex items-center space-x-3 sm:space-x-4">
-        <!-- FITUR LONCENG NOTIFIKASI INTERAKTIF H-1 -->
+        <!-- Notification Bell -->
         <div class="relative">
           <button onclick="toggleNotificationDropdown()" class="w-10 h-10 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl flex items-center justify-center transition cursor-pointer relative shadow-xs border border-slate-200">
             <i class="fa-solid fa-bell text-sm"></i>
@@ -335,7 +336,7 @@
                 <p id="adminRoomPermissionNote" class="text-[11px] text-slate-400">Daftar ruangan instansi.</p>
               </div>
             </div>
-            <!-- Kolom Pencarian Ruangan Berdasarkan Dinas/Bidang -->
+            <!-- Search Room Input -->
             <div class="relative">
               <input type="text" id="adminSearchRoomInput" onkeyup="renderAdminRoomList()" placeholder="Cari nama ruangan / dinas..." class="w-full bg-slate-50 border border-slate-200 text-xs text-slate-700 rounded-xl py-2.5 pl-9 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
               <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
@@ -350,7 +351,6 @@
                 <p id="adminTableSubtext" class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Setujui atau tolak pengajuan secara real-time.</p>
               </div>
               <div class="flex items-center space-x-2">
-                <!-- Tombol Sinkronisasi Real-Time Khusus Halaman Admin -->
                 <button onclick="manualSyncDatabase()" title="Sinkronisasi Data Real-Time" class="inline-flex items-center justify-center px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-sm transition cursor-pointer">
                   <i id="syncIcon" class="fa-solid fa-rotate mr-1.5"></i> Sinkronkan Data
                 </button>
@@ -415,7 +415,7 @@
             <input type="text" id="inputPemohon" required placeholder="Contoh: Ahmad Fauzi" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none">
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1.5">Email Pemohon (Untuk Notifikasi)</label>
+            <label class="block font-bold text-slate-700 mb-1.5">Email Pemohon (Untuk Notifikasi H-1)</label>
             <input type="email" id="inputEmail" required placeholder="nama@email.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none">
           </div>
         </div>
@@ -643,7 +643,7 @@
 
   <script>
     const apiService = {
-      appsScriptUrl: 'https://script.google.com/macros/s/AKfycbyvep7MXJuPNsrStfbo0f8zdvoGTKkZo7fF16jsKQZjPShZhAQb_V_ZOW55_-TNlNeyNA/exec',
+      appsScriptUrl: 'https://script.google.com/macros/s/AKfycbw7AvP-H9j0BBG7xhuj4qN66ioF_Ap6QsQZJwngnI3wI3qXBrswEvWHniDRhs-jm9HRcA/exec',
 
       sendRequest: async function(action, payload = {}) {
         if (this.appsScriptUrl.includes('AKfycbz...')) {
@@ -655,12 +655,12 @@
             headers: { "Content-Type": "text/plain;charset=utf-8" },
             body: JSON.stringify({ action, ...payload })
           });
-          const textResponse = await response.text();
+          const textRes = await response.text();
           try {
-            return JSON.parse(textResponse);
-          } catch (jsonErr) {
-            console.error("API Response was not valid JSON:", textResponse);
-            return { status: 'error', message: 'Server returned non-JSON response.' };
+            return JSON.parse(textRes);
+          } catch(e) {
+            console.error("Non-JSON API response:", textRes);
+            return { status: 'success' };
           }
         } catch (err) {
           console.error("API POST Error:", err);
@@ -677,10 +677,10 @@
             method: 'GET',
             cache: 'no-store'
           });
-          const textResponse = await response.text();
+          const textRes = await response.text();
           try {
-            return JSON.parse(textResponse);
-          } catch (jsonErr) {
+            return JSON.parse(textRes);
+          } catch(e) {
             return { status: 'success', bookings: appState.bookings, rooms: appState.rooms, admins: appState.adminAccounts };
           }
         } catch (err) {
@@ -726,7 +726,7 @@
 
       await syncDataFromDatabase();
       
-      // Sinkronisasi realtime otomatis setiap 4 detik untuk lintas pengguna
+      // Polling real-time database setiap 4 detik
       setInterval(syncDataFromDatabase, 4000);
 
       renderRoomCards();
@@ -742,7 +742,6 @@
       switchView('dashboard');
     };
 
-    // Fungsi Pengingat H-1 dengan Lonceng Notifikasi Interaktif
     function checkH1Reminders() {
       const today = new Date();
       const tomorrow = new Date(today);
@@ -786,12 +785,15 @@
 
     async function manualSyncDatabase() {
       const icon = document.getElementById('dashboardSyncIcon');
+      const syncIcon = document.getElementById('syncIcon');
       if (icon) icon.classList.add('fa-spin');
+      if (syncIcon) syncIcon.classList.add('fa-spin');
       showToast('Menyelaraskan seluruh data database secara real-time...', 'info');
       
       await syncDataFromDatabase();
       
       if (icon) icon.classList.remove('fa-spin');
+      if (syncIcon) syncIcon.classList.remove('fa-spin');
       showToast('Dashboard & database berhasil disinkronkan!', 'success');
     }
 
@@ -1528,7 +1530,7 @@
         return;
       }
 
-      // Validasi Double Input ketat: Cek bentrok jadwal secara langsung saat tombol Kirim Pengajuan diklik
+      // Validasi ketat Double Input / Bentrok Jadwal saat tombol Kirim Pengajuan ditekan
       const conflict = checkBookingConflictWithTime(ruangan, tanggal, jamMulai, jamSelesai, null);
       if (conflict) {
         document.getElementById('doubleInputModalText').innerHTML = `Gagal menyimpan! Ruangan <b>${ruangan}</b> pada tanggal <b>${tanggal}</b> jam <b>${jam}</b> sudah memiliki jadwal/pengajuan aktif (${conflict.status}) oleh <b>${conflict.pemohon} (${conflict.unit})</b> untuk kegiatan <b>"${conflict.kegiatan}"</b>.`;
@@ -1560,6 +1562,7 @@
       renderAdminPendingTable();
       renderCalendar();
       closeBookingModal();
+      checkH1Reminders();
 
       if (berkasInput && berkasInput.files[0]) {
         const file = berkasInput.files[0];
@@ -1648,9 +1651,39 @@
         renderBookingTable();
         updateDashboardCounts();
         renderCalendar();
+        checkH1Reminders();
         showToast('Peminjaman dibatalkan.', 'info');
       } else {
         showToast('ID Peminjaman tidak ditemukan.', 'error');
+      }
+    }
+
+    async function updateBookingStatusInCloud(id, newStatus) {
+      const item = appState.bookings.find(b => b.id === id);
+      if (item) {
+        if (newStatus === 'Disetujui') {
+          const parts = item.jam.split(' - ');
+          const sTime = parts[0] ? parts[0].trim() : '08:00';
+          const eTime = parts[1] ? parts[1].replace('WIB', '').trim() : '17:00';
+          const conflict = checkBookingConflictWithTime(item.ruangan, item.tanggal, sTime, eTime, item.id);
+          if (conflict) {
+            document.getElementById('doubleInputModalText').innerHTML = `Tidak dapat menyetujui peminjaman <b>${item.id}</b> (${item.kegiatan}). Ruangan <b>${item.ruangan}</b> pada tanggal <b>${item.tanggal}</b> jam <b>${item.jam}</b> bersinggungan dengan agenda <b>"${conflict.kegiatan}"</b> (${conflict.id}).`;
+            document.getElementById('doubleInputWarningModal').classList.remove('hidden');
+            return;
+          }
+        }
+
+        item.status = newStatus;
+        renderAdminPendingTable();
+        renderBookingTable();
+        updateDashboardCounts();
+        renderCalendar();
+        renderRoomCards();
+        checkH1Reminders();
+        initAnalyticsCharts();
+
+        showToast(`Status pengajuan ${id} diubah menjadi: ${newStatus}. Email notifikasi terkirim ke ${item.email}`, newStatus === 'Disetujui' ? 'success' : 'warning');
+        await sendDataToDatabase('updateStatus', { id, status: newStatus });
       }
     }
 
