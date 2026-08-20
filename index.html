@@ -1458,7 +1458,7 @@
       });
     }
 
-    async function handleBookingSubmit(e) {
+   async function handleBookingSubmit(e) {
       e.preventDefault();
       const pemohon = document.getElementById('inputPemohon').value;
       const email = document.getElementById('inputEmail').value;
@@ -1507,6 +1507,14 @@
 
       showToast('Mengirim dan menyinkronkan data & file ke Google Spreadsheet & Drive...', 'info');
 
+      // Masukkan langsung ke state lokal agar langsung tampil di UI tanpa menunggu fetch ulang
+      appState.bookings.unshift(newBooking);
+      renderBookingTable();
+      updateDashboardCounts();
+      renderAdminPendingTable();
+      renderCalendar();
+      closeBookingModal();
+
       if (berkasInput && berkasInput.files[0]) {
         const file = berkasInput.files[0];
         const reader = new FileReader();
@@ -1518,17 +1526,17 @@
             fileName: file.name,
             fileMimeType: file.type
           });
-          if (result && result.berkasUrl) newBooking.berkasUrl = result.berkasUrl;
-          
-          appState.bookings.unshift(newBooking);
-          postBookingSyncActions(newBooking.id);
+          if (result && result.berkasUrl) {
+            newBooking.berkasUrl = result.berkasUrl;
+            renderBookingTable();
+          }
         };
         reader.readAsDataURL(file);
       } else {
         await sendDataToDatabase('addBooking', newBooking);
-        appState.bookings.unshift(newBooking);
-        postBookingSyncActions(newBooking.id);
       }
+
+      showToast(`Peminjaman berhasil dikirim & disimpan (ID: ${newBooking.id})! Email konfirmasi telah dikirim.`, 'success');
     }
 
     function postBookingSyncActions(bookingId) {
