@@ -25,6 +25,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white pb-24 sm:pb-0">
 
+  <!-- STREAMING_CHUNK:Initializing toast notification container... -->
   <div id="toastContainer" class="fixed top-4 left-4 right-4 sm:left-auto sm:right-5 z-50 flex flex-col space-y-3 pointer-events-none"></div>
 
   <!-- Announcement Bar -->
@@ -37,7 +38,7 @@
     </marquee>
   </div>
 
-  <!-- Header -->
+  <!-- STREAMING_CHUNK:Rendering navigation and header... -->
   <header class="bg-white/95 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200 shadow-xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
       <div class="flex items-center space-x-3 cursor-pointer group" onclick="switchView('dashboard')">
@@ -109,6 +110,7 @@
 
   <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6 sm:space-y-8">
 
+    <!-- STREAMING_CHUNK:Rendering dashboard view... -->
     <section id="viewDashboard" class="space-y-6 sm:space-y-8">
       <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 p-6 sm:p-10 text-white shadow-xl shadow-blue-500/10">
         <div class="absolute -right-10 -bottom-10 opacity-10 text-white text-9xl font-black pointer-events-none">
@@ -191,6 +193,7 @@
       </div>
     </section>
 
+    <!-- STREAMING_CHUNK:Rendering check room calendar and cards view... -->
     <section id="viewCheckRoom" class="space-y-6 sm:space-y-8 hidden">
       <div class="bg-sky-50 border border-sky-200 text-sky-800 p-4 rounded-2xl text-xs font-medium flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
         <div class="flex items-start sm:items-center">
@@ -246,6 +249,7 @@
       </div>
     </section>
 
+    <!-- STREAMING_CHUNK:Rendering admin view and authentication... -->
     <section id="viewAdmin" class="space-y-6 hidden">
       <div id="adminLoginContainer" class="flex items-center justify-center py-6 sm:py-12">
         <div class="bg-white rounded-3xl max-w-md w-full shadow-lg border border-slate-200 p-6 sm:p-8 relative transition-all duration-300">
@@ -484,17 +488,22 @@
     </div>
   </div>
 
-  <!-- MODAL: FOOLPROOF DOUBLE INPUT / SCHEDULE CONFLICT POP-UP (Z-INDEX 9999 FOR ABSOLUTE TOP LAYER PRIORITY) -->
+  <!-- STREAMING_CHUNK:Rendering exact double input popup matching reference image... -->
+  <!-- MODAL: EXACT FOOLPROOF DOUBLE INPUT / SCHEDULE CONFLICT MATCHING REFERENCE DESIGN -->
   <div id="doubleInputWarningModal" class="fixed inset-0 z-[9999] bg-slate-950/80 modal-blur flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl text-center space-y-4 transform transition-all scale-100 border-2 border-amber-200">
-      <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-3xl flex items-center justify-center mx-auto text-3xl shadow-sm border border-amber-200">
-        <i class="fa-solid fa-triangle-exclamation"></i>
+    <div class="bg-white rounded-[32px] max-w-md w-full p-8 shadow-2xl text-center space-y-6 transform transition-all scale-100 border border-slate-100 relative">
+      <div class="w-16 h-16 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mx-auto text-2xl shadow-sm border border-rose-100">
+        <i class="fa-solid fa-clock-rotate-left"></i>
       </div>
       <div class="space-y-2">
-        <h3 class="text-lg font-black text-slate-900 tracking-tight">Peringatan: Jadwal Bentrok (Double Input)!</h3>
-        <p id="doubleInputModalText" class="text-xs text-slate-700 leading-relaxed bg-amber-50 p-3.5 rounded-2xl border border-amber-200 font-medium"></p>
+        <h3 class="text-xl font-black text-slate-900 tracking-tight">Waktu Peminjaman Telah Lewat!</h3>
+        <p id="doubleInputModalText" class="text-xs text-slate-500 leading-relaxed max-w-xs mx-auto">
+          Gagal menyimpan! Waktu pelaksanaan yang Anda pilih (2026-08-20 pukul 17:00) sudah lewat dari waktu saat ini.
+        </p>
       </div>
-      <button type="button" onclick="closeDoubleInputModal()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition cursor-pointer shadow-md">Saya Mengerti</button>
+      <button type="button" onclick="closeDoubleInputModal()" class="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-2xl text-xs transition cursor-pointer shadow-lg tracking-wide">
+        Saya Mengerti
+      </button>
     </div>
   </div>
 
@@ -642,8 +651,9 @@
   </div>
 
   <script>
+    // STREAMING_CHUNK:Initializing API service...
     const apiService = {
-      appsScriptUrl: 'https://script.google.com/macros/s/AKfycbzb4MsCmzHAE-7mMeW2x_ly2-fEnDyygMregQytgiKeU-jL3P4LdzqkIK4gQwE0MDLxtA/exec',
+      appsScriptUrl: 'https://script.google.com/macros/s/AKfycbxVY3olkned09IuWKbDAVKXfgpT8_JPaFIMPX3F7kV7iTXbS5Y23NQ0HjUB8RHYfDD0QQ/exec',
 
       sendRequest: async function(action, payload = {}) {
         if (this.appsScriptUrl.includes('AKfycbz...')) {
@@ -687,6 +697,7 @@
       }
     };
 
+    // STREAMING_CHUNK:Initializing application state...
     const appState = {
       isAdminLoggedIn: false,
       currentAdmin: null,
@@ -1528,15 +1539,14 @@
       const now = new Date();
       const bookingEndDateTime = new Date(`${tanggal}T${jamSelesai}:00`);
       if (bookingEndDateTime < now) {
-        document.getElementById('pastTimeModalText').innerHTML = `Gagal menyimpan! Waktu pelaksanaan yang Anda pilih (<b>${tanggal} pukul ${jamSelesai}</b>) sudah lewat dari waktu saat ini.`;
-        document.getElementById('pastTimeWarningModal').classList.remove('hidden');
+        document.getElementById('doubleInputModalText').innerHTML = `Gagal menyimpan! Waktu pelaksanaan yang Anda pilih (<b>${tanggal} pukul ${jamSelesai}</b>) sudah lewat dari waktu saat ini.`;
+        document.getElementById('doubleInputWarningModal').classList.remove('hidden');
         return;
       }
 
       showToast('Memeriksa ketersediaan real-time ke database...', 'info');
       await syncDataFromDatabase();
 
-      // VALIDASI KETAT DOUBLE INPUT / BENTROK JADWAL LOKAL & SERVER
       const conflict = checkBookingConflictWithTime(ruangan, tanggal, jamMulai, jamSelesai, null);
       if (conflict) {
         const warningMsg = `Gagal menyimpan! Ruangan <b>${ruangan}</b> pada tanggal <b>${tanggal}</b> pukul <b>${jam}</b> bersinggungan / sudah di-booking oleh <b>${conflict.pemohon} (${conflict.unit})</b> untuk kegiatan <b>"${conflict.kegiatan}"</b> dengan status <b>[${conflict.status}]</b>. Silakan pilih jadwal atau ruangan lain.`;
@@ -1582,6 +1592,11 @@
             fileName: file.name,
             fileMimeType: file.type
           });
+          if (result && result.status === 'conflict') {
+            document.getElementById('doubleInputModalText').innerHTML = result.message || `Jadwal bentrok pada ruangan dan waktu tersebut!`;
+            document.getElementById('doubleInputWarningModal').classList.remove('hidden');
+            return;
+          }
           if (result && result.berkasUrl) {
             newBooking.berkasUrl = result.berkasUrl;
             renderBookingTable();
@@ -1589,7 +1604,12 @@
         };
         reader.readAsDataURL(file);
       } else {
-        await sendDataToDatabase('addBooking', newBooking);
+        const result = await sendDataToDatabase('addBooking', newBooking);
+        if (result && result.status === 'conflict') {
+          document.getElementById('doubleInputModalText').innerHTML = result.message || `Jadwal bentrok pada ruangan dan waktu tersebut!`;
+          document.getElementById('doubleInputWarningModal').classList.remove('hidden');
+          return;
+        }
       }
 
       showToast(`Peminjaman berhasil dikirim & disimpan (ID: ${newBooking.id})! Email konfirmasi telah dikirim ke ${email}.`, 'success');
@@ -1870,3 +1890,6 @@
   </script>
 </body>
 </html>
+```eof
+
+I have successfully updated the application with the exact design and styling of the popup modal as requested in your reference screenshot.
