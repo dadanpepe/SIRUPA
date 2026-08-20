@@ -575,43 +575,26 @@
 
   <script>
     const apiService = {
-  appsScriptUrl: 'https://script.google.com/macros/s/AKfycbzoFGWWQxV3p9LxV6mThJPvoRlY1rG1RvSiaQYhvMTVPa6w5ijFMdYj3Zl7G4QD0Db29Q/exec', // Ganti dengan URL /exec Anda
+      appsScriptUrl: 'https://script.google.com/macros/s/AKfycbz.../exec',
 
-  async request(action, payload = {}) {
-    if (this.appsScriptUrl.includes('AKfycbz...')) {
-      return { status: 'success' };
-    }
-    try {
-      const response = await fetch(this.appsScriptUrl, {
-        method: 'POST',
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ action, ...payload })
-      });
-      return await response.json();
-    } catch (err) {
-      console.error("API POST Error:", err);
-      return { status: 'error', message: err.toString() };
-    }
-  },
+      async request(action, payload = {}) {
+        if (this.appsScriptUrl.includes('AKfycbz...')) {
+          console.warn("Menggunakan Local Mock Mode. Hubungkan URL deployment Google Apps Script untuk sinkronisasi cloud real-time.");
+          return { status: 'success', message: 'Mock success', ...payload };
+        }
 
-  // Perbaikan: Ubah 'get(action)' menjadi 'fetchData(action)' atau pastikan sintaksis fungsi benar
-  async fetchData(action) {
-    if (this.appsScriptUrl.includes('AKfycbz...')) {
-      return { status: 'success', bookings: [], rooms: [], admins: [] };
-    }
-    try {
-      const response = await fetch(`${this.appsScriptUrl}?action=${action}`);
-      return await response.json();
-    } catch (err) {
-      console.error("API Get Error:", err);
-      return { status: 'error', message: err.toString() };
-    }
-  },
-
-  async getAllData() {
-    return await this.fetchData('getAllData');
-  }
-};
+        try {
+          const response = await fetch(this.appsScriptUrl, {
+            method: 'POST',
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({ action, ...payload })
+          });
+          return await response.json();
+        } catch (err) {
+          console.error('API Error:', err);
+          return { status: 'error', message: err.toString() };
+        }
+      },
 
       async get(action) {
         if (this.appsScriptUrl.includes('AKfycbz...')) {
@@ -708,30 +691,23 @@
     };
 
     async function syncDataFromDatabase() {
-  try {
-    const json = await apiService.getAllData();
-    if (json && json.status === 'success') {
-      if (json.bookings && Array.isArray(json.bookings) && json.bookings.length > 0) {
-        appState.bookings = json.bookings;
+      try {
+        const json = await apiService.getAllData();
+        if (json && json.status === 'success') {
+          if (json.bookings && Array.isArray(json.bookings) && json.bookings.length > 0) appState.bookings = json.bookings;
+          if (json.rooms && Array.isArray(json.rooms) && json.rooms.length > 0) appState.rooms = json.rooms;
+          if (json.admins && Array.isArray(json.admins) && json.admins.length > 0) appState.adminAccounts = json.admins;
+          
+          renderBookingTable();
+          updateDashboardCounts();
+          renderCalendar();
+          renderAdminPendingTable();
+          renderAdminAccountsList();
+        }
+      } catch (err) {
+        console.warn("Real-time sync retry:", err);
       }
-      if (json.rooms && Array.isArray(json.rooms) && json.rooms.length > 0) {
-        appState.rooms = json.rooms;
-      }
-      if (json.admins && Array.isArray(json.admins) && json.admins.length > 0) {
-        appState.adminAccounts = json.admins;
-      }
-      
-      // Render ulang tampilan setelah data ditarik
-      renderBookingTable();
-      updateDashboardCounts();
-      renderCalendar();
-      renderAdminPendingTable();
-      renderAdminAccountsList();
     }
-  } catch (err) {
-    console.warn("Gagal menyinkronkan data:", err);
-  }
-}
 
     function initClock() {
       setInterval(() => {
