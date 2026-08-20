@@ -27,15 +27,17 @@
 
   <div id="toastContainer" class="fixed top-4 left-4 right-4 sm:left-auto sm:right-5 z-50 flex flex-col space-y-3 pointer-events-none"></div>
 
+  <!-- Announcement Bar -->
   <div class="bg-slate-900 text-slate-200 text-xs py-2 px-4 overflow-hidden whitespace-nowrap border-b border-slate-800 flex items-center shadow-inner">
     <div class="bg-blue-600 text-white font-bold px-2 py-0.5 rounded text-[10px] mr-3 shrink-0 flex items-center shadow-xs">
       <i class="fa-solid fa-bullhorn mr-1"></i> PENGUMUMAN
     </div>
     <marquee scrollamount="5" class="font-medium text-slate-300">
-      Sistem Informasi Ruangan dan Peminjaman (SIRUPA) aktif. Deteksi double-input real-time, pengingat H-1 otomatis, & validasi ketat jadwal operasional.
+      Sistem Informasi Ruangan dan Peminjaman (SIRUPA) aktif. Proteksi anti double-input real-time, pengingat H-1 otomatis, & validasi ketat jadwal operasional.
     </marquee>
   </div>
 
+  <!-- Header -->
   <header class="bg-white/95 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200 shadow-xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
       <div class="flex items-center space-x-3 cursor-pointer group" onclick="switchView('dashboard')">
@@ -107,7 +109,6 @@
 
   <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6 sm:space-y-8">
 
-    <!-- Dashboard View -->
     <section id="viewDashboard" class="space-y-6 sm:space-y-8">
       <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 p-6 sm:p-10 text-white shadow-xl shadow-blue-500/10">
         <div class="absolute -right-10 -bottom-10 opacity-10 text-white text-9xl font-black pointer-events-none">
@@ -190,7 +191,6 @@
       </div>
     </section>
 
-    <!-- Check Room View -->
     <section id="viewCheckRoom" class="space-y-6 sm:space-y-8 hidden">
       <div class="bg-sky-50 border border-sky-200 text-sky-800 p-4 rounded-2xl text-xs font-medium flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
         <div class="flex items-start sm:items-center">
@@ -246,7 +246,6 @@
       </div>
     </section>
 
-    <!-- Admin View -->
     <section id="viewAdmin" class="space-y-6 hidden">
       <div id="adminLoginContainer" class="flex items-center justify-center py-6 sm:py-12">
         <div class="bg-white rounded-3xl max-w-md w-full shadow-lg border border-slate-200 p-6 sm:p-8 relative transition-all duration-300">
@@ -380,7 +379,7 @@
     © 2026 SIRUPA - Sistem Informasi Ruangan dan Peminjaman.
   </footer>
 
-  <!-- MODAL: BOOKING -->
+  <!-- MODAL: BOOKING FORM -->
   <div id="bookingModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
     <div class="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-8 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto space-y-5">
       <button onclick="closeBookingModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
@@ -391,7 +390,7 @@
       </div>
 
       <div id="bookingConflictBanner" class="hidden bg-amber-50 border border-amber-200 rounded-2xl p-3.5 text-xs text-amber-800 space-y-1">
-        <div class="font-bold flex items-center"><i class="fa-solid fa-triangle-exclamation mr-1.5 text-amber-600"></i> Jadwal Bentrok!</div>
+        <div class="font-bold flex items-center"><i class="fa-solid fa-triangle-exclamation mr-1.5 text-amber-600"></i> Peringatan Bentrok Jadwal!</div>
         <p id="bookingConflictText"></p>
       </div>
 
@@ -452,8 +451,8 @@
           <div>
             <label class="block font-bold text-slate-700 mb-1.5">Waktu / Jam Pelaksanaan</label>
             <div class="grid grid-cols-2 gap-2">
-              <input type="text" id="inputJamMulai" required value="08:00" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-center outline-none">
-              <input type="text" id="inputJamSelesai" required value="17:00" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-center outline-none">
+              <input type="text" id="inputJamMulai" required value="08:00" onchange="checkBookingAvailability()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-center outline-none">
+              <input type="text" id="inputJamSelesai" required value="17:00" onchange="checkBookingAvailability()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-center outline-none">
             </div>
           </div>
         </div>
@@ -485,18 +484,21 @@
     </div>
   </div>
 
-  <!-- MODAL: CONFLICT / WARNING (DOUBLE INPUT POPUP) -->
-  <div id="doubleInputWarningModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl text-center space-y-4">
-      <div class="w-16 h-16 bg-amber-50 text-amber-600 rounded-3xl flex items-center justify-center mx-auto text-3xl shadow-sm border border-amber-100"><i class="fa-solid fa-triangle-exclamation"></i></div>
-      <div class="space-y-1">
-        <h3 class="text-lg font-black text-slate-900 tracking-tight">Peringatan: Jadwal Bentrok (Double Input)!</h3>
-        <p id="doubleInputModalText" class="text-xs text-slate-500 leading-relaxed"></p>
+  <!-- MODAL: FOOLPROOF DOUBLE INPUT / SCHEDULE CONFLICT POP-UP (Z-INDEX 9999 FOR ABSOLUTE TOP LAYER PRIORITY) -->
+  <div id="doubleInputWarningModal" class="fixed inset-0 z-[9999] bg-slate-950/80 modal-blur flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl text-center space-y-4 transform transition-all scale-100 border-2 border-amber-200">
+      <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-3xl flex items-center justify-center mx-auto text-3xl shadow-sm border border-amber-200">
+        <i class="fa-solid fa-triangle-exclamation"></i>
       </div>
-      <button onclick="closeDoubleInputModal()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition cursor-pointer shadow-md">Saya Mengerti</button>
+      <div class="space-y-2">
+        <h3 class="text-lg font-black text-slate-900 tracking-tight">Peringatan: Jadwal Bentrok (Double Input)!</h3>
+        <p id="doubleInputModalText" class="text-xs text-slate-700 leading-relaxed bg-amber-50 p-3.5 rounded-2xl border border-amber-200 font-medium"></p>
+      </div>
+      <button type="button" onclick="closeDoubleInputModal()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition cursor-pointer shadow-md">Saya Mengerti</button>
     </div>
   </div>
 
+  <!-- MODAL: PAST TIME WARNING -->
   <div id="pastTimeWarningModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl text-center space-y-4">
       <div class="w-16 h-16 bg-rose-50 text-rose-600 rounded-3xl flex items-center justify-center mx-auto text-3xl shadow-sm border border-rose-100"><i class="fa-solid fa-clock-rotate-left"></i></div>
@@ -657,11 +659,9 @@
           try {
             return JSON.parse(textRes);
           } catch(e) {
-            console.error("Non-JSON API response:", textRes);
             return { status: 'success' };
           }
         } catch (err) {
-          console.error("API POST Error:", err);
           return { status: 'error', message: err.toString() };
         }
       },
@@ -723,8 +723,6 @@
       }
 
       await syncDataFromDatabase();
-      
-      // Polling real-time database setiap 4 detik
       setInterval(syncDataFromDatabase, 4000);
 
       renderRoomCards();
@@ -1477,12 +1475,14 @@
       else group.classList.remove('hidden');
     }
 
+    function toMinutes(timeStr) {
+      if (!timeStr) return 0;
+      const cleanStr = timeStr.replace('WIB', '').trim();
+      const [h, m] = cleanStr.split(':').map(Number);
+      return (h || 0) * 60 + (m || 0);
+    }
+
     function checkTimeOverlap(start1, end1, start2, end2) {
-      const toMinutes = (timeStr) => {
-        const cleanStr = timeStr.replace('WIB', '').trim();
-        const [h, m] = cleanStr.split(':').map(Number);
-        return h * 60 + m;
-      };
       const s1 = toMinutes(start1);
       const e1 = toMinutes(end1);
       const s2 = toMinutes(start2);
@@ -1492,8 +1492,13 @@
 
     function checkBookingConflictWithTime(ruangan, tanggal, jamMulaiBaru, jamSelesaiBaru, excludeId = null) {
       return appState.bookings.find(b => {
-        if (b.ruangan.toLowerCase() === ruangan.toLowerCase() && b.tanggal === tanggal && (b.status === 'Disetujui' || b.status === 'Menunggu') && b.id !== excludeId) {
-          const parts = b.jam.split(' - ');
+        const isSameRoom = (b.ruangan || '').trim().toLowerCase() === (ruangan || '').trim().toLowerCase();
+        const isSameDate = b.tanggal === tanggal;
+        const isActiveStatus = (b.status === 'Disetujui' || b.status === 'Menunggu');
+        const isNotSelf = b.id !== excludeId;
+
+        if (isSameRoom && isSameDate && isActiveStatus && isNotSelf) {
+          const parts = (b.jam || '').split(' - ');
           if (parts.length >= 2) {
             const existingStart = parts[0].trim();
             const existingEnd = parts[1].replace('WIB', '').trim();
@@ -1504,6 +1509,7 @@
       });
     }
 
+    // FOOLPROOF SUBMIT: Pop-up double input tampil saat tombol "Kirim Pengajuan" diklik jika bentrok
     async function handleBookingSubmit(e) {
       e.preventDefault();
       const pemohon = document.getElementById('inputPemohon').value;
@@ -1528,12 +1534,13 @@
         return;
       }
 
-      // Validasi ketat Double Input / Bentrok Jadwal saat tombol Kirim Pengajuan ditekan
+      // VALIDASI KETAT DOUBLE INPUT / BENTROK JADWAL SAAT TOMBOL KIRIM DIKLIK
       const conflict = checkBookingConflictWithTime(ruangan, tanggal, jamMulai, jamSelesai, null);
       if (conflict) {
-        document.getElementById('doubleInputModalText').innerHTML = `Gagal menyimpan! Ruangan <b>${ruangan}</b> pada tanggal <b>${tanggal}</b> jam <b>${jam}</b> sudah memiliki jadwal/pengajuan aktif (${conflict.status}) oleh <b>${conflict.pemohon} (${conflict.unit})</b> untuk kegiatan <b>"${conflict.kegiatan}"</b>.`;
+        const warningMsg = `Gagal menyimpan! Ruangan <b>${ruangan}</b> pada tanggal <b>${tanggal}</b> pukul <b>${jam}</b> bersinggungan / sudah di-booking oleh <b>${conflict.pemohon} (${conflict.unit})</b> untuk kegiatan <b>"${conflict.kegiatan}"</b> dengan status <b>[${conflict.status}]</b>. Silakan pilih jadwal atau ruangan lain.`;
+        document.getElementById('doubleInputModalText').innerHTML = warningMsg;
         document.getElementById('doubleInputWarningModal').classList.remove('hidden');
-        return;
+        return; // Hentikan total proses agar tidak terjadi double input
       }
 
       const currentRoom = appState.rooms.find(r => r.name === ruangan);
@@ -1586,8 +1593,15 @@
       showToast(`Peminjaman berhasil dikirim & disimpan (ID: ${newBooking.id})! Email konfirmasi telah dikirim ke ${email}.`, 'success');
     }
 
-    function closeDoubleInputModal() { document.getElementById('doubleInputWarningModal').classList.add('hidden'); }
-    function closePastTimeModal() { document.getElementById('pastTimeWarningModal').classList.add('hidden'); }
+    function closeDoubleInputModal() {
+      const modal = document.getElementById('doubleInputWarningModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function closePastTimeModal() { 
+      const modal = document.getElementById('pastTimeWarningModal');
+      if (modal) modal.classList.add('hidden'); 
+    }
 
     function checkBookingAvailability() {
       const tanggal = document.getElementById('inputTanggal').value;
