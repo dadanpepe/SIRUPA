@@ -41,7 +41,7 @@
 
       <div class="flex items-center space-x-3">
         <div class="hidden md:flex flex-col text-right border-r border-slate-200 pr-4">
-          <span id="liveClock" class="text-xs font-mono font-bold text-slate-800">16:52:51 WIB</span>
+          <span id="liveClock" class="text-xs font-mono font-bold text-slate-800">17:01:20 WIB</span>
           <span id="liveDate" class="text-[10px] text-slate-400 font-medium">Kamis, 20 Agustus 2026</span>
         </div>
 
@@ -448,7 +448,7 @@
       </div>
       <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3 text-left space-y-1 text-xs">
         <div class="font-bold text-slate-800"><i class="fa-solid fa-circle-info text-blue-600 mr-1"></i> Informasi Sistem:</div>
-        <p class="text-slate-600 text-[11px]">Sistem mendeteksi jadwal jam yang bertubrukan pada ruangan dan tanggal yang sama. Pengajuan dibatalkan.</p>
+        <p class="text-slate-600 text-[11px]">Sistem mendeteksi jadwal jam yang bertubrukan pada ruangan dan tanggal yang sama. Pengajuan dibatalkan dan tidak disimpan.</p>
       </div>
       <button onclick="closeDoubleInputModal()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition cursor-pointer shadow-md">Saya Mengerti</button>
     </div>
@@ -591,7 +591,7 @@
 
   <script>
     const apiService = {
-      appsScriptUrl: 'https://script.google.com/macros/s/AKfycbzoFGWWQxV3p9LxV6mThJPvoRlY1rG1RvSiaQYhvMTVPa6w5ijFMdYj3Zl7G4QD0Db29Q/exec',
+      appsScriptUrl: 'https://script.google.com/macros/s/AKfycby.../exec',
 
       sendRequest: async function(action, payload = {}) {
         if (this.appsScriptUrl.includes('AKfycbz...')) {
@@ -1303,10 +1303,11 @@
       else group.classList.remove('hidden');
     }
 
-    // Fungsi utilitas untuk memeriksa tumpang tindih waktu (overlap minutes)
+    // Pengecekan tumpang tindih waktu presisi (overlap)
     function checkTimeOverlap(start1, end1, start2, end2) {
       const toMinutes = (timeStr) => {
-        const [h, m] = timeStr.split(':').map(Number);
+        const cleanStr = timeStr.replace('WIB', '').trim();
+        const [h, m] = cleanStr.split(':').map(Number);
         return h * 60 + m;
       };
       const s1 = toMinutes(start1);
@@ -1318,7 +1319,7 @@
 
     function checkBookingConflictWithTime(ruangan, tanggal, jamMulaiBaru, jamSelesaiBaru, excludeId = null) {
       return appState.bookings.find(b => {
-        if (b.ruangan === ruangan && b.tanggal === tanggal && b.status === 'Disetujui' && b.id !== excludeId) {
+        if (b.ruangan.toLowerCase() === ruangan.toLowerCase() && b.tanggal === tanggal && (b.status === 'Disetujui' || b.status === 'Menunggu') && b.id !== excludeId) {
           const parts = b.jam.split(' - ');
           if (parts.length >= 2) {
             const existingStart = parts[0].trim();
@@ -1345,21 +1346,21 @@
       const catatan = document.getElementById('inputCatatan').value;
       const berkasInput = document.getElementById('inputBerkas');
 
-      // 1. VALIDASI WAKTU LAMPAU (PAST TIME) SECARA KETAT
+      // 1. VALIDASI WAKTU LAMPAU (PAST TIME) SECARA MUTLAK
       const now = new Date();
       const bookingEndDateTime = new Date(`${tanggal}T${jamSelesai}:00`);
       if (bookingEndDateTime < now) {
         document.getElementById('pastTimeModalText').innerHTML = `Gagal menyimpan! Waktu pelaksanaan yang Anda pilih (<b>${tanggal} pukul ${jamSelesai}</b>) sudah lewat dari waktu saat ini.`;
         document.getElementById('pastTimeWarningModal').classList.remove('hidden');
-        return; // Menghentikan eksekusi pengajuan secara total
+        return; // Menghentikan eksekusi secara mutlak
       }
 
-      // 2. VALIDASI DOUBLE INPUT / BENTROK JAM PADA TANGGAL & RUANGAN YANG SAMA
+      // 2. VALIDASI DOUBLE INPUT / BENTROK JAM SECARA MUTLAK
       const conflict = checkBookingConflictWithTime(ruangan, tanggal, jamMulai, jamSelesai, null);
       if (conflict) {
-        document.getElementById('doubleInputModalText').innerHTML = `Gagal mengirim pengajuan! Ruangan <b>${ruangan}</b> pada tanggal <b>${tanggal}</b> sudah memiliki jadwal disetujui untuk kegiatan <b>"${conflict.kegiatan}"</b> (${conflict.jam}) yang bersinggungan dengan jam pilihan Anda.`;
+        document.getElementById('doubleInputModalText').innerHTML = `Gagal menyimpan! Ruangan <b>${ruangan}</b> pada tanggal <b>${tanggal}</b> sudah memiliki jadwal/pengajuan aktif (${conflict.status}) pada jam <b>${conflict.jam}</b> untuk kegiatan <b>"${conflict.kegiatan}"</b>. Jadwal jam bersinggungan / double input.`;
         document.getElementById('doubleInputWarningModal').classList.remove('hidden');
-        return; // Menghentikan eksekusi pengajuan secara total
+        return; // Menghentikan eksekusi secara mutlak, form TIDAK disimpan!
       }
 
       const currentRoom = appState.rooms.find(r => r.name === ruangan);
