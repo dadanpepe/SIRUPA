@@ -19,16 +19,15 @@
       50% { opacity: 0.6; transform: scale(0.98); }
     }
     .live-pulse { animation: pulseGlow 2s infinite ease-in-out; }
-    /* Mobile smooth scrolling */
     html { scroll-behavior: smooth; }
+    /* Mobile scroll safety */
+    body { overflow-y: auto !important; }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white pb-16 sm:pb-0">
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white pb-24 sm:pb-0">
 
-  <!-- TOAST NOTIFICATION CONTAINER -->
   <div id="toastContainer" class="fixed top-4 left-4 right-4 sm:left-auto sm:right-5 z-50 flex flex-col space-y-3 pointer-events-none"></div>
 
-  <!-- HEADER / NAVIGATION (RESPONSIVE) -->
   <header class="bg-white/95 backdrop-blur-md sticky top-0 z-40 border-b border-slate-200 shadow-xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
       <div class="flex items-center space-x-2.5 cursor-pointer" onclick="switchView('dashboard')">
@@ -44,7 +43,7 @@
       <div class="flex items-center space-x-3">
         <div class="hidden md:flex flex-col text-right border-r border-slate-200 pr-4">
           <span id="liveClock" class="text-xs font-mono font-bold text-slate-800">12:08:26 WIB</span>
-          <span id="liveDate" class="text-[10px] text-slate-400 font-medium">Rabu, 19 Agustus 2026</span>
+          <span id="liveDate" class="text-[10px] text-slate-400 font-medium">Rabu, 20 Agustus 2026</span>
         </div>
 
         <!-- Desktop Nav -->
@@ -63,8 +62,7 @@
     </div>
   </header>
 
-  <!-- MOBILE BOTTOM NAVIGATION BAR -->
-  <div class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-6 py-2 flex justify-around items-center shadow-lg">
+  <div class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-6 py-2.5 flex justify-around items-center shadow-2xl">
     <button onclick="switchView('dashboard')" id="mobNavDashboard" class="flex flex-col items-center text-blue-600 space-y-0.5">
       <i class="fa-solid fa-gauge-high text-lg"></i>
       <span class="text-[10px] font-bold">Dashboard</span>
@@ -79,7 +77,6 @@
     </button>
   </div>
 
-  <!-- MAIN CONTENT -->
   <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6 sm:space-y-8">
 
     <!-- VIEW 1: DASHBOARD -->
@@ -336,8 +333,8 @@
   </footer>
 
   <!-- MODAL: SUPER ADMIN & EDIT ADMIN -->
-  <div id="superAdminModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden">
-    <div class="bg-white rounded-3xl max-w-2xl w-full p-5 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto space-y-6">
+  <div id="superAdminModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-5 sm:p-8 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto space-y-6">
       <button onclick="closeSuperAdminModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
       <div class="space-y-1">
         <span class="text-[10px] font-black text-purple-600 uppercase tracking-wider">Super Admin Kontrol</span>
@@ -377,8 +374,8 @@
   </div>
 
   <!-- MODAL: ADD / EDIT ROOM -->
-  <div id="roomModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden">
-    <div class="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+  <div id="roomModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-8 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto">
       <button onclick="closeRoomModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
       <div class="mb-5 space-y-1"><h3 id="roomModalTitle" class="text-base sm:text-lg font-black text-slate-900 tracking-tight">Tambah Ruangan Baru</h3></div>
       <form id="roomForm" onsubmit="handleRoomFormSubmit(event)" class="space-y-4 text-xs">
@@ -405,8 +402,8 @@
   </div>
 
   <!-- MODAL: BOOKING FORM -->
-  <div id="bookingModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden">
-    <div class="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+  <div id="bookingModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-8 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto">
       <button onclick="closeBookingModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
       <div class="mb-5 space-y-1">
         <span id="bookingRoomContextBadge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 mb-1">Pengajuan Umum</span>
@@ -467,8 +464,8 @@
   </div>
 
   <!-- MODAL: CAPACITY WARNING POPUP -->
-  <div id="capacityPopupModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl relative text-center space-y-4">
+  <div id="capacityPopupModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-4 hidden overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl relative text-center space-y-4 my-auto">
       <div class="w-14 h-14 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto text-2xl"><i class="fa-solid fa-triangle-exclamation"></i></div>
       <div class="space-y-1">
         <h3 class="text-base font-black text-slate-900">Kapasitas Ruangan Terlampaui!</h3>
@@ -479,8 +476,8 @@
   </div>
 
   <!-- MODAL: DETAIL BOOKING -->
-  <div id="bookingDetailsModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-8 shadow-2xl relative space-y-4">
+  <div id="bookingDetailsModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-4 hidden overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-8 shadow-2xl relative space-y-4 my-auto">
       <button onclick="closeBookingDetailsModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
       <div class="space-y-1"><span class="text-[10px] font-black text-blue-600 uppercase tracking-wider">Detail Agenda</span><h3 id="modalDetailTitle" class="text-base font-black text-slate-900">Informasi Jadwal</h3></div>
       <div id="modalDetailContent" class="space-y-2.5 text-xs text-slate-700 bg-slate-50 p-4 rounded-2xl border border-slate-200"></div>
@@ -489,8 +486,8 @@
   </div>
 
   <!-- MODAL: CANCEL BOOKING -->
-  <div id="cancelBookingModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-8 shadow-2xl relative space-y-4">
+  <div id="cancelBookingModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-4 hidden overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-8 shadow-2xl relative space-y-4 my-auto">
       <button onclick="closeCancelModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
       <div class="space-y-1"><span class="text-[10px] font-black text-rose-600 uppercase tracking-wider">Pembatalan Jadwal</span><h3 class="text-base font-black text-slate-900">Batalkan Peminjaman</h3></div>
       <form onsubmit="handleCancelBookingSubmit(event)" class="space-y-4 text-xs">
