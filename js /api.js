@@ -6,7 +6,7 @@
 
 const ApiService = {
   // Masukkan URL Web App Google Apps Script Anda setelah di-deploy di sini
-  appsScriptUrl: 'https://script.google.com/macros/s/AKfycbzhgfN9ZvqgquCTvZiTYIA4aRYbRXvRKsvDWM5bsOchst8Wn9GpeD1r3rWBBbGOfSZu/exec',
+  appsScriptUrl: 'https://script.google.com/macros/s/AKfycbxo9WMoxuSunoSbij5hBPFU5dOCbiQv33bZRi8Kj6prEP6JABrVx22z0FXwojmG31i4/exec',
 
   async request(action, payload = {}) {
     if (this.appsScriptUrl.includes('AKfycbz...')) {
