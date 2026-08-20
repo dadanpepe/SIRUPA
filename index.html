@@ -42,7 +42,7 @@
       <div class="flex items-center space-x-3">
         <div class="hidden md:flex flex-col text-right border-r border-slate-200 pr-4">
           <span id="liveClock" class="text-xs font-mono font-bold text-slate-800">12:08:26 WIB</span>
-          <span id="liveDate" class="text-[10px] text-slate-400 font-medium">Rabu, 20 Agustus 2026</span>
+          <span id="liveDate" class="text-[10px] text-slate-400 font-medium">Kamis, 20 Agustus 2026</span>
         </div>
 
         <!-- Desktop Nav -->
@@ -464,7 +464,7 @@
       </div>
       <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3 text-left space-y-1 text-xs">
         <div class="font-bold text-slate-800"><i class="fa-solid fa-circle-info text-rose-600 mr-1"></i> Aturan Sistem:</div>
-        <p class="text-slate-600 text-[11px]">Anda tidak dapat melakukan booking untuk tanggal atau jam yang sudah berlalu / lampau. Silakan pilih waktu yang valid.</p>
+        <p class="text-slate-600 text-[11px]">Anda tidak dapat melakukan booking untuk tanggal atau jam yang sudah berlalu / lampau. Pengajuan dibatalkan.</p>
       </div>
       <button onclick="closePastTimeModal()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition cursor-pointer shadow-md">Saya Mengerti</button>
     </div>
@@ -591,7 +591,7 @@
 
   <script>
     const apiService = {
-      appsScriptUrl: 'https://script.google.com/macros/s/AKfycbzoFGWWQxV3p9LxV6mThJPvoRlY1rG1RvSiaQYhvMTVPa6w5ijFMdYj3Zl7G4QD0Db29Q/exec',
+      appsScriptUrl: 'https://script.google.com/macros/s/AKfycby.../exec',
 
       sendRequest: async function(action, payload = {}) {
         if (this.appsScriptUrl.includes('AKfycbz...')) {
@@ -610,21 +610,8 @@
         }
       },
 
-      getData: async function(action) {
-        if (this.appsScriptUrl.includes('AKfycbz...')) {
-          return { status: 'success', bookings: [], rooms: [], admins: [] };
-        }
-        try {
-          const response = await fetch(`${this.appsScriptUrl}?action=${action}`);
-          return await response.json();
-        } catch (err) {
-          console.error("API Get Error:", err);
-          return { status: 'error', message: err.toString() };
-        }
-      },
-
       getAllData: async function() {
-        return await this.getData('getAllData');
+        return await this.sendRequest('getAllData');
       }
     };
 
