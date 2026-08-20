@@ -33,7 +33,7 @@
       <i class="fa-solid fa-bullhorn mr-1"></i> PENGUMUMAN
     </div>
     <marquee scrollamount="5" class="font-medium text-slate-300">
-      Selamat datang di Sistem Informasi Ruangan dan Peminjaman (SIRUPA). Unggah berkas surat izin berformat PDF saat melakukan pengajuan peminjaman ruangan. Gunakan tombol sinkronisasi di samping lonceng untuk memperbarui data secara real-time.
+      Selamat datang di Sistem Informasi Ruangan dan Peminjaman (SIRUPA). Unggah berkas surat izin berformat PDF saat melakukan pengajuan peminjaman ruangan. Pastikan jadwal tidak bentrok dengan kegiatan instansi lain.
     </marquee>
   </div>
 
@@ -50,11 +50,6 @@
       </div>
 
       <div class="flex items-center space-x-3 sm:space-x-4">
-        <!-- TOMBOL FITUR SINKRONISASI REAL-TIME -->
-        <button onclick="manualSyncDatabase()" title="Sinkronisasi Data Real-Time" class="w-10 h-10 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl flex items-center justify-center transition cursor-pointer relative shadow-xs border border-slate-200">
-          <i id="syncIcon" class="fa-solid fa-rotate text-sm"></i>
-        </button>
-
         <!-- FITUR LONCENG NOTIFIKASI INTERAKTIF -->
         <div class="relative">
           <button onclick="toggleNotificationDropdown()" class="w-10 h-10 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl flex items-center justify-center transition cursor-pointer relative shadow-xs border border-slate-200">
@@ -352,7 +347,13 @@
                 <h3 class="text-sm sm:text-base font-bold text-slate-900">Daftar Masuk Permintaan Peminjaman</h3>
                 <p id="adminTableSubtext" class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Setujui atau tolak pengajuan secara real-time.</p>
               </div>
-              <button onclick="handleAdminRefresh()" class="inline-flex items-center justify-center px-3.5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition cursor-pointer"><i class="fa-solid fa-arrows-rotate mr-1.5 text-blue-600"></i> Muat Ulang</button>
+              <div class="flex items-center space-x-2">
+                <!-- Tombol Sinkronisasi Real-Time Khusus Halaman Admin -->
+                <button onclick="manualSyncDatabase()" title="Sinkronisasi Data Real-Time" class="inline-flex items-center justify-center px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-sm transition cursor-pointer">
+                  <i id="syncIcon" class="fa-solid fa-rotate mr-1.5"></i> Sinkronkan Data
+                </button>
+                <button onclick="handleAdminRefresh()" class="inline-flex items-center justify-center px-3.5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition cursor-pointer"><i class="fa-solid fa-arrows-rotate mr-1.5 text-blue-600"></i> Muat Ulang</button>
+              </div>
             </div>
             <div class="overflow-x-auto flex-grow">
               <table class="w-full text-left border-collapse min-w-[600px]">
@@ -640,7 +641,7 @@
 
   <script>
     const apiService = {
-      appsScriptUrl: 'https://script.google.com/macros/s/AKfycbx9yghGGsF00XWUoL-8HJSV2p5jVHsn7qb9l0Qd1HOx-S6XHIegQ-A8T2ChShR1rNmycA/exec',
+      appsScriptUrl: 'https://script.google.com/macros/s/AKfycby.../exec',
 
       sendRequest: async function(action, payload = {}) {
         if (this.appsScriptUrl.includes('AKfycbz...')) {
@@ -757,7 +758,7 @@
       if (dropdown) dropdown.classList.toggle('hidden');
     }
 
-    // Fungsi Tombol Sinkronisasi Real-Time Manual
+    // Fungsi Tombol Sinkronisasi Real-Time Manual (Di Panel Admin)
     async function manualSyncDatabase() {
       const icon = document.getElementById('syncIcon');
       if (icon) icon.classList.add('fa-spin');
@@ -766,16 +767,22 @@
       await syncDataFromDatabase();
       
       if (icon) icon.classList.remove('fa-spin');
-      showToast('Data aplikasi berhasil disinkronkan secara real-time!', 'success');
+      showToast('Data aplikasi berhasil disinkronkan dengan database!', 'success');
     }
 
     async function syncDataFromDatabase() {
       try {
         const json = await apiService.getAllData();
         if (json && json.status === 'success') {
-          if (json.bookings && Array.isArray(json.bookings) && json.bookings.length > 0) appState.bookings = json.bookings;
-          if (json.rooms && Array.isArray(json.rooms) && json.rooms.length > 0) appState.rooms = json.rooms;
-          if (json.admins && Array.isArray(json.admins) && json.admins.length > 0) appState.adminAccounts = json.admins;
+          if (json.bookings && Array.isArray(json.bookings)) {
+            appState.bookings = json.bookings;
+          }
+          if (json.rooms && Array.isArray(json.rooms) && json.rooms.length > 0) {
+            appState.rooms = json.rooms;
+          }
+          if (json.admins && Array.isArray(json.admins) && json.admins.length > 0) {
+            appState.adminAccounts = json.admins;
+          }
           
           renderBookingTable();
           updateDashboardCounts();
@@ -786,7 +793,7 @@
           checkH1Reminders();
         }
       } catch (err) {
-        console.warn("Real-time sync silent retry:", err);
+        console.warn("Real-time sync error:", err);
       }
     }
 
@@ -1524,7 +1531,6 @@
 
       showToast('Mengirim dan menyinkronkan data & file ke Google Spreadsheet & Drive...', 'info');
 
-      // Masukkan langsung ke state lokal agar langsung tampil di UI
       appState.bookings.unshift(newBooking);
       renderBookingTable();
       updateDashboardCounts();
