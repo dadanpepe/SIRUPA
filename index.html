@@ -4,12 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>SIRUPA - Sistem Informasi Ruangan dan Peminjaman</title>
+  
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
     body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -56,13 +58,13 @@
       0% { opacity: 0; transform: scale(0.96) translateY(12px); }
       100% { opacity: 1; transform: scale(1) translateY(0); }
     }
-    .animate-fade-in { animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .animate-fade-in { animation: fadeInScale 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
     @keyframes chartFadeIn {
       0% { opacity: 0; transform: translateY(20px); }
       100% { opacity: 1; transform: translateY(0); }
     }
-    .animate-chart { animation: chartFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .animate-chart { animation: chartFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
     html { scroll-behavior: smooth; }
     body { overflow-y: auto !important; }
@@ -70,9 +72,10 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white pb-24 sm:pb-0">
 
+  <!-- Toast Notification Container -->
   <div id="toastContainer" class="fixed top-4 left-4 right-4 sm:left-auto sm:right-5 z-[9999999] flex flex-col space-y-3 pointer-events-none"></div>
 
-  <!-- Announcement Bar -->
+  <!-- Announcement Marquee Bar -->
   <div class="bg-slate-900 text-slate-200 text-xs py-2 px-4 overflow-hidden whitespace-nowrap border-b border-slate-800 flex items-center shadow-inner">
     <div class="bg-blue-600 text-white font-bold px-2 py-0.5 rounded text-[10px] mr-3 shrink-0 flex items-center shadow-xs animate-pulse">
       <i class="fa-solid fa-bullhorn mr-1"></i> PENGUMUMAN
@@ -95,7 +98,7 @@
       </div>
 
       <div class="flex items-center space-x-3 sm:space-x-4">
-        <!-- Notification Bell with Animated Swing -->
+        <!-- Notification Bell -->
         <div class="relative">
           <button onclick="toggleNotificationDropdown()" class="w-10 h-10 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl flex items-center justify-center transition transform active:scale-95 cursor-pointer relative shadow-xs border border-slate-200">
             <i id="bellIcon" class="fa-solid fa-bell text-sm"></i>
@@ -151,6 +154,7 @@
     </button>
   </div>
 
+  <!-- Main Content Layout -->
   <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6 sm:space-y-8 animate-fade-in">
 
     <!-- VIEW: DASHBOARD -->
@@ -162,7 +166,7 @@
         <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div class="max-w-3xl space-y-2 sm:space-y-3">
             <h2 class="text-xl sm:text-3xl lg:text-4xl font-black tracking-tight leading-tight">Dashboard & Statistik Ruangan</h2>
-            <p class="text-blue-100 text-xs sm:text-sm leading-relaxed opacity-90">Pantau ketersediaan jadwal ruangan, analisis penggunaan fasilitas, dan sinkronisasi real-time database otomatis.</p>
+            <p class="text-blue-100 text-xs sm:text-sm leading-relaxed opacity-90">Pantau ketersediaan jadwal ruangan, analisis penggunaan fasilitas, dan sinkronisasi real-time database otomatis tanpa delay.</p>
           </div>
         </div>
       </div>
@@ -393,7 +397,6 @@
               <h3 class="text-xs sm:text-sm font-bold text-slate-900 flex items-center"><i class="fa-solid fa-bullhorn mr-2 text-blue-600 animate-bounce"></i> Pengelolaan Papan Pengumuman (Real-Time)</h3>
               <p class="text-[11px] text-slate-400">Pesan baru yang dimasukkan akan ditambahkan ke papan pengumuman tanpa menghapus publikasi sebelumnya.</p>
             </div>
-            <!-- Super Admin Clear Announcement Button -->
             <button id="superAdminClearAnnounceBtn" onclick="clearAllAnnouncements()" class="hidden px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition items-center space-x-1.5 cursor-pointer">
               <i class="fa-solid fa-trash-can"></i> <span>Hapus Semua Pengumuman</span>
             </button>
@@ -606,7 +609,7 @@
     </div>
   </div>
 
-  <!-- MODAL: CANCEL BOOKING (High Z-Index & Above Blur Overlay) -->
+  <!-- MODAL: CANCEL BOOKING -->
   <div id="cancelBookingModal" class="fixed inset-0 z-[999999] bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto animate-fade-in" style="display: none;">
     <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-8 shadow-2xl relative space-y-5 my-auto z-[1000000]">
       <button onclick="closeCancelModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
@@ -942,7 +945,6 @@
       });
     }
 
-    // Automatic Image Slider for Rooms
     function initRoomImageSlider() {
       if (roomSlideInterval) clearInterval(roomSlideInterval);
       roomSlideInterval = setInterval(() => {
