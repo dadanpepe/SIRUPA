@@ -1,3 +1,74 @@
-/* Custom animations and scrollbar tweaks for PinTaR /
-/ Custom animations and scrollbar tweaks for PinTaR */::-webkit-scrollbar {width: 6px;height: 6px;}::-webkit-scrollbar {width: 6px;height: 6px;}::
--webkit-scrollbar-track {background: #f1f5f9;}::-webkit-scrollbar-thumb {background: #cbd5e1;border-radius: 3px;}::-webkit-scrollbar-thumb:hover {background: #94a3b8;}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+body {
+font-family: 'Inter', sans-serif;
+-webkit-tap-highlight-color: transparent;
+}
+
+.modal-blur {
+backdrop-filter: blur(8px);
+}
+
+@keyframes pulseGlow {
+0%, 100% { opacity: 1; transform: scale(1); }
+50% { opacity: 0.6; transform: scale(0.98); }
+}
+.live-pulse {
+animation: pulseGlow 2s infinite ease-in-out;
+}
+
+@keyframes bellSwing {
+0% { transform: rotate(0deg); }
+15% { transform: rotate(14deg); }
+30% { transform: rotate(-14deg); }
+45% { transform: rotate(10deg); }
+60% { transform: rotate(-10deg); }
+75% { transform: rotate(4deg); }
+85% { transform: rotate(-4deg); }
+100% { transform: rotate(0deg); }
+}
+.animate-bell-swing {
+animation: bellSwing 1.2s ease-in-out infinite;
+transform-origin: top center;
+}
+
+@keyframes floatSlow {
+0%, 100% { transform: translateY(0px); }
+50% { transform: translateY(-8px); }
+}
+.animate-float {
+animation: floatSlow 4s ease-in-out infinite;
+}
+
+@keyframes shimmerBg {
+0% { background-position: 0% 50%; }
+50% { background-position: 100% 50%; }
+100% { background-position: 0% 50%; }
+}
+.animate-shimmer {
+background-size: 200% 200%;
+animation: shimmerBg 8s ease infinite;
+}
+
+@keyframes fadeInScale {
+0% { opacity: 0; transform: scale(0.96) translateY(12px); }
+100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.animate-fade-in {
+animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes chartFadeIn {
+0% { opacity: 0; transform: translateY(20px); }
+100% { opacity: 1; transform: translateY(0); }
+}
+.animate-chart {
+animation: chartFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+html {
+scroll-behavior: smooth;
+}
+body {
+overflow-y: auto !important;
+}
