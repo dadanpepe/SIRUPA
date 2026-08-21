@@ -2072,6 +2072,131 @@
         }
       }, 5000);
     }
+
+    function formatIndonesianDate(dateStr) {
+      if (!dateStr) return '-';
+      try {
+        const parts = dateStr.split('-');
+        if (parts.length === 3) {
+          const year = parts[0];
+          const monthNum = parseInt(parts[1], 10) - 1;
+          const day = parts[2];
+          return `${day} ${monthNames[monthNum] || ''} ${year}`;
+        }
+      } catch(e) {}
+      return dateStr;
+    }
+
+    function renderAdminPendingTable() {
+      const tbody = document.getElementById('adminPendingTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (appState.bookings.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400 font-medium">Tidak ada pengajuan masuk.</td></tr>`;
+        return;
+      }
+
+      let visibleBookings = appState.bookings;
+      if (appState.currentAdmin && !appState.currentAdmin.isSuper) {
+        const adminUnitLower = (appState.currentAdmin.unit || '').trim().toLowerCase();
+        visibleBookings = appState.bookings.filter(b => {
+          const bookingUnitLower = (b.unit || '').trim().toLowerCase();
+          const targetRoom = appState.rooms.find(r => r.name === b.ruangan);
+          const roomUnitLower = targetRoom ? (targetRoom.unit || '').trim().toLowerCase() : '';
+          return bookingUnitLower === adminUnitLower || roomUnitLower === adminUnitLower || adminUnitLower.includes(bookingUnitLower);
+        });
+      }
+
+      const searchInput = document.getElementById('adminSearchPendingInput');
+      const searchQuery = searchInput ? searchInput.value.trim().toLowerCase() : '';
+      if (searchQuery !== '') {
+        visibleBookings = visibleBookings.filter(b => {
+          const p = (b.pemohon || '').toLowerCase();
+          const k = (b.kegiatan || '').toLowerCase();
+          const r = (b.ruangan || '').toLowerCase();
+          const id = (b.id || '').toLowerCase();
+          return p.includes(searchQuery) || k.includes(searchQuery) || r.includes(searchQuery) || id.includes(searchQuery);
+        });
+      }
+
+      if (visibleBookings.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 text-xs">Tidak ada permintaan peminjaman ditemukan.</td></tr>`;
+        return;
+      }
+
+      visibleBookings.forEach(item => {
+        let statusTag = `<span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full text-[10px] font-bold inline-flex items-center"><i class="fa-solid fa-hourglass mr-1"></i> Menunggu</span>`;
+        if (item.status === 'Disetujui') statusTag = `<span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full text-[10px] font-bold inline-flex items-center"><i class="fa-solid fa-check mr-1"></i> Disetujui</span>`;
+        if (item.status === 'Dibatalkan') statusTag = `<span class="bg-rose-100 text-rose-800 px-2.5 py-1 rounded-full text-[10px] font-bold inline-flex items-center"><i class="fa-solid fa-ban mr-1"></i> Dibatalkan</span>`;
+        if (item.status === 'Ditolak') statusTag = `<span class="bg-rose-100 text-rose-800 px-2.5 py-1 rounded-full text-[10px] font-bold inline-flex items-center"><i class="fa-solid fa-xmark mr-1"></i> Ditolak</span>`;
+
+        const pdfUrl = (item.berkasUrl && item.berkasUrl !== '#') ? item.berkasUrl : '#';
+        const pdfBtnDisabled = pdfUrl === '#' ? 'opacity-40 cursor-not-allowed pointer-events-none' : 'hover:bg-blue-100 cursor-pointer';
+        const formattedDate = formatIndonesianDate(item.tanggal);
+
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="p-4 pl-5">
+              <span class="font-bold text-blue-600">${item.id}</span>
+              <div class="text-[11px] text-slate-600 font-medium">${item.pemohon}</div>
+              <div class="text-[10px] text-slate-400">${item.unit}</div>
+            </td>
+            <td class="p-4 font-bold text-slate-800">${item.kegiatan}</td>
+            <td class="p-4 text-slate-700">${item.ruangan}</td>
+            <td class="p-4">
+              <div class="font-semibold text-slate-800">${formattedDate}</div>
+              <div class="text-[10px] text-slate-400">${item.jam}</div>
+            </td>
+            <td class="p-4">${statusTag}</td>
+            <td class="p-4 pr-5 text-center">
+              <div class="inline-flex items-center space-x-1.5">
+                <button onclick="openPdfModal('${pdfUrl}', '${item.id}')" title="Lihat Berkas PDF" class="px-2.5 py-1.5 bg-blue-50 ${pdfBtnDisabled} text-blue-700 font-bold rounded-xl text-[11px] transition inline-flex items-center border border-blue-200 cursor-pointer">
+                  <i class="fa-solid fa-file-pdf mr-1 text-xs text-rose-500"></i> PDF
+                </button>
+                <button onclick="updateBookingStatusInCloud('${item.id}', 'Disetujui')" class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-xl text-[11px] transition cursor-pointer border border-emerald-200">Setujui</button>
+                <button onclick="updateBookingStatusInCloud('${item.id}', 'Ditolak')" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-[11px] transition cursor-pointer border border-rose-200">Tolak</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function openPdfModal(url, bookingId) {
+      if (!url || url === '#') {
+        showToast('Berkas PDF tidak tersedia untuk peminjaman ini.', 'warning');
+        return;
+      }
+      let modal = document.getElementById('pdfViewerModal');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'pdfViewerModal';
+        modal.className = 'fixed inset-0 z-50 bg-slate-950/70 modal-blur flex items-center justify-center p-3 sm:p-4 animate-fade-in';
+        modal.innerHTML = `
+          <div class="bg-white rounded-3xl max-w-3xl w-full p-5 sm:p-6 shadow-2xl relative space-y-4 my-auto h-[80vh] flex flex-col">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 id="pdfModalTitle" class="text-sm sm:text-base font-black text-slate-900">Pratinjau Berkas PDF</h3>
+              <button onclick="closePdfModal()" class="text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="flex-grow bg-slate-100 rounded-2xl overflow-hidden relative">
+              <iframe id="pdfIframe" src="" class="w-full h-full border-0"></iframe>
+            </div>
+          </div>`;
+        document.body.appendChild(modal);
+      }
+      document.getElementById('pdfModalTitle').innerText = `Pratinjau Berkas PDF (${bookingId})`;
+      document.getElementById('pdfIframe').src = url;
+      modal.classList.remove('hidden');
+    }
+
+    function closePdfModal() {
+      const modal = document.getElementById('pdfViewerModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        document.getElementById('pdfIframe').src = '';
+      }
+    }
   </script>
 </body>
 </html>
