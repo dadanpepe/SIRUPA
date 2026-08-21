@@ -154,7 +154,6 @@
     </button>
   </div>
 
-  <!-- Main Content Layout -->
   <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6 sm:space-y-8 animate-fade-in">
 
     <!-- VIEW: DASHBOARD -->
@@ -826,6 +825,22 @@
     let chartInstances = {};
     let roomSlideInterval = null;
 
+    function getStatusBadge(status) {
+      const s = (status || '').trim();
+      switch (s) {
+        case 'Disetujui':
+          return `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-full text-xs font-bold inline-flex items-center"><i class="fa-solid fa-circle-check mr-1 text-[10px]"></i> Disetujui</span>`;
+        case 'Menunggu':
+          return `<span class="bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-1 rounded-full text-xs font-bold inline-flex items-center"><i class="fa-solid fa-hourglass-half mr-1 text-[10px]"></i> Menunggu</span>`;
+        case 'Dibatalkan':
+          return `<span class="bg-slate-100 text-slate-600 border border-slate-200 px-2.5 py-1 rounded-full text-xs font-bold inline-flex items-center"><i class="fa-solid fa-ban mr-1 text-[10px]"></i> Dibatalkan</span>`;
+        case 'Ditolak':
+          return `<span class="bg-rose-50 text-rose-700 border border-rose-200 px-2.5 py-1 rounded-full text-xs font-bold inline-flex items-center"><i class="fa-solid fa-circle-xmark mr-1 text-[10px]"></i> Ditolak</span>`;
+        default:
+          return `<span class="bg-slate-100 text-slate-700 border border-slate-200 px-2.5 py-1 rounded-full text-xs font-bold">${s}</span>`;
+      }
+    }
+
     function formatDDMMYYYY(dateStr) {
       if (!dateStr) return '-';
       try {
@@ -985,7 +1000,7 @@
             <td class="p-3 sm:p-4 font-bold text-slate-800">${item.kegiatan}</td>
             <td class="p-3 sm:p-4 text-slate-600 font-medium">${item.ruangan}</td>
             <td class="p-3 sm:p-4"><div class="font-medium text-slate-700">${formattedDate}</div><div class="text-[11px] text-slate-400">${item.jam}</div></td>
-            <td class="p-3 sm:p-4 pr-5 sm:pr-6"><span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full text-xs font-bold">${item.status}</span></td>
+            <td class="p-3 sm:p-4 pr-5 sm:pr-6">${getStatusBadge(item.status)}</td>
           </tr>`;
       });
     }
@@ -1337,7 +1352,7 @@
                 <span class="font-mono font-bold text-blue-600 text-xs">${b.id}</span>
                 <div class="flex items-center space-x-1">
                   ${executionBadge}
-                  <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-[10px] font-bold">${b.status}</span>
+                  ${getStatusBadge(b.status)}
                 </div>
               </div>
               <div class="text-xs font-extrabold text-slate-900">${b.kegiatan}</div>
@@ -1476,10 +1491,7 @@
       }
 
       visibleBookings.forEach(item => {
-        let statusTag = `<span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full text-[10px] font-bold inline-flex items-center"><i class="fa-solid fa-hourglass mr-1"></i> Menunggu</span>`;
-        if (item.status === 'Disetujui') statusTag = `<span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full text-[10px] font-bold inline-flex items-center"><i class="fa-solid fa-check mr-1"></i> Disetujui</span>`;
-        if (item.status === 'Dibatalkan') statusTag = `<span class="bg-rose-100 text-rose-800 px-2.5 py-1 rounded-full text-[10px] font-bold inline-flex items-center"><i class="fa-solid fa-ban mr-1"></i> Dibatalkan</span>`;
-        if (item.status === 'Ditolak') statusTag = `<span class="bg-rose-100 text-rose-800 px-2.5 py-1 rounded-full text-[10px] font-bold inline-flex items-center"><i class="fa-solid fa-xmark mr-1"></i> Ditolak</span>`;
+        let statusTag = getStatusBadge(item.status);
 
         const pdfUrl = (item.berkasUrl && item.berkasUrl !== '#') ? item.berkasUrl : '#';
         const pdfBtnDisabled = pdfUrl === '#' ? 'opacity-40 cursor-not-allowed pointer-events-none' : 'hover:bg-blue-100 cursor-pointer';
