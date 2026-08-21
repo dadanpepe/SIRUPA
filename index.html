@@ -634,7 +634,7 @@
 
   <script>
     const apiService = {
-      appsScriptUrl: 'https://script.google.com/macros/s/AKfycbwPIqOmIeNqny4CBmaLALaAho8PpGC9N9nupervqyh_Ryd8FbwfkjL6Gl8cOq0twLLHNg/exec',
+      appsScriptUrl: 'https://script.google.com/macros/s/AKfycbxVY3olkned09IuWKbDAVKXfgpT8_JPaFIMPX3F7kV7iTXbS5Y23NQ0HjUB8RHYfDD0QQ/exec',
 
       sendRequest: async function(action, payload = {}) {
         if (this.appsScriptUrl.includes('AKfycbz...')) {
@@ -1573,6 +1573,7 @@
       showToast('Memeriksa ketersediaan real-time ke database...', 'info');
       await syncDataFromDatabase();
 
+      // Validasi ketat lokal
       const conflict = checkBookingConflictWithTime(ruangan, tanggal, jamMulai, jamSelesai, null);
       if (conflict) {
         triggerDoubleBookingWarning(ruangan, tanggal, `${jamMulai} - ${jamSelesai}`, conflict);
@@ -1595,52 +1596,54 @@
         berkasUrl: '#', status: 'Menunggu', tahun: 2026, timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16)
       };
 
-      showToast('Mengirim dan menyinkronkan data & file ke Google Spreadsheet & Drive...', 'info');
+      showToast('Mengirim dan menyinkronkan data & file ke Google Spreadsheet...', 'info');
 
+      // Kirim langsung ke Cloud Backend untuk verifikasi server-side LockService
+      let serverResult = { status: 'success' };
+      if (berkasInput && berkasInput.files[0]) {
+        const file = berkasInput.files[0];
+        const reader = new FileReader();
+        
+        await new Promise((resolve) => {
+          reader.onload = async function(uploadEvent) {
+            const base64String = uploadEvent.target.result.split(',')[1];
+            serverResult = await sendDataToDatabase('addBooking', {
+              ...newBooking,
+              fileBase64: base64String,
+              fileName: file.name,
+              fileMimeType: file.type
+            });
+            resolve();
+          };
+          reader.readAsDataURL(file);
+        });
+      } else {
+        serverResult = await sendDataToDatabase('addBooking', newBooking);
+      }
+
+      // Jika server mendeteksi bentrok (LockService / Double Input terdeteksi)
+      if (serverResult && serverResult.status === 'conflict') {
+        triggerDoubleBookingWarning(ruangan, tanggal, `${jamMulai} - ${jamSelesai}`, {
+          kegiatan: "Agenda Lain (Terdeteksi Server Lain)",
+          pemohon: "Pengguna Lain",
+          unit: "-"
+        });
+        await syncDataFromDatabase();
+        return;
+      }
+
+      // Jika berhasil lolos validasi server
       appState.bookings.unshift(newBooking);
+      if (serverResult && serverResult.berkasUrl) {
+        newBooking.berkasUrl = serverResult.berkasUrl;
+      }
+
       renderBookingTable();
       updateDashboardCounts();
       renderAdminPendingTable();
       renderCalendar();
       closeBookingModal();
       checkH1Reminders();
-
-      if (berkasInput && berkasInput.files[0]) {
-        const file = berkasInput.files[0];
-        const reader = new FileReader();
-        reader.onload = async function(uploadEvent) {
-          const base64String = uploadEvent.target.result.split(',')[1];
-          const result = await sendDataToDatabase('addBooking', {
-            ...newBooking,
-            fileBase64: base64String,
-            fileName: file.name,
-            fileMimeType: file.type
-          });
-          if (result && result.status === 'conflict') {
-            triggerDoubleBookingWarning(ruangan, tanggal, `${jamMulai} - ${jamSelesai}`, {
-              kegiatan: "Agenda Lain (Server Conflict)",
-              pemohon: "Konflik Database",
-              unit: "-"
-            });
-            return;
-          }
-          if (result && result.berkasUrl) {
-            newBooking.berkasUrl = result.berkasUrl;
-            renderBookingTable();
-          }
-        };
-        reader.readAsDataURL(file);
-      } else {
-        const result = await sendDataToDatabase('addBooking', newBooking);
-        if (result && result.status === 'conflict') {
-          triggerDoubleBookingWarning(ruangan, tanggal, `${jamMulai} - ${jamSelesai}`, {
-            kegiatan: "Agenda Lain (Server Conflict)",
-            pemohon: "Konflik Database",
-            unit: "-"
-          });
-          return;
-        }
-      }
 
       showToast(`Peminjaman berhasil dikirim & disimpan (ID: ${newBooking.id})! Email konfirmasi telah dikirim ke ${email}.`, 'success');
     }
