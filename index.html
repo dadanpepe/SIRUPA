@@ -25,7 +25,6 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white pb-24 sm:pb-0">
 
-  <!-- STREAMING_CHUNK:Initializing toast notification container... -->
   <div id="toastContainer" class="fixed top-4 left-4 right-4 sm:left-auto sm:right-5 z-50 flex flex-col space-y-3 pointer-events-none"></div>
 
   <!-- Announcement Bar -->
@@ -38,7 +37,6 @@
     </marquee>
   </div>
 
-  <!-- STREAMING_CHUNK:Rendering navigation and header... -->
   <header class="bg-white/95 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200 shadow-xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
       <div class="flex items-center space-x-3 cursor-pointer group" onclick="switchView('dashboard')">
@@ -110,7 +108,6 @@
 
   <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6 sm:space-y-8">
 
-    <!-- STREAMING_CHUNK:Rendering dashboard view... -->
     <section id="viewDashboard" class="space-y-6 sm:space-y-8">
       <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 p-6 sm:p-10 text-white shadow-xl shadow-blue-500/10">
         <div class="absolute -right-10 -bottom-10 opacity-10 text-white text-9xl font-black pointer-events-none">
@@ -193,7 +190,6 @@
       </div>
     </section>
 
-    <!-- STREAMING_CHUNK:Rendering check room calendar and cards view... -->
     <section id="viewCheckRoom" class="space-y-6 sm:space-y-8 hidden">
       <div class="bg-sky-50 border border-sky-200 text-sky-800 p-4 rounded-2xl text-xs font-medium flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
         <div class="flex items-start sm:items-center">
@@ -249,7 +245,6 @@
       </div>
     </section>
 
-    <!-- STREAMING_CHUNK:Rendering admin view and authentication... -->
     <section id="viewAdmin" class="space-y-6 hidden">
       <div id="adminLoginContainer" class="flex items-center justify-center py-6 sm:py-12">
         <div class="bg-white rounded-3xl max-w-md w-full shadow-lg border border-slate-200 p-6 sm:p-8 relative transition-all duration-300">
@@ -488,34 +483,21 @@
     </div>
   </div>
 
-  <!-- STREAMING_CHUNK:Rendering exact double input popup matching reference image... -->
   <!-- MODAL: EXACT FOOLPROOF DOUBLE INPUT / SCHEDULE CONFLICT MATCHING REFERENCE DESIGN -->
-  <div id="doubleInputWarningModal" class="fixed inset-0 z-[9999] bg-slate-950/80 modal-blur flex items-center justify-center p-4 hidden">
+  <div id="doubleInputWarningModal" class="fixed inset-0 z-[999999] bg-slate-950/85 modal-blur flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-[32px] max-w-md w-full p-8 shadow-2xl text-center space-y-6 transform transition-all scale-100 border border-slate-100 relative">
       <div class="w-16 h-16 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mx-auto text-2xl shadow-sm border border-rose-100">
         <i class="fa-solid fa-clock-rotate-left"></i>
       </div>
       <div class="space-y-2">
-        <h3 class="text-xl font-black text-slate-900 tracking-tight">Waktu Peminjaman Telah Lewat!</h3>
+        <h3 id="doubleInputModalTitle" class="text-xl font-black text-slate-900 tracking-tight">Peringatan Bentrok Jadwal Ruangan!</h3>
         <p id="doubleInputModalText" class="text-xs text-slate-500 leading-relaxed max-w-xs mx-auto">
-          Gagal menyimpan! Waktu pelaksanaan yang Anda pilih (2026-08-20 pukul 17:00) sudah lewat dari waktu saat ini.
+          Gagal menyimpan! Waktu pelaksanaan yang Anda pilih sudah terisi atau bentrok dengan agenda peminjaman lain.
         </p>
       </div>
       <button type="button" onclick="closeDoubleInputModal()" class="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-2xl text-xs transition cursor-pointer shadow-lg tracking-wide">
-        Saya Mengerti
+        Saya Mengerti & Pilih Jadwal Lain
       </button>
-    </div>
-  </div>
-
-  <!-- MODAL: PAST TIME WARNING -->
-  <div id="pastTimeWarningModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl text-center space-y-4">
-      <div class="w-16 h-16 bg-rose-50 text-rose-600 rounded-3xl flex items-center justify-center mx-auto text-3xl shadow-sm border border-rose-100"><i class="fa-solid fa-clock-rotate-left"></i></div>
-      <div class="space-y-1">
-        <h3 class="text-lg font-black text-slate-900 tracking-tight">Waktu Peminjaman Telah Lewat!</h3>
-        <p id="pastTimeModalText" class="text-xs text-slate-500 leading-relaxed"></p>
-      </div>
-      <button onclick="closePastTimeModal()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition cursor-pointer shadow-md">Saya Mengerti</button>
     </div>
   </div>
 
@@ -651,9 +633,8 @@
   </div>
 
   <script>
-    // STREAMING_CHUNK:Initializing API service...
     const apiService = {
-      appsScriptUrl: 'https://script.google.com/macros/s/AKfycbxVY3olkned09IuWKbDAVKXfgpT8_JPaFIMPX3F7kV7iTXbS5Y23NQ0HjUB8RHYfDD0QQ/exec',
+      appsScriptUrl: 'https://script.google.com/macros/s/AKfycbziSoh80TFa6OgDUOSPCj_tN00GmnAfy1DrU_fVHwS1C9xcUliKvepIgFPm6wvdcbMWCQ/exec',
 
       sendRequest: async function(action, payload = {}) {
         if (this.appsScriptUrl.includes('AKfycbz...')) {
@@ -697,7 +678,6 @@
       }
     };
 
-    // STREAMING_CHUNK:Initializing application state...
     const appState = {
       isAdminLoggedIn: false,
       currentAdmin: null,
@@ -748,6 +728,49 @@
       checkH1Reminders();
       switchView('dashboard');
     };
+
+    function checkBookingAvailability() {
+      const ruanganSelect = document.getElementById('inputRuangan');
+      const tanggalInput = document.getElementById('inputTanggal');
+      const jamMulaiInput = document.getElementById('inputJamMulai');
+      const jamSelesaiInput = document.getElementById('inputJamSelesai');
+      const conflictBanner = document.getElementById('bookingConflictBanner');
+      const conflictText = document.getElementById('bookingConflictText');
+
+      if (!ruanganSelect || !tanggalInput || !jamMulaiInput || !jamSelesaiInput) return;
+
+      const ruangan = ruanganSelect.value;
+      const tanggal = tanggalInput.value;
+      const jamMulai = jamMulaiInput.value;
+      const jamSelesai = jamSelesaiInput.value;
+
+      if (!ruangan || !tanggal || !jamMulai || !jamSelesai) {
+        if (conflictBanner) conflictBanner.classList.add('hidden');
+        return;
+      }
+
+      const conflict = checkBookingConflictWithTime(ruangan, tanggal, jamMulai, jamSelesai, null);
+      if (conflict) {
+        if (conflictBanner && conflictText) {
+          conflictText.innerHTML = `Perhatian: Ruangan <b>${ruangan}</b> pada tanggal <b>${tanggal}</b> pukul <b>${jamMulai} - ${jamSelesai} WIB</b> bersinggungan dengan agenda <b>"${conflict.kegiatan}"</b> oleh <b>${conflict.pemohon}</b> [Status: ${conflict.status}].`;
+          conflictBanner.classList.remove('hidden');
+        }
+      } else {
+        if (conflictBanner) conflictBanner.classList.add('hidden');
+      }
+    }
+
+    function triggerDoubleBookingWarning(roomName, dateStr, jamStr, conflictItem) {
+      document.getElementById('doubleInputModalTitle').innerText = "Peringatan: Jadwal Bentrok!";
+      document.getElementById('doubleInputModalText').innerHTML = `Gagal menyimpan! Ruangan <b>${roomName}</b> pada tanggal <b>${dateStr}</b> pukul <b>${jamStr} WIB</b> sudah diajukan/disetujui untuk kegiatan <b>"${conflictItem.kegiatan}"</b> (${conflictItem.pemohon} - ${conflictItem.unit}). Silakan pilih jam atau tanggal lain.`;
+      
+      const warningModal = document.getElementById('doubleInputWarningModal');
+      if (warningModal) {
+        warningModal.classList.remove('hidden');
+        warningModal.style.display = 'flex';
+        warningModal.style.zIndex = '999999';
+      }
+    }
 
     function checkH1Reminders() {
       const today = new Date();
@@ -1346,7 +1369,7 @@
       const room = appState.rooms.find(r => r.id === roomId);
       if (room) {
         room.statusText = room.statusText === 'Tersedia' ? 'Sedang Perbaikan' : 'Tersedia';
-        room.badgeClass = room.statusText === 'Tersedia' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200';
+        room.badgeClass = room.statusText === 'Tersedia' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-emerald-200';
         room.icon = room.statusText === 'Tersedia' ? 'fa-circle-check' : 'fa-triangle-exclamation';
         renderAdminRoomList();
         renderRoomCards();
@@ -1539,8 +1562,11 @@
       const now = new Date();
       const bookingEndDateTime = new Date(`${tanggal}T${jamSelesai}:00`);
       if (bookingEndDateTime < now) {
-        document.getElementById('doubleInputModalText').innerHTML = `Gagal menyimpan! Waktu pelaksanaan yang Anda pilih (<b>${tanggal} pukul ${jamSelesai}</b>) sudah lewat dari waktu saat ini.`;
-        document.getElementById('doubleInputWarningModal').classList.remove('hidden');
+        triggerDoubleBookingWarning(ruangan, tanggal, `${jamMulai} - ${jamSelesai}`, {
+          kegiatan: "Waktu Telah Lewat",
+          pemohon: pemohon,
+          unit: unit
+        });
         return;
       }
 
@@ -1549,9 +1575,7 @@
 
       const conflict = checkBookingConflictWithTime(ruangan, tanggal, jamMulai, jamSelesai, null);
       if (conflict) {
-        const warningMsg = `Gagal menyimpan! Ruangan <b>${ruangan}</b> pada tanggal <b>${tanggal}</b> pukul <b>${jam}</b> bersinggungan / sudah di-booking oleh <b>${conflict.pemohon} (${conflict.unit})</b> untuk kegiatan <b>"${conflict.kegiatan}"</b> dengan status <b>[${conflict.status}]</b>. Silakan pilih jadwal atau ruangan lain.`;
-        document.getElementById('doubleInputModalText').innerHTML = warningMsg;
-        document.getElementById('doubleInputWarningModal').classList.remove('hidden');
+        triggerDoubleBookingWarning(ruangan, tanggal, `${jamMulai} - ${jamSelesai}`, conflict);
         return;
       }
 
@@ -1593,8 +1617,11 @@
             fileMimeType: file.type
           });
           if (result && result.status === 'conflict') {
-            document.getElementById('doubleInputModalText').innerHTML = result.message || `Jadwal bentrok pada ruangan dan waktu tersebut!`;
-            document.getElementById('doubleInputWarningModal').classList.remove('hidden');
+            triggerDoubleBookingWarning(ruangan, tanggal, `${jamMulai} - ${jamSelesai}`, {
+              kegiatan: "Agenda Lain (Server Conflict)",
+              pemohon: "Konflik Database",
+              unit: "-"
+            });
             return;
           }
           if (result && result.berkasUrl) {
@@ -1606,8 +1633,11 @@
       } else {
         const result = await sendDataToDatabase('addBooking', newBooking);
         if (result && result.status === 'conflict') {
-          document.getElementById('doubleInputModalText').innerHTML = result.message || `Jadwal bentrok pada ruangan dan waktu tersebut!`;
-          document.getElementById('doubleInputWarningModal').classList.remove('hidden');
+          triggerDoubleBookingWarning(ruangan, tanggal, `${jamMulai} - ${jamSelesai}`, {
+            kegiatan: "Agenda Lain (Server Conflict)",
+            pemohon: "Konflik Database",
+            unit: "-"
+          });
           return;
         }
       }
@@ -1617,33 +1647,9 @@
 
     function closeDoubleInputModal() {
       const modal = document.getElementById('doubleInputWarningModal');
-      if (modal) modal.classList.add('hidden');
-    }
-
-    function closePastTimeModal() { 
-      const modal = document.getElementById('pastTimeWarningModal');
-      if (modal) modal.classList.add('hidden'); 
-    }
-
-    function checkBookingAvailability() {
-      const tanggal = document.getElementById('inputTanggal').value;
-      const ruangan = document.getElementById('inputRuangan').value;
-      const jamMulai = document.getElementById('inputJamMulai').value || '08:00';
-      const jamSelesai = document.getElementById('inputJamSelesai').value || '17:00';
-      const conflictBanner = document.getElementById('bookingConflictBanner');
-      const conflictText = document.getElementById('bookingConflictText');
-
-      if (!tanggal || !ruangan) return;
-
-      const conflicting = checkBookingConflictWithTime(ruangan, tanggal, jamMulai, jamSelesai);
-
-      if (conflicting) {
-        if (conflictBanner && conflictText) {
-          conflictText.innerText = `Peringatan: Ruangan "${ruangan}" sudah di-booking pada jam yang bersinggungan dengan kegiatan "${conflicting.kegiatan}" (${conflicting.jam}) pada tanggal tersebut.`;
-          conflictBanner.classList.remove('hidden');
-        }
-      } else {
-        if (conflictBanner) conflictBanner.classList.add('hidden');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
       }
     }
 
@@ -1701,6 +1707,7 @@
           const eTime = parts[1] ? parts[1].replace('WIB', '').trim() : '17:00';
           const conflict = checkBookingConflictWithTime(item.ruangan, item.tanggal, sTime, eTime, item.id);
           if (conflict) {
+            document.getElementById('doubleInputModalTitle').innerText = "Peringatan: Jadwal Bentrok!";
             document.getElementById('doubleInputModalText').innerHTML = `Tidak dapat menyetujui peminjaman <b>${item.id}</b> (${item.kegiatan}). Ruangan <b>${item.ruangan}</b> pada tanggal <b>${item.tanggal}</b> jam <b>${item.jam}</b> bersinggungan dengan agenda <b>"${conflict.kegiatan}"</b> (${conflict.id}).`;
             document.getElementById('doubleInputWarningModal').classList.remove('hidden');
             return;
@@ -1890,6 +1897,3 @@
   </script>
 </body>
 </html>
-```eof
-
-I have successfully updated the application with the exact design and styling of the popup modal as requested in your reference screenshot.
