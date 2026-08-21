@@ -101,7 +101,7 @@
         </div>
 
         <div class="hidden md:flex flex-col text-right border-r border-slate-200 pr-4">
-          <span id="liveClock" class="text-xs font-mono font-bold text-slate-800">10:41:50 WIB</span>
+          <span id="liveClock" class="text-xs font-mono font-bold text-slate-800">11:42:09 WIB</span>
           <span id="liveDate" class="text-[10px] text-slate-400 font-medium">Jumat, 21 Agustus 2026</span>
         </div>
 
@@ -763,6 +763,94 @@
 
     let chartInstances = {};
 
+    function renderRoomCards() {
+      const container = document.getElementById('roomCardsGrid');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const filterSelect = document.getElementById('filterUnitSelect');
+      const selectedUnit = filterSelect ? filterSelect.value : 'Semua';
+
+      let filteredRooms = appState.rooms;
+      if (selectedUnit && selectedUnit !== 'Semua') {
+        filteredRooms = appState.rooms.filter(r => (r.unit || 'Umum').toLowerCase() === selectedUnit.toLowerCase());
+      }
+
+      if (filteredRooms.length === 0) {
+        container.innerHTML = `<div class="col-span-2 py-12 text-center text-slate-400 font-medium bg-white rounded-3xl border border-slate-200">Tidak ada ruangan untuk unit / dinas "${selectedUnit}".</div>`;
+        return;
+      }
+
+      filteredRooms.forEach((room) => {
+        const featuresHtml = (room.features || []).map(f => `<span class="inline-flex items-center text-[10px] sm:text-[11px] text-slate-600 font-medium mr-1.5 mb-1 bg-slate-100 px-2 py-0.5 rounded-md"><i class="fa-solid fa-check text-emerald-600 mr-1 text-xs"></i> ${f}</span>`).join('');
+        
+        const isUnderMaintenance = room.statusText === 'Sedang Perbaikan' || room.statusText === 'Tidak Tersedia';
+        const btnDisabledAttr = isUnderMaintenance ? 'disabled' : '';
+        const btnClass = isUnderMaintenance 
+          ? 'bg-slate-200 text-slate-400 cursor-not-allowed px-4 py-2.5 rounded-2xl text-xs font-bold' 
+          : 'bg-transparent text-blue-600 hover:underline font-bold text-xs transition cursor-pointer';
+
+        const photo = (room.images && room.images[0]) ? room.images[0] : 'https://placehold.co/800x400/e2e8f0/64748b?text=Ruangan';
+
+        container.innerHTML += `
+          <div class="bg-white rounded-3xl border border-slate-200 shadow-xs hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 overflow-hidden flex flex-col justify-between">
+            <div>
+              <div class="relative h-48 sm:h-56 w-full overflow-hidden bg-slate-100">
+                <img src="${photo}" alt="${room.name}" class="w-full h-full object-cover transform hover:scale-105 transition duration-500" onerror="this.src='https://placehold.co/800x400/e2e8f0/64748b?text=Ruangan'">
+                <span class="absolute top-3 right-3 sm:top-4 sm:right-4 bg-white/90 backdrop-blur-md text-slate-800 text-[11px] sm:text-xs font-semibold px-3.5 py-1.5 rounded-full shadow-sm flex items-center"><i class="fa-solid fa-users text-blue-600 mr-1.5"></i> ${room.capacity}</span>
+                <span class="absolute top-3 left-3 sm:top-4 sm:left-4 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">${room.unit || 'Umum'}</span>
+              </div>
+              <div class="p-4 sm:p-6 space-y-2.5">
+                <h4 class="text-base sm:text-lg font-bold text-slate-900">${room.name}</h4>
+                <p class="text-[11px] sm:text-xs text-slate-500 leading-relaxed">${room.description}</p>
+                <div class="flex flex-wrap pt-1">${featuresHtml}</div>
+              </div>
+            </div>
+            <div class="p-4 sm:p-6 pt-0 flex items-center justify-between border-t border-slate-100 mt-2 pt-3 sm:pt-4">
+              <span class="inline-flex items-center px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-bold border ${room.badgeClass}"><i class="fa-solid ${room.icon} mr-1.5"></i> ${room.statusText}</span>
+              <button ${btnDisabledAttr} onclick="openBookingModalForRoom('${room.name}')" class="${btnClass}">Pinjam Ruangan</button>
+            </div>
+          </div>`;
+      });
+    }
+
+    function renderBookingTable(filteredList = null) {
+      const list = filteredList || appState.bookings;
+      const tbody = document.getElementById('bookingTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 font-medium">Tidak ada data peminjaman.</td></tr>`;
+        return;
+      }
+      list.forEach(item => {
+        let statusBadge = item.status === 'Disetujui' ? `<span class="bg-emerald-50 text-emerald-700 border px-3 py-1 rounded-full text-xs font-bold">Disetujui</span>` : item.status === 'Menunggu' ? `<span class="bg-amber-50 text-amber-700 border px-3 py-1 rounded-full text-xs font-bold">Menunggu</span>` : `<span class="bg-rose-50 text-rose-700 border px-3 py-1 rounded-full text-xs font-bold">${item.status}</span>`;
+        
+        let displayDate = item.tanggal;
+        if (displayDate && displayDate.includes('T')) {
+          displayDate = displayDate.split('T')[0];
+        }
+        const formattedDate = formatIndonesianDate(displayDate);
+
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50/80 transition">
+            <td class="p-3 sm:p-4 pl-5 sm:pl-6"><span class="font-bold text-blue-600">${item.id}</span><div class="text-[11px] text-slate-400">${item.pemohon}</div></td>
+            <td class="p-3 sm:p-4 font-bold text-slate-800">${item.kegiatan}</td>
+            <td class="p-3 sm:p-4 text-slate-600 font-medium">${item.ruangan}</td>
+            <td class="p-3 sm:p-4"><div class="font-medium text-slate-700">${formattedDate}</div><div class="text-[11px] text-slate-400">${item.jam}</div></td>
+            <td class="p-3 sm:p-4 pr-5 sm:pr-6">${statusBadge}</td>
+          </tr>`;
+      });
+    }
+
+    function updateDashboardCounts() {
+      const disetujuiCount = appState.bookings.filter(b => b.status === 'Disetujui').length;
+      const menungguCount = appState.bookings.filter(b => b.status === 'Menunggu').length;
+      if (document.getElementById('kpiTotalRuangan')) document.getElementById('kpiTotalRuangan').innerText = appState.rooms.length;
+      if (document.getElementById('kpiDisetujuiCount')) document.getElementById('kpiDisetujuiCount').innerText = disetujuiCount;
+      if (document.getElementById('kpiMenungguCount')) document.getElementById('kpiMenungguCount').innerText = menungguCount;
+    }
+
     window.onload = async function() {
       initClock();
       populateRoomOptions();
@@ -1152,7 +1240,11 @@
             nextMonthCounter++;
           }
 
-          const bookingsOnThisDay = appState.bookings.filter(b => b.tanggal === dateStr && b.status === 'Disetujui');
+          const bookingsOnThisDay = appState.bookings.filter(b => {
+            let bDate = b.tanggal || '';
+            if (bDate.includes('T')) bDate = bDate.split('T')[0];
+            return bDate === dateStr && b.status === 'Disetujui';
+          });
           const hasBookings = bookingsOnThisDay.length > 0;
           let cellBgClass = 'bg-white', textColor = isCurrentMonth ? 'text-slate-800' : 'text-slate-300', dblClickAttr = '';
 
@@ -1165,7 +1257,7 @@
             dblClickAttr = `onclick="showEmptyAgendaModal('${dateStr}')" ondblclick="showEmptyAgendaModal('${dateStr}')"`;
           }
 
-          rowHtml += `<td ${dblClickAttr} class="align-top border-r border-slate-200 p-1.5 sm:p-2 relative ${cellBgClass} transition cursor-pointer"><span class="${textColor} text-xs">${dayNum}</span></td>`;
+          rowHtml += `<td ${dblClickAttr} class="align-top border-r border-slate-200 p-1.5 sm:p-2 relative ${cellBgClass} transition cursor-pointer"><span class="${textColor} text-xs">${dayNum}</span>${hasBookings ? '<span class="absolute bottom-1.5 right-1.5 w-2 h-2 bg-rose-600 rounded-full live-pulse"></span>' : ''}</td>`;
         }
         rowHtml += '</tr>';
         if (dateCounter > totalDays && i >= 4) break;
@@ -1204,65 +1296,6 @@
       renderCalendar();
     }
 
-    function updateDashboardCounts() {
-      const disetujuiCount = appState.bookings.filter(b => b.status === 'Disetujui').length;
-      const menungguCount = appState.bookings.filter(b => b.status === 'Menunggu').length;
-      if (document.getElementById('kpiTotalRuangan')) document.getElementById('kpiTotalRuangan').innerText = appState.rooms.length;
-      if (document.getElementById('kpiDisetujuiCount')) document.getElementById('kpiDisetujuiCount').innerText = disetujuiCount;
-      if (document.getElementById('kpiMenungguCount')) document.getElementById('kpiMenungguCount').innerText = menungguCount;
-    }
-
-    function renderRoomCards() {
-      const container = document.getElementById('roomCardsGrid');
-      if (!container) return;
-      container.innerHTML = '';
-
-      const filterSelect = document.getElementById('filterUnitSelect');
-      const selectedUnit = filterSelect ? filterSelect.value : 'Semua';
-
-      let filteredRooms = appState.rooms;
-      if (selectedUnit && selectedUnit !== 'Semua') {
-        filteredRooms = appState.rooms.filter(r => (r.unit || 'Umum').toLowerCase() === selectedUnit.toLowerCase());
-      }
-
-      if (filteredRooms.length === 0) {
-        container.innerHTML = `<div class="col-span-2 py-12 text-center text-slate-400 font-medium bg-white rounded-3xl border border-slate-200">Tidak ada ruangan untuk unit / dinas "${selectedUnit}".</div>`;
-        return;
-      }
-
-      filteredRooms.forEach((room) => {
-        const featuresHtml = (room.features || []).map(f => `<span class="inline-flex items-center text-[10px] sm:text-[11px] text-slate-600 font-medium mr-1.5 mb-1 bg-slate-100 px-2 py-0.5 rounded-md"><i class="fa-solid fa-check text-emerald-600 mr-1 text-xs"></i> ${f}</span>`).join('');
-        
-        const isUnderMaintenance = room.statusText === 'Sedang Perbaikan' || room.statusText === 'Tidak Tersedia';
-        const btnDisabledAttr = isUnderMaintenance ? 'disabled' : '';
-        const btnClass = isUnderMaintenance 
-          ? 'bg-slate-200 text-slate-400 cursor-not-allowed px-4 py-2.5 rounded-2xl text-xs font-bold' 
-          : 'bg-transparent text-blue-600 hover:underline font-bold text-xs transition cursor-pointer';
-
-        const photo = (room.images && room.images[0]) ? room.images[0] : 'https://placehold.co/800x400/e2e8f0/64748b?text=Ruangan';
-
-        container.innerHTML += `
-          <div class="bg-white rounded-3xl border border-slate-200 shadow-xs hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 overflow-hidden flex flex-col justify-between">
-            <div>
-              <div class="relative h-48 sm:h-56 w-full overflow-hidden bg-slate-100">
-                <img src="${photo}" alt="${room.name}" class="w-full h-full object-cover transform hover:scale-105 transition duration-500" onerror="this.src='https://placehold.co/800x400/e2e8f0/64748b?text=Ruangan'">
-                <span class="absolute top-3 right-3 sm:top-4 sm:right-4 bg-white/90 backdrop-blur-md text-slate-800 text-[11px] sm:text-xs font-semibold px-3.5 py-1.5 rounded-full shadow-sm flex items-center"><i class="fa-solid fa-users text-blue-600 mr-1.5"></i> ${room.capacity}</span>
-                <span class="absolute top-3 left-3 sm:top-4 sm:left-4 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">${room.unit || 'Umum'}</span>
-              </div>
-              <div class="p-4 sm:p-6 space-y-2.5">
-                <h4 class="text-base sm:text-lg font-bold text-slate-900">${room.name}</h4>
-                <p class="text-[11px] sm:text-xs text-slate-500 leading-relaxed">${room.description}</p>
-                <div class="flex flex-wrap pt-1">${featuresHtml}</div>
-              </div>
-            </div>
-            <div class="p-4 sm:p-6 pt-0 flex items-center justify-between border-t border-slate-100 mt-2 pt-3 sm:pt-4">
-              <span class="inline-flex items-center px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-bold border ${room.badgeClass}"><i class="fa-solid ${room.icon} mr-1.5"></i> ${room.statusText}</span>
-              <button ${btnDisabledAttr} onclick="openBookingModalForRoom('${room.name}')" class="${btnClass}">Pinjam Ruangan</button>
-            </div>
-          </div>`;
-      });
-    }
-
     function openBookingModalForRoom(roomName) {
       const room = appState.rooms.find(r => r.name === roomName);
       if (room && (room.statusText === 'Sedang Perbaikan' || room.statusText === 'Tidak Tersedia')) {
@@ -1290,33 +1323,6 @@
       document.getElementById('bookingForm').reset();
       const conflictBanner = document.getElementById('bookingConflictBanner');
       if (conflictBanner) conflictBanner.classList.add('hidden');
-    }
-
-    function renderBookingTable(filteredList = null) {
-      const list = filteredList || appState.bookings;
-      const tbody = document.getElementById('bookingTableBody');
-      if (!tbody) return;
-      tbody.innerHTML = '';
-      if (list.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 font-medium">Tidak ada data peminjaman.</td></tr>`;
-        return;
-      }
-      list.forEach(item => {
-        let statusBadge = item.status === 'Disetujui' ? `<span class="bg-emerald-50 text-emerald-700 border px-3 py-1 rounded-full text-xs font-bold">Disetujui</span>` : item.status === 'Menunggu' ? `<span class="bg-amber-50 text-amber-700 border px-3 py-1 rounded-full text-xs font-bold">Menunggu</span>` : `<span class="bg-rose-50 text-rose-700 border px-3 py-1 rounded-full text-xs font-bold">${item.status}</span>`;
-        tbody.innerHTML += `
-          <tr class="hover:bg-slate-50/80 transition">
-            <td class="p-3 sm:p-4 pl-5 sm:pl-6"><span class="font-bold text-blue-600">${item.id}</span><div class="text-[11px] text-slate-400">${item.pemohon}</div></td>
-            <td class="p-3 sm:p-4 font-bold text-slate-800">${item.kegiatan}</td>
-            <td class="p-3 sm:p-4 text-slate-600 font-medium">${item.ruangan}</td>
-            <td class="p-3 sm:p-4"><div class="font-medium text-slate-700">${item.tanggal}</div><div class="text-[11px] text-slate-400">${item.jam}</div></td>
-            <td class="p-3 sm:p-4 pr-5 sm:pr-6">${statusBadge}</td>
-          </tr>`;
-      });
-    }
-
-    function filterBookingTable() {
-      const query = document.getElementById('searchTableInput').value.toLowerCase();
-      renderBookingTable(appState.bookings.filter(b => b.pemohon.toLowerCase().includes(query) || b.kegiatan.toLowerCase().includes(query) || b.ruangan.toLowerCase().includes(query)));
     }
 
     function renderAdminRoomList() {
@@ -1411,6 +1417,12 @@
 
         const pdfUrl = (item.berkasUrl && item.berkasUrl !== '#') ? item.berkasUrl : '#';
         const pdfBtnDisabled = pdfUrl === '#' ? 'opacity-40 cursor-not-allowed pointer-events-none' : 'hover:bg-blue-100 cursor-pointer';
+        
+        let displayDateAdmin = item.tanggal;
+        if (displayDateAdmin && displayDateAdmin.includes('T')) {
+          displayDateAdmin = displayDateAdmin.split('T')[0];
+        }
+        const formattedDate = formatIndonesianDate(displayDateAdmin);
 
         tbody.innerHTML += `
           <tr class="hover:bg-slate-50 transition">
@@ -1422,15 +1434,15 @@
             <td class="p-4 font-bold text-slate-800">${item.kegiatan}</td>
             <td class="p-4 text-slate-700">${item.ruangan}</td>
             <td class="p-4">
-              <div class="font-semibold text-slate-800">${item.tanggal}</div>
+              <div class="font-semibold text-slate-800">${formattedDate}</div>
               <div class="text-[10px] text-slate-400">${item.jam}</div>
             </td>
             <td class="p-4">${statusTag}</td>
             <td class="p-4 pr-5 text-center">
               <div class="inline-flex items-center space-x-1.5">
-                <a href="${pdfUrl}" target="_blank" title="Lihat Berkas PDF" class="px-2.5 py-1.5 bg-blue-50 ${pdfBtnDisabled} text-blue-700 font-bold rounded-xl text-[11px] transition inline-flex items-center border border-blue-200">
+                <button onclick="openPdfModal('${pdfUrl}', '${item.id}')" title="Lihat Berkas PDF" class="px-2.5 py-1.5 bg-blue-50 ${pdfBtnDisabled} text-blue-700 font-bold rounded-xl text-[11px] transition inline-flex items-center border border-blue-200 cursor-pointer">
                   <i class="fa-solid fa-file-pdf mr-1 text-xs text-rose-500"></i> PDF
-                </a>
+                </button>
                 <button onclick="updateBookingStatusInCloud('${item.id}', 'Disetujui')" class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-xl text-[11px] transition cursor-pointer border border-emerald-200">Setujui</button>
                 <button onclick="updateBookingStatusInCloud('${item.id}', 'Ditolak')" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-[11px] transition cursor-pointer border border-rose-200">Tolak</button>
               </div>
@@ -1438,6 +1450,41 @@
           </tr>
         `;
       });
+    }
+
+    function openPdfModal(url, bookingId) {
+      if (!url || url === '#') {
+        showToast('Berkas PDF tidak tersedia untuk peminjaman ini.', 'warning');
+        return;
+      }
+      let modal = document.getElementById('pdfViewerModal');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'pdfViewerModal';
+        modal.className = 'fixed inset-0 z-50 bg-slate-950/70 modal-blur flex items-center justify-center p-3 sm:p-4 animate-fade-in';
+        modal.innerHTML = `
+          <div class="bg-white rounded-3xl max-w-3xl w-full p-5 sm:p-6 shadow-2xl relative space-y-4 my-auto h-[80vh] flex flex-col">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 id="pdfModalTitle" class="text-sm sm:text-base font-black text-slate-900">Pratinjau Berkas PDF</h3>
+              <button onclick="closePdfModal()" class="text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="flex-grow bg-slate-100 rounded-2xl overflow-hidden relative">
+              <iframe id="pdfIframe" src="" class="w-full h-full border-0"></iframe>
+            </div>
+          </div>`;
+        document.body.appendChild(modal);
+      }
+      document.getElementById('pdfModalTitle').innerText = `Pratinjau Berkas PDF (${bookingId})`;
+      document.getElementById('pdfIframe').src = url;
+      modal.classList.remove('hidden');
+    }
+
+    function closePdfModal() {
+      const modal = document.getElementById('pdfViewerModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        document.getElementById('pdfIframe').src = '';
+      }
     }
 
     function openSuperAdminModal() { document.getElementById('superAdminModal').classList.remove('hidden'); renderAdminAccountsList(); }
@@ -1705,7 +1752,6 @@
       const catatan = document.getElementById('inputCatatan').value.trim();
       const berkasInput = document.getElementById('inputBerkas');
 
-      // 1. VALIDASI WAKTU LAMPAU (PAST TIME CHECK)
       const now = new Date();
       const todayStr = now.toISOString().split('T')[0];
       if (tanggal === todayStr) {
@@ -1720,14 +1766,12 @@
         return;
       }
 
-      // 2. VALIDASI BENTROK JADWAL
       const conflict = checkBookingConflictWithTime(ruangan, tanggal, jamMulai, jamSelesai, null);
       if (conflict) {
         triggerDoubleBookingWarning(ruangan, tanggal, `${jamMulai} - ${jamSelesai}`, conflict);
         return; 
       }
 
-      // 3. VALIDASI KAPASITAS
       const currentRoom = appState.rooms.find(r => r.name === ruangan);
       if (currentRoom) {
         const maxCapNum = parseInt(currentRoom.capacity) || 100;
@@ -2076,7 +2120,11 @@
     function formatIndonesianDate(dateStr) {
       if (!dateStr) return '-';
       try {
-        const parts = dateStr.split('-');
+        let cleanDate = String(dateStr).trim();
+        if (cleanDate.includes('T')) {
+          cleanDate = cleanDate.split('T')[0];
+        }
+        const parts = cleanDate.split('-');
         if (parts.length === 3) {
           const year = parts[0];
           const monthNum = parseInt(parts[1], 10) - 1;
@@ -2085,117 +2133,6 @@
         }
       } catch(e) {}
       return dateStr;
-    }
-
-    function renderAdminPendingTable() {
-      const tbody = document.getElementById('adminPendingTableBody');
-      if (!tbody) return;
-      tbody.innerHTML = '';
-
-      if (appState.bookings.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400 font-medium">Tidak ada pengajuan masuk.</td></tr>`;
-        return;
-      }
-
-      let visibleBookings = appState.bookings;
-      if (appState.currentAdmin && !appState.currentAdmin.isSuper) {
-        const adminUnitLower = (appState.currentAdmin.unit || '').trim().toLowerCase();
-        visibleBookings = appState.bookings.filter(b => {
-          const bookingUnitLower = (b.unit || '').trim().toLowerCase();
-          const targetRoom = appState.rooms.find(r => r.name === b.ruangan);
-          const roomUnitLower = targetRoom ? (targetRoom.unit || '').trim().toLowerCase() : '';
-          return bookingUnitLower === adminUnitLower || roomUnitLower === adminUnitLower || adminUnitLower.includes(bookingUnitLower);
-        });
-      }
-
-      const searchInput = document.getElementById('adminSearchPendingInput');
-      const searchQuery = searchInput ? searchInput.value.trim().toLowerCase() : '';
-      if (searchQuery !== '') {
-        visibleBookings = visibleBookings.filter(b => {
-          const p = (b.pemohon || '').toLowerCase();
-          const k = (b.kegiatan || '').toLowerCase();
-          const r = (b.ruangan || '').toLowerCase();
-          const id = (b.id || '').toLowerCase();
-          return p.includes(searchQuery) || k.includes(searchQuery) || r.includes(searchQuery) || id.includes(searchQuery);
-        });
-      }
-
-      if (visibleBookings.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 text-xs">Tidak ada permintaan peminjaman ditemukan.</td></tr>`;
-        return;
-      }
-
-      visibleBookings.forEach(item => {
-        let statusTag = `<span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full text-[10px] font-bold inline-flex items-center"><i class="fa-solid fa-hourglass mr-1"></i> Menunggu</span>`;
-        if (item.status === 'Disetujui') statusTag = `<span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full text-[10px] font-bold inline-flex items-center"><i class="fa-solid fa-check mr-1"></i> Disetujui</span>`;
-        if (item.status === 'Dibatalkan') statusTag = `<span class="bg-rose-100 text-rose-800 px-2.5 py-1 rounded-full text-[10px] font-bold inline-flex items-center"><i class="fa-solid fa-ban mr-1"></i> Dibatalkan</span>`;
-        if (item.status === 'Ditolak') statusTag = `<span class="bg-rose-100 text-rose-800 px-2.5 py-1 rounded-full text-[10px] font-bold inline-flex items-center"><i class="fa-solid fa-xmark mr-1"></i> Ditolak</span>`;
-
-        const pdfUrl = (item.berkasUrl && item.berkasUrl !== '#') ? item.berkasUrl : '#';
-        const pdfBtnDisabled = pdfUrl === '#' ? 'opacity-40 cursor-not-allowed pointer-events-none' : 'hover:bg-blue-100 cursor-pointer';
-        const formattedDate = formatIndonesianDate(item.tanggal);
-
-        tbody.innerHTML += `
-          <tr class="hover:bg-slate-50 transition">
-            <td class="p-4 pl-5">
-              <span class="font-bold text-blue-600">${item.id}</span>
-              <div class="text-[11px] text-slate-600 font-medium">${item.pemohon}</div>
-              <div class="text-[10px] text-slate-400">${item.unit}</div>
-            </td>
-            <td class="p-4 font-bold text-slate-800">${item.kegiatan}</td>
-            <td class="p-4 text-slate-700">${item.ruangan}</td>
-            <td class="p-4">
-              <div class="font-semibold text-slate-800">${formattedDate}</div>
-              <div class="text-[10px] text-slate-400">${item.jam}</div>
-            </td>
-            <td class="p-4">${statusTag}</td>
-            <td class="p-4 pr-5 text-center">
-              <div class="inline-flex items-center space-x-1.5">
-                <button onclick="openPdfModal('${pdfUrl}', '${item.id}')" title="Lihat Berkas PDF" class="px-2.5 py-1.5 bg-blue-50 ${pdfBtnDisabled} text-blue-700 font-bold rounded-xl text-[11px] transition inline-flex items-center border border-blue-200 cursor-pointer">
-                  <i class="fa-solid fa-file-pdf mr-1 text-xs text-rose-500"></i> PDF
-                </button>
-                <button onclick="updateBookingStatusInCloud('${item.id}', 'Disetujui')" class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-xl text-[11px] transition cursor-pointer border border-emerald-200">Setujui</button>
-                <button onclick="updateBookingStatusInCloud('${item.id}', 'Ditolak')" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-[11px] transition cursor-pointer border border-rose-200">Tolak</button>
-              </div>
-            </td>
-          </tr>
-        `;
-      });
-    }
-
-    function openPdfModal(url, bookingId) {
-      if (!url || url === '#') {
-        showToast('Berkas PDF tidak tersedia untuk peminjaman ini.', 'warning');
-        return;
-      }
-      let modal = document.getElementById('pdfViewerModal');
-      if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'pdfViewerModal';
-        modal.className = 'fixed inset-0 z-50 bg-slate-950/70 modal-blur flex items-center justify-center p-3 sm:p-4 animate-fade-in';
-        modal.innerHTML = `
-          <div class="bg-white rounded-3xl max-w-3xl w-full p-5 sm:p-6 shadow-2xl relative space-y-4 my-auto h-[80vh] flex flex-col">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 id="pdfModalTitle" class="text-sm sm:text-base font-black text-slate-900">Pratinjau Berkas PDF</h3>
-              <button onclick="closePdfModal()" class="text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="flex-grow bg-slate-100 rounded-2xl overflow-hidden relative">
-              <iframe id="pdfIframe" src="" class="w-full h-full border-0"></iframe>
-            </div>
-          </div>`;
-        document.body.appendChild(modal);
-      }
-      document.getElementById('pdfModalTitle').innerText = `Pratinjau Berkas PDF (${bookingId})`;
-      document.getElementById('pdfIframe').src = url;
-      modal.classList.remove('hidden');
-    }
-
-    function closePdfModal() {
-      const modal = document.getElementById('pdfViewerModal');
-      if (modal) {
-        modal.classList.add('hidden');
-        document.getElementById('pdfIframe').src = '';
-      }
     }
   </script>
 </body>
