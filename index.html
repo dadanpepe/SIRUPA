@@ -14,11 +14,41 @@
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
     body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
     .modal-blur { backdrop-filter: blur(8px); }
+
     @keyframes pulseGlow {
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.6; transform: scale(0.98); }
     }
     .live-pulse { animation: pulseGlow 2s infinite ease-in-out; }
+
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+    .animate-float { animation: floatSlow 4s ease-in-out infinite; }
+
+    @keyframes shimmerBg {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .animate-shimmer {
+      background-size: 200% 200%;
+      animation: shimmerBg 8s ease infinite;
+    }
+
+    @keyframes fadeInScale {
+      0% { opacity: 0; transform: scale(0.96) translateY(12px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .animate-fade-in { animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+    @keyframes chartFadeIn {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .animate-chart { animation: chartFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
     html { scroll-behavior: smooth; }
     body { overflow-y: auto !important; }
   </style>
@@ -29,22 +59,22 @@
 
   <!-- Announcement Bar -->
   <div class="bg-slate-900 text-slate-200 text-xs py-2 px-4 overflow-hidden whitespace-nowrap border-b border-slate-800 flex items-center shadow-inner">
-    <div class="bg-blue-600 text-white font-bold px-2 py-0.5 rounded text-[10px] mr-3 shrink-0 flex items-center shadow-xs">
+    <div class="bg-blue-600 text-white font-bold px-2 py-0.5 rounded text-[10px] mr-3 shrink-0 flex items-center shadow-xs animate-pulse">
       <i class="fa-solid fa-bullhorn mr-1"></i> PENGUMUMAN
     </div>
-    <marquee scrollamount="5" class="font-medium text-slate-300">
-      Sistem Informasi Ruangan dan Peminjaman (SIRUPA) aktif. Proteksi anti double-input server-side & real-time sync, pengingat H-1 otomatis, & validasi jadwal ketat.
+    <marquee id="announcementMarqueeText" scrollamount="5" class="font-medium text-slate-300">
+      Sistem Informasi Ruangan dan Peminjaman (SIRUPA) aktif. Proteksi anti double-input, validasi jam lampau, & pop-up bentrok ketat real-time.
     </marquee>
   </div>
 
-  <header class="bg-white/95 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200 shadow-xs">
+  <header class="bg-white/95 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200 shadow-xs transition-all duration-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
       <div class="flex items-center space-x-3 cursor-pointer group" onclick="switchView('dashboard')">
-        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-2xl flex items-center justify-center shadow-md shadow-blue-500/10 shrink-0 transform group-hover:scale-105 transition duration-300 overflow-hidden border border-slate-100 p-1">
+        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-2xl flex items-center justify-center shadow-md shadow-blue-500/10 shrink-0 transform group-hover:scale-110 group-hover:rotate-3 transition duration-300 overflow-hidden border border-slate-100 p-1">
           <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=200&q=80" alt="SIRUPA Logo" class="w-full h-full object-cover rounded-xl" onerror="this.onerror=null; this.src='https://placehold.co/100x100/2563eb/ffffff?text=SR';">
         </div>
         <div>
-          <h1 id="headerTitle" class="text-sm sm:text-lg font-black tracking-tight text-slate-900 leading-tight">SIRUPA <span class="text-slate-400 font-normal hidden sm:inline">| Ruangan dan Peminjaman</span></h1>
+          <h1 id="headerTitle" class="text-sm sm:text-lg font-black tracking-tight text-slate-900 leading-tight group-hover:text-blue-600 transition">SIRUPA <span class="text-slate-400 font-normal hidden sm:inline">| Ruangan dan Peminjaman</span></h1>
           <p id="headerSubtitle" class="text-[10px] sm:text-[11px] font-semibold text-blue-600">Sistem Informasi Ruangan dan Peminjaman</p>
         </div>
       </div>
@@ -52,15 +82,15 @@
       <div class="flex items-center space-x-3 sm:space-x-4">
         <!-- Notification Bell -->
         <div class="relative">
-          <button onclick="toggleNotificationDropdown()" class="w-10 h-10 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl flex items-center justify-center transition cursor-pointer relative shadow-xs border border-slate-200">
+          <button onclick="toggleNotificationDropdown()" class="w-10 h-10 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl flex items-center justify-center transition transform active:scale-95 cursor-pointer relative shadow-xs border border-slate-200">
             <i class="fa-solid fa-bell text-sm"></i>
             <span id="notifBadge" class="hidden absolute -top-1 -right-1 w-5 h-5 bg-rose-600 text-white font-black text-[10px] rounded-full flex items-center justify-center live-pulse shadow-sm">0</span>
           </button>
           
-          <div id="notifDropdown" class="hidden absolute right-0 mt-3 w-80 sm:w-96 bg-white rounded-3xl shadow-2xl border border-slate-200 p-4 z-50 space-y-3 transform transition-all">
+          <div id="notifDropdown" class="hidden absolute right-0 mt-3 w-80 sm:w-96 bg-white rounded-3xl shadow-2xl border border-slate-200 p-4 z-50 space-y-3 transform transition-all animate-fade-in">
             <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
               <h4 class="font-black text-slate-900 text-xs uppercase tracking-wider flex items-center">
-                <i class="fa-solid fa-bell mr-1.5 text-blue-600"></i> Notifikasi & Pengingat H-1
+                <i class="fa-solid fa-bell mr-1.5 text-blue-600 animate-bounce"></i> Notifikasi & Pengingat Otomatis
               </h4>
               <button onclick="toggleNotificationDropdown()" class="text-slate-400 hover:text-slate-600 text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
@@ -71,18 +101,18 @@
         </div>
 
         <div class="hidden md:flex flex-col text-right border-r border-slate-200 pr-4">
-          <span id="liveClock" class="text-xs font-mono font-bold text-slate-800">17:52:30 WIB</span>
+          <span id="liveClock" class="text-xs font-mono font-bold text-slate-800">10:41:50 WIB</span>
           <span id="liveDate" class="text-[10px] text-slate-400 font-medium">Jumat, 21 Agustus 2026</span>
         </div>
 
         <nav class="hidden sm:flex items-center bg-slate-100 p-1 rounded-full border border-slate-200 space-x-1">
-          <button id="navDashboard" onclick="switchView('dashboard')" class="flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold transition-all bg-blue-600 text-white shadow-xs cursor-pointer">
+          <button id="navDashboard" onclick="switchView('dashboard')" class="flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold transition-all bg-blue-600 text-white shadow-xs cursor-pointer transform active:scale-95">
             <i class="fa-solid fa-gauge-high mr-1.5"></i> Dashboard
           </button>
-          <button id="navCheckRoom" onclick="switchView('checkRoom')" class="flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold transition-all text-slate-600 hover:text-blue-600 cursor-pointer">
+          <button id="navCheckRoom" onclick="switchView('checkRoom')" class="flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold transition-all text-slate-600 hover:text-blue-600 cursor-pointer transform active:scale-95">
             <i class="fa-solid fa-magnifying-glass-chart mr-1.5"></i> Cek Ruangan
           </button>
-          <button id="navAdmin" onclick="switchView('admin')" class="flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold transition-all text-slate-600 hover:text-blue-600 cursor-pointer">
+          <button id="navAdmin" onclick="switchView('admin')" class="flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold transition-all text-slate-600 hover:text-blue-600 cursor-pointer transform active:scale-95">
             <i class="fa-solid fa-user-shield mr-1.5"></i> Admin
           </button>
         </nav>
@@ -90,78 +120,90 @@
     </div>
   </header>
 
-  <!-- Mobile Bottom Nav -->
   <div class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-6 py-2.5 flex justify-around items-center shadow-2xl">
-    <button onclick="switchView('dashboard')" id="mobNavDashboard" class="flex flex-col items-center text-blue-600 space-y-0.5 cursor-pointer">
+    <button onclick="switchView('dashboard')" id="mobNavDashboard" class="flex flex-col items-center text-blue-600 space-y-0.5 cursor-pointer transform active:scale-90 transition">
       <i class="fa-solid fa-gauge-high text-lg"></i>
       <span class="text-[10px] font-bold">Dashboard</span>
     </button>
-    <button onclick="switchView('checkRoom')" id="mobNavCheckRoom" class="flex flex-col items-center text-slate-400 space-y-0.5 cursor-pointer">
+    <button onclick="switchView('checkRoom')" id="mobNavCheckRoom" class="flex flex-col items-center text-slate-400 space-y-0.5 cursor-pointer transform active:scale-90 transition">
       <i class="fa-solid fa-magnifying-glass-chart text-lg"></i>
       <span class="text-[10px] font-bold">Cek Ruang</span>
     </button>
-    <button onclick="switchView('admin')" id="mobNavAdmin" class="flex flex-col items-center text-slate-400 space-y-0.5 cursor-pointer">
+    <button onclick="switchView('admin')" id="mobNavAdmin" class="flex flex-col items-center text-slate-400 space-y-0.5 cursor-pointer transform active:scale-90 transition">
       <i class="fa-solid fa-user-shield text-lg"></i>
       <span class="text-[10px] font-bold">Admin</span>
     </button>
   </div>
 
-  <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6 sm:space-y-8">
+  <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6 sm:space-y-8 animate-fade-in">
 
     <section id="viewDashboard" class="space-y-6 sm:space-y-8">
-      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 p-6 sm:p-10 text-white shadow-xl shadow-blue-500/10">
-        <div class="absolute -right-10 -bottom-10 opacity-10 text-white text-9xl font-black pointer-events-none">
+      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 p-6 sm:p-10 text-white shadow-xl shadow-blue-500/10 animate-shimmer">
+        <div class="absolute -right-10 -bottom-10 opacity-10 text-white text-9xl font-black pointer-events-none animate-float">
           <svg class="w-96 h-96" viewBox="0 0 24 24" fill="currentColor"><path d="M3 21H21V19H3V21ZM5 17H19V5H5V17ZM7 7H17V15H7V7Z"/></svg>
         </div>
         <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div class="max-w-3xl space-y-2 sm:space-y-3">
             <h2 class="text-xl sm:text-3xl lg:text-4xl font-black tracking-tight leading-tight">Dashboard & Statistik Ruangan</h2>
-            <p class="text-blue-100 text-xs sm:text-sm leading-relaxed opacity-90">Pantau ketersediaan jadwal ruangan, analisis penggunaan fasilitas, dan sinkronisasi real-time database.</p>
+            <p class="text-blue-100 text-xs sm:text-sm leading-relaxed opacity-90">Pantau ketersediaan jadwal ruangan, analisis penggunaan fasilitas, dan sinkronisasi real-time database otomatis.</p>
           </div>
-          <button onclick="manualSyncDatabase()" class="px-5 py-3 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-bold rounded-2xl text-xs transition border border-white/30 cursor-pointer flex items-center justify-center space-x-2 shrink-0">
-            <i id="dashboardSyncIcon" class="fa-solid fa-rotate"></i>
-            <span>Sinkronkan Dashboard</span>
-          </button>
         </div>
       </div>
 
-      <!-- KPI Cards -->
+      <!-- Modern Modernized Animated KPI Cards with Sophisticated Gradients & Hover Depth -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
-        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-          <div class="space-y-1"><p class="text-xs font-medium text-slate-400">Total Ruangan</p><h4 class="text-2xl font-black text-slate-900" id="kpiTotalRuangan">0</h4></div>
-          <div class="w-11 h-11 sm:w-12 sm:h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-door-open"></i></div>
+        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex items-center justify-between group overflow-hidden relative">
+          <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-gradient-to-tr from-blue-500/10 to-indigo-500/20 rounded-full group-hover:scale-150 transition duration-500 pointer-events-none"></div>
+          <div class="space-y-1 relative z-10">
+            <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Total Ruangan</p>
+            <h4 class="text-2xl sm:text-3xl font-black text-slate-900 group-hover:text-blue-600 transition" id="kpiTotalRuangan">0</h4>
+          </div>
+          <div class="w-16 h-16 bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-500 text-white rounded-2xl flex items-center justify-center text-2xl shadow-xl shadow-blue-500/30 group-hover:scale-110 group-hover:rotate-12 transition duration-500 shrink-0 relative z-10 animate-float">
+            <i class="fa-solid fa-building-user"></i>
+          </div>
         </div>
-        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-          <div class="space-y-1"><p class="text-xs font-medium text-slate-400">Peminjaman Disetujui</p><h4 class="text-2xl font-black text-slate-900" id="kpiDisetujuiCount">0</h4></div>
-          <div class="w-11 h-11 sm:w-12 sm:h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-calendar-check"></i></div>
+        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex items-center justify-between group overflow-hidden relative">
+          <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-gradient-to-tr from-emerald-500/10 to-teal-500/20 rounded-full group-hover:scale-150 transition duration-500 pointer-events-none"></div>
+          <div class="space-y-1 relative z-10">
+            <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Peminjaman Disetujui</p>
+            <h4 class="text-2xl sm:text-3xl font-black text-slate-900 group-hover:text-emerald-600 transition" id="kpiDisetujuiCount">0</h4>
+          </div>
+          <div class="w-16 h-16 bg-gradient-to-tr from-emerald-600 via-teal-600 to-emerald-400 text-white rounded-2xl flex items-center justify-center text-2xl shadow-xl shadow-emerald-500/30 group-hover:scale-110 group-hover:rotate-12 transition duration-500 shrink-0 relative z-10 animate-float" style="animation-delay: 1s;">
+            <i class="fa-solid fa-circle-check"></i>
+          </div>
         </div>
-        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-          <div class="space-y-1"><p class="text-xs font-medium text-slate-400">Menunggu Verifikasi</p><h4 class="text-2xl font-black text-slate-900" id="kpiMenungguCount">0</h4></div>
-          <div class="w-11 h-11 sm:w-12 sm:h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-hourglass-half"></i></div>
+        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex items-center justify-between group overflow-hidden relative">
+          <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-gradient-to-tr from-amber-500/10 to-orange-500/20 rounded-full group-hover:scale-150 transition duration-500 pointer-events-none"></div>
+          <div class="space-y-1 relative z-10">
+            <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Menunggu Verifikasi</p>
+            <h4 class="text-2xl sm:text-3xl font-black text-slate-900 group-hover:text-amber-600 transition" id="kpiMenungguCount">0</h4>
+          </div>
+          <div class="w-16 h-16 bg-gradient-to-tr from-amber-500 via-orange-600 to-amber-400 text-white rounded-2xl flex items-center justify-center text-2xl shadow-xl shadow-amber-500/30 group-hover:scale-110 group-hover:rotate-12 transition duration-500 shrink-0 relative z-10 animate-float" style="animation-delay: 2s;">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+          </div>
         </div>
       </div>
 
-      <!-- Charts -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
-          <div class="flex items-center justify-between"><h4 class="text-xs sm:text-sm font-bold text-slate-900">Distribusi Penggunaan Ruangan</h4><span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">Doughnut</span></div>
+        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs hover:shadow-xl transition duration-500 space-y-4 animate-chart">
+          <div class="flex items-center justify-between"><h4 class="text-xs sm:text-sm font-bold text-slate-900">Distribusi Penggunaan Ruangan</h4><span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full animate-pulse">Doughnut</span></div>
           <div class="h-56 sm:h-64 relative flex items-center justify-center"><canvas id="chartPenggunaanRuangan"></canvas></div>
         </div>
-        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
-          <div class="flex items-center justify-between"><h4 class="text-xs sm:text-sm font-bold text-slate-900">Tren Pemakaian Per Tahun</h4><span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full">Line</span></div>
+        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs hover:shadow-xl transition duration-500 space-y-4 animate-chart" style="animation-delay: 0.1s;">
+          <div class="flex items-center justify-between"><h4 class="text-xs sm:text-sm font-bold text-slate-900">Tren Pemakaian Per Tahun</h4><span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full animate-pulse">Line</span></div>
           <div class="h-56 sm:h-64 relative"><canvas id="chartPemakaianTahun"></canvas></div>
         </div>
-        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
-          <div class="flex items-center justify-between"><h4 class="text-xs sm:text-sm font-bold text-slate-900">Kategori Kegiatan</h4><span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">Bar</span></div>
+        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs hover:shadow-xl transition duration-500 space-y-4 animate-chart" style="animation-delay: 0.2s;">
+          <div class="flex items-center justify-between"><h4 class="text-xs sm:text-sm font-bold text-slate-900">Kategori Kegiatan</h4><span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full animate-pulse">Bar</span></div>
           <div class="h-56 sm:h-64 relative"><canvas id="chartPesertaKategori"></canvas></div>
         </div>
-        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
-          <div class="flex items-center justify-between"><h4 class="text-xs sm:text-sm font-bold text-slate-900">Proporsi Unit Dinas</h4><span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full">Polar Area</span></div>
+        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs hover:shadow-xl transition duration-500 space-y-4 animate-chart" style="animation-delay: 0.3s;">
+          <div class="flex items-center justify-between"><h4 class="text-xs sm:text-sm font-bold text-slate-900">Proporsi Unit Dinas</h4><span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full animate-pulse">Polar Area</span></div>
           <div class="h-56 sm:h-64 relative flex items-center justify-center"><canvas id="chartUnit"></canvas></div>
         </div>
       </div>
 
-      <!-- Booking History Table -->
+      <!-- Booking History Table with Animated Rows -->
       <div class="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden">
         <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
@@ -191,12 +233,12 @@
     </section>
 
     <section id="viewCheckRoom" class="space-y-6 sm:space-y-8 hidden">
-      <div class="bg-sky-50 border border-sky-200 text-sky-800 p-4 rounded-2xl text-xs font-medium flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
+      <div class="bg-sky-50 border border-sky-200 text-sky-800 p-4 rounded-2xl text-xs font-medium flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs animate-fade-in">
         <div class="flex items-start sm:items-center">
           <i class="fa-solid fa-circle-info text-sky-600 mr-2.5 text-base mt-0.5 sm:mt-0 shrink-0"></i>
           <span>Note : Tanggal ditandai merah menandakan adanya agenda peminjaman disetujui (Double-tap/klik untuk detail)</span>
         </div>
-        <button onclick="openCancelModal()" class="w-full sm:w-auto px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-xs transition border border-rose-200 cursor-pointer shrink-0 flex items-center justify-center">
+        <button onclick="openCancelModal()" class="w-full sm:w-auto px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-xs transition border border-rose-200 cursor-pointer shrink-0 flex items-center justify-center transform active:scale-95">
           <i class="fa-solid fa-ban mr-1.5"></i> Batal Pinjam
         </button>
       </div>
@@ -206,9 +248,9 @@
           <h3 class="text-xs sm:text-sm font-black text-slate-900 tracking-wide uppercase">CEK RUANG</h3>
           <span class="text-xs sm:text-sm font-black text-slate-900 tracking-wider text-center" id="calendarMonthTitle">AGUSTUS 2026</span>
           <div class="flex items-center justify-end space-x-2">
-            <button onclick="changeMonth(-1)" class="w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center justify-center cursor-pointer shadow-xs"><i class="fa-solid fa-chevron-left"></i></button>
-            <button id="nextMonthBtn" onclick="changeMonth(1)" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-sm cursor-pointer">September 2026</button>
-            <button onclick="changeMonth(1)" class="w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center justify-center cursor-pointer shadow-xs"><i class="fa-solid fa-chevron-right"></i></button>
+            <button onclick="changeMonth(-1)" class="w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center justify-center cursor-pointer shadow-xs transform active:scale-90"><i class="fa-solid fa-chevron-left"></i></button>
+            <button id="nextMonthBtn" onclick="changeMonth(1)" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-sm cursor-pointer transform active:scale-95">September 2026</button>
+            <button onclick="changeMonth(1)" class="w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center justify-center cursor-pointer shadow-xs transform active:scale-90"><i class="fa-solid fa-chevron-right"></i></button>
           </div>
         </div>
         <div class="overflow-x-auto border border-slate-200 rounded-2xl">
@@ -246,11 +288,11 @@
     </section>
 
     <section id="viewAdmin" class="space-y-6 hidden">
-      <div id="adminLoginContainer" class="flex items-center justify-center py-6 sm:py-12">
-        <div class="bg-white rounded-3xl max-w-md w-full shadow-lg border border-slate-200 p-6 sm:p-8 relative transition-all duration-300">
+      <div id="adminLoginContainer" class="flex items-center justify-center py-6 sm:py-12 animate-fade-in">
+        <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 p-6 sm:p-8 relative transition-all duration-300">
           <div id="authStep1" class="space-y-5 sm:space-y-6">
             <div class="text-center space-y-2">
-              <div class="w-12 h-12 sm:w-14 sm:h-14 bg-slate-900 text-white rounded-2xl mx-auto flex items-center justify-center text-xl sm:text-2xl shadow-md"><i class="fa-solid fa-user-shield"></i></div>
+              <div class="w-12 h-12 sm:w-14 sm:h-14 bg-slate-900 text-white rounded-2xl mx-auto flex items-center justify-center text-xl sm:text-2xl shadow-md animate-float"><i class="fa-solid fa-user-shield"></i></div>
               <h3 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight">Login Administrator</h3>
               <p class="text-xs text-slate-500 leading-relaxed max-w-xs mx-auto">Masuk sebagai Super Admin atau Admin Dinas/Bidang.</p>
             </div>
@@ -266,12 +308,12 @@
                   <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"><i id="eyeIcon" class="fa-solid fa-eye text-xs"></i></button>
                 </div>
               </div>
-              <div id="credentialsError" class="hidden bg-rose-50 border border-rose-200 text-rose-700 p-3 rounded-xl text-xs font-semibold flex items-center space-x-2">
+              <div id="credentialsError" class="hidden bg-rose-50 border border-rose-200 text-rose-700 p-3 rounded-xl text-xs font-semibold flex items-center space-x-2 animate-shake">
                 <i class="fa-solid fa-circle-exclamation text-rose-500 text-base shrink-0"></i>
                 <span id="credentialsErrorText">Username atau Password tidak sesuai!</span>
               </div>
               <div class="pt-2">
-                <button type="submit" class="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-md transition flex items-center justify-center space-x-2 cursor-pointer text-xs">
+                <button type="submit" class="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-md transition transform active:scale-95 flex items-center justify-center space-x-2 cursor-pointer text-xs">
                   <span>Lanjutkan Verifikasi</span><i class="fa-solid fa-arrow-right ml-1"></i>
                 </button>
               </div>
@@ -279,9 +321,9 @@
           </div>
 
           <!-- 2FA Step -->
-          <div id="authStep2" class="space-y-4 hidden">
+          <div id="authStep2" class="space-y-4 hidden animate-fade-in">
             <div class="text-center">
-              <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl mx-auto flex items-center justify-center text-xl mb-2 shadow-xs border border-blue-100"><i class="fa-brands fa-google text-lg"></i></div>
+              <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl mx-auto flex items-center justify-center text-xl mb-2 shadow-xs border border-blue-100 animate-float"><i class="fa-brands fa-google text-lg"></i></div>
               <h3 class="text-sm sm:text-base font-extrabold text-slate-900">Autentikasi Google Authenticator</h3>
             </div>
             <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
@@ -301,14 +343,14 @@
             <div id="otpError" class="hidden bg-rose-50 border border-rose-200 text-rose-700 p-2.5 rounded-xl text-xs font-semibold text-center">Kode OTP Google Authenticator tidak valid.</div>
             <div class="grid grid-cols-2 gap-3 pt-1">
               <button type="button" onclick="backToStep1()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold text-xs rounded-xl transition cursor-pointer flex items-center justify-center"><i class="fa-solid fa-arrow-left mr-1.5"></i> Ganti</button>
-              <button type="button" onclick="verifyGoogleAuthenticator2FA()" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition cursor-pointer flex items-center justify-center"><i class="fa-solid fa-shield-halved mr-1.5"></i> Autentikasi</button>
+              <button type="button" onclick="verifyGoogleAuthenticator2FA()" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition transform active:scale-95 cursor-pointer flex items-center justify-center"><i class="fa-solid fa-shield-halved mr-1.5"></i> Autentikasi</button>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Admin Panel Container -->
-      <div id="adminPanelContainer" class="space-y-6 hidden">
+      <div id="adminPanelContainer" class="space-y-6 hidden animate-fade-in">
         <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div class="flex items-center space-x-3.5">
             <div id="adminPanelIconBg" class="w-11 h-11 sm:w-12 sm:h-12 bg-slate-900 text-white rounded-2xl flex items-center justify-center text-lg sm:text-xl shadow-md shrink-0"><i class="fa-solid fa-user-shield"></i></div>
@@ -318,9 +360,25 @@
             </div>
           </div>
           <div class="flex items-center space-x-2.5 flex-wrap gap-y-2">
-            <button id="superAdminOnlyBtn" onclick="openSuperAdminModal()" class="hidden inline-flex items-center px-3.5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs transition shadow-sm cursor-pointer"><i class="fa-solid fa-users-gear mr-1.5"></i> Kelola Admin</button>
-            <button onclick="openAddRoomModal()" class="inline-flex items-center px-3.5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition shadow-sm cursor-pointer"><i class="fa-solid fa-plus mr-1.5"></i> Tambah Ruangan</button>
-            <button onclick="adminLogout()" class="inline-flex items-center px-3.5 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-xs transition border border-rose-200 cursor-pointer"><i class="fa-solid fa-right-from-bracket mr-1.5"></i> Keluar</button>
+            <button id="superAdminOnlyBtn" onclick="openSuperAdminModal()" class="hidden inline-flex items-center px-3.5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs transition shadow-sm cursor-pointer transform active:scale-95"><i class="fa-solid fa-users-gear mr-1.5"></i> Kelola Admin</button>
+            <button onclick="openAddRoomModal()" class="inline-flex items-center px-3.5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition shadow-sm cursor-pointer transform active:scale-95"><i class="fa-solid fa-plus mr-1.5"></i> Tambah Ruangan</button>
+            <button onclick="adminLogout()" class="inline-flex items-center px-3.5 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-xs transition border border-rose-200 cursor-pointer transform active:scale-95"><i class="fa-solid fa-right-from-bracket mr-1.5"></i> Keluar</button>
+          </div>
+        </div>
+
+        <!-- Announcement Manager Card -->
+        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div>
+              <h3 class="text-xs sm:text-sm font-bold text-slate-900 flex items-center"><i class="fa-solid fa-bullhorn mr-2 text-blue-600 animate-bounce"></i> Pengelolaan Papan Pengumuman (Real-Time)</h3>
+              <p class="text-[11px] text-slate-400">Pesan yang dimasukkan akan langsung tampil di seluruh layar pengguna melalui teks berjalan (marquee).</p>
+            </div>
+          </div>
+          <div class="flex flex-col sm:flex-row items-center gap-3">
+            <input type="text" id="adminAnnouncementInput" placeholder="Tulis pengumuman terbaru instansi..." class="w-full bg-slate-50 border border-slate-200 text-xs text-slate-800 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
+            <button onclick="saveAnnouncement()" class="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition shadow-sm cursor-pointer shrink-0 flex items-center justify-center transform active:scale-95">
+              <i class="fa-solid fa-paper-plane mr-2"></i> Publikasikan Pengumuman
+            </button>
           </div>
         </div>
 
@@ -346,11 +404,12 @@
                 <h3 class="text-sm sm:text-base font-bold text-slate-900">Daftar Masuk Permintaan Peminjaman</h3>
                 <p id="adminTableSubtext" class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Setujui atau tolak pengajuan secara real-time.</p>
               </div>
-              <div class="flex items-center space-x-2">
-                <button onclick="manualSyncDatabase()" title="Sinkronisasi Data Real-Time" class="inline-flex items-center justify-center px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-sm transition cursor-pointer">
-                  <i id="syncIcon" class="fa-solid fa-rotate mr-1.5"></i> Sinkronkan Data
-                </button>
-                <button onclick="handleAdminRefresh()" class="inline-flex items-center justify-center px-3.5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition cursor-pointer"><i class="fa-solid fa-arrows-rotate mr-1.5 text-blue-600"></i> Muat Ulang</button>
+            </div>
+            <!-- Search bar for admin pending bookings -->
+            <div class="p-4 bg-slate-50 border-b border-slate-100">
+              <div class="relative w-full">
+                <input type="text" id="adminSearchPendingInput" onkeyup="renderAdminPendingTable()" placeholder="Cari nama pemohon, kegiatan, atau ruangan..." class="w-full bg-white border border-slate-200 text-xs text-slate-700 rounded-xl py-2.5 pl-9 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
               </div>
             </div>
             <div class="overflow-x-auto flex-grow">
@@ -379,7 +438,7 @@
   </footer>
 
   <!-- MODAL: BOOKING FORM -->
-  <div id="bookingModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
+  <div id="bookingModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto animate-fade-in">
     <div class="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-8 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto space-y-5">
       <button onclick="closeBookingModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
       
@@ -411,7 +470,7 @@
             <input type="text" id="inputPemohon" required placeholder="Contoh: Ahmad Fauzi" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none">
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1.5">Email Pemohon (Untuk Notifikasi H-1)</label>
+            <label class="block font-bold text-slate-700 mb-1.5">Email Pemohon (Untuk Pengingat H-1 & H-3 Jam)</label>
             <input type="email" id="inputEmail" required placeholder="nama@email.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none">
           </div>
         </div>
@@ -474,7 +533,7 @@
 
         <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100">
           <button type="button" onclick="closeBookingModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition cursor-pointer">Batal</button>
-          <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition cursor-pointer flex items-center space-x-2">
+          <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition transform active:scale-95 cursor-pointer flex items-center space-x-2">
             <i class="fa-solid fa-paper-plane text-xs"></i>
             <span>Kirim Pengajuan</span>
           </button>
@@ -483,26 +542,28 @@
     </div>
   </div>
 
-  <!-- MODAL: EXACT FOOLPROOF DOUBLE INPUT / SCHEDULE CONFLICT MATCHING REFERENCE DESIGN -->
-  <div id="doubleInputWarningModal" class="fixed inset-0 z-[999999] bg-slate-950/85 modal-blur flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-[32px] max-w-md w-full p-8 shadow-2xl text-center space-y-6 transform transition-all scale-100 border border-slate-100 relative">
-      <div class="w-16 h-16 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mx-auto text-2xl shadow-sm border border-rose-100">
-        <i class="fa-solid fa-clock-rotate-left"></i>
-      </div>
-      <div class="space-y-2">
-        <h3 id="doubleInputModalTitle" class="text-xl font-black text-slate-900 tracking-tight">Peringatan Bentrok Jadwal Ruangan!</h3>
-        <p id="doubleInputModalText" class="text-xs text-slate-500 leading-relaxed max-w-xs mx-auto">
-          Gagal menyimpan! Waktu pelaksanaan yang Anda pilih sudah terisi atau bentrok dengan agenda peminjaman lain.
-        </p>
-      </div>
-      <button type="button" onclick="closeDoubleInputModal()" class="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-2xl text-xs transition cursor-pointer shadow-lg tracking-wide">
-        Saya Mengerti & Pilih Jadwal Lain
-      </button>
+  <!-- MODAL: SCHEDULE CONFLICT WARNING -->
+  <div id="doubleInputWarningModal" class="fixed inset-0 z-[999999] bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden animate-fade-in">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center space-y-4">
+      <div class="w-14 h-14 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-sm animate-bounce"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <h3 id="doubleInputModalTitle" class="text-base font-black text-slate-900">Peringatan Bentrok Jadwal!</h3>
+      <p id="doubleInputModalText" class="text-xs text-slate-500 leading-relaxed">Waktu pelaksanaan yang Anda pilih sudah terisi atau bentrok dengan agenda peminjaman lain.</p>
+      <button onclick="closeDoubleInputModal()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition transform active:scale-95 cursor-pointer">Mengerti</button>
+    </div>
+  </div>
+
+  <!-- MODAL: PAST TIME WARNING -->
+  <div id="pastTimeWarningModal" class="fixed inset-0 z-[999999] bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden animate-fade-in">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center space-y-4">
+      <div class="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-sm animate-bounce"><i class="fa-solid fa-clock-rotate-left"></i></div>
+      <h3 class="text-base font-black text-slate-900">Waktu Telah Terlewat!</h3>
+      <p id="pastTimeModalText" class="text-xs text-slate-500 leading-relaxed">Jam atau waktu pelaksanaan yang Anda pilih sudah terlewat untuk hari ini. Silakan pilih waktu yang valid.</p>
+      <button onclick="closePastTimeModal()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition transform active:scale-95 cursor-pointer">Mengerti</button>
     </div>
   </div>
 
   <!-- MODAL: BOOKING DETAILS -->
-  <div id="bookingDetailsModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
+  <div id="bookingDetailsModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto animate-fade-in">
     <div class="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-8 shadow-2xl relative space-y-4 my-auto">
       <button onclick="closeBookingDetailsModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
       <h3 id="modalDetailTitle" class="text-base font-black text-slate-900">Detail Jadwal Ruangan</h3>
@@ -514,17 +575,17 @@
   </div>
 
   <!-- MODAL: CAPACITY EXCEEDED WARNING -->
-  <div id="capacityPopupModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden">
+  <div id="capacityPopupModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden animate-fade-in">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center space-y-4">
-      <div class="w-14 h-14 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-sm"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <div class="w-14 h-14 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-sm animate-bounce"><i class="fa-solid fa-triangle-exclamation"></i></div>
       <h3 class="text-base font-black text-slate-900">Kapasitas Ruangan Terlampaui</h3>
       <p id="popupCapacityText" class="text-xs text-slate-500 leading-relaxed"></p>
-      <button onclick="closeCapacityPopup()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition cursor-pointer">Mengerti</button>
+      <button onclick="closeCapacityPopup()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition transform active:scale-95 cursor-pointer">Mengerti</button>
     </div>
   </div>
 
   <!-- MODAL: CANCEL BOOKING -->
-  <div id="cancelBookingModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
+  <div id="cancelBookingModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto animate-fade-in">
     <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-8 shadow-2xl relative space-y-5 my-auto">
       <button onclick="closeCancelModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
       <div class="space-y-1">
@@ -542,7 +603,7 @@
         </div>
         <div class="flex items-center justify-end space-x-3 pt-2">
           <button type="button" onclick="closeCancelModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition cursor-pointer">Tutup</button>
-          <button type="submit" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl shadow-md transition cursor-pointer flex items-center space-x-2">
+          <button type="submit" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl shadow-md transition transform active:scale-95 cursor-pointer flex items-center space-x-2">
             <i class="fa-solid fa-ban text-xs"></i>
             <span>Konfirmasi Batal</span>
           </button>
@@ -552,7 +613,7 @@
   </div>
 
   <!-- MODAL: SUPER ADMIN & EDIT ADMIN -->
-  <div id="superAdminModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
+  <div id="superAdminModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto animate-fade-in">
     <div class="bg-white rounded-3xl max-w-2xl w-full p-5 sm:p-8 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto space-y-6">
       <button onclick="closeSuperAdminModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
       <div class="space-y-1">
@@ -582,7 +643,7 @@
         </div>
         <div class="flex items-center justify-end space-x-2 pt-1">
           <button type="button" id="cancelEditAdminBtn" onclick="resetAdminForm()" class="hidden px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl transition cursor-pointer">Batal</button>
-          <button type="submit" id="submitAdminBtn" class="w-full sm:w-auto px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-md transition cursor-pointer flex items-center justify-center"><i class="fa-solid fa-floppy-disk mr-2"></i> Simpan Akun Admin</button>
+          <button type="submit" id="submitAdminBtn" class="w-full sm:w-auto px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-md transition transform active:scale-95 cursor-pointer flex items-center justify-center"><i class="fa-solid fa-floppy-disk mr-2"></i> Simpan Akun Admin</button>
         </div>
       </form>
       <div class="space-y-3">
@@ -593,7 +654,7 @@
   </div>
 
   <!-- MODAL: ADD / EDIT ROOM -->
-  <div id="roomModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
+  <div id="roomModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto animate-fade-in">
     <div class="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-8 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto">
       <button onclick="closeRoomModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
       <div class="mb-5 space-y-1"><h3 id="roomModalTitle" class="text-base sm:text-lg font-black text-slate-900 tracking-tight">Tambah Ruangan Baru</h3></div>
@@ -626,7 +687,7 @@
 
         <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100">
           <button type="button" onclick="closeRoomModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition cursor-pointer">Batal</button>
-          <button type="submit" id="submitRoomBtn" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition cursor-pointer flex items-center"><i class="fa-solid fa-floppy-disk mr-2"></i> Simpan Ruangan</button>
+          <button type="submit" id="submitRoomBtn" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition transform active:scale-95 cursor-pointer flex items-center"><i class="fa-solid fa-floppy-disk mr-2"></i> Simpan Ruangan</button>
         </div>
       </form>
     </div>
@@ -634,7 +695,7 @@
 
   <script>
     const apiService = {
-      appsScriptUrl: 'https://script.google.com/macros/s/AKfycbw6dsZC_8dVRlntUO8z_S8VbePMqxpL9JqINdLF7BWagquEZ6StPtSi8Q0GhLXhtKbBeA/exec',
+      appsScriptUrl: 'https://script.google.com/macros/s/AKfycbxVY3olkned09IuWKbDAVKXfgpT8_JPaFIMPX3F7kV7iTXbS5Y23NQ0HjUB8RHYfDD0QQ/exec',
 
       sendRequest: async function(action, payload = {}) {
         if (this.appsScriptUrl.includes('AKfycbz...')) {
@@ -659,7 +720,7 @@
 
       getAllData: async function() {
         if (this.appsScriptUrl.includes('AKfycbz...')) {
-          return { status: 'success', bookings: appState.bookings, rooms: appState.rooms, admins: appState.adminAccounts };
+          return { status: 'success', bookings: appState.bookings, rooms: appState.rooms, admins: appState.adminAccounts, announcement: appState.announcementText };
         }
         try {
           const response = await fetch(`${this.appsScriptUrl}?action=getAllData&_t=${Date.now()}`, {
@@ -670,10 +731,10 @@
           try {
             return JSON.parse(textRes);
           } catch(e) {
-            return { status: 'success', bookings: appState.bookings, rooms: appState.rooms, admins: appState.adminAccounts };
+            return { status: 'success', bookings: appState.bookings, rooms: appState.rooms, admins: appState.adminAccounts, announcement: appState.announcementText };
           }
         } catch (err) {
-          return { status: 'success', bookings: appState.bookings, rooms: appState.rooms, admins: appState.adminAccounts };
+          return { status: 'success', bookings: appState.bookings, rooms: appState.rooms, admins: appState.adminAccounts, announcement: appState.announcementText };
         }
       }
     };
@@ -685,6 +746,7 @@
       totpTimer: 30,
       currentYear: 2026,
       currentMonth: 7, // August
+      announcementText: "Sistem Informasi Ruangan dan Peminjaman (SIRUPA) aktif. Proteksi anti double-input, validasi jam lampau, & pop-up bentrok ketat real-time.",
       adminAccounts: [
         { username: 'superadmin', name: 'Super Administrator', pass: 'admin123', unit: 'Semua Dinas', isSuper: true },
         { username: 'admin_umum', name: 'Budi Santoso', pass: 'admin123', unit: 'Bagian Umum', isSuper: false },
@@ -725,7 +787,8 @@
       initAnalyticsCharts();
       startTotpCountdown();
       renderCalendar();
-      checkH1Reminders();
+      checkAutomatedReminders();
+      updateAnnouncementDisplay();
       switchView('dashboard');
     };
 
@@ -797,8 +860,8 @@
     }
 
     function triggerDoubleBookingWarning(roomName, dateStr, jamStr, conflictItem) {
-      document.getElementById('doubleInputModalTitle').innerText = "Peringatan: Jadwal Bentrok!";
-      document.getElementById('doubleInputModalText').innerHTML = `Gagal menyimpan! Ruangan <b>${roomName}</b> pada tanggal <b>${dateStr}</b> pukul <b>${jamStr} WIB</b> sudah diajukan/disetujui untuk kegiatan <b>"${conflictItem.kegiatan}"</b> (${conflictItem.pemohon} - ${conflictItem.unit}). Silakan pilih jam atau tanggal lain.`;
+      document.getElementById('doubleInputModalTitle').innerText = "Peringatan Bentrok Jadwal!";
+      document.getElementById('doubleInputModalText').innerHTML = `Gagal menyimpan! Ruangan <b>${roomName}</b> pada tanggal <b>${dateStr}</b> pukul <b>${jamStr} WIB</b> sudah terisi/diajukan untuk kegiatan <b>"${conflictItem.kegiatan}"</b> oleh <b>${conflictItem.pemohon}</b> (${conflictItem.unit}). Silakan pilih jadwal lain.`;
       
       const warningModal = document.getElementById('doubleInputWarningModal');
       if (warningModal) {
@@ -808,59 +871,111 @@
       }
     }
 
-    function checkH1Reminders() {
-      const today = new Date();
-      const tomorrow = new Date(today);
-      tomorrow.setDate(today.getDate() + 1);
+    function closeDoubleInputModal() {
+      const modal = document.getElementById('doubleInputWarningModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+      }
+    }
+
+    function triggerPastTimeWarning(message) {
+      const modal = document.getElementById('pastTimeWarningModal');
+      const textEl = document.getElementById('pastTimeModalText');
+      if (textEl && message) textEl.innerText = message;
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.style.display = 'flex';
+        modal.style.zIndex = '999999';
+      }
+    }
+
+    function closePastTimeModal() {
+      const modal = document.getElementById('pastTimeWarningModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+      }
+    }
+
+    function checkAutomatedReminders() {
+      const now = new Date();
+      const todayStr = now.toISOString().split('T')[0];
+      
+      const tomorrow = new Date(now);
+      tomorrow.setDate(now.getDate() + 1);
       const tomorrowStr = tomorrow.toISOString().split('T')[0];
 
       const h1Bookings = appState.bookings.filter(b => b.tanggal === tomorrowStr && b.status === 'Disetujui');
       const badge = document.getElementById('notifBadge');
       const container = document.getElementById('notifListContainer');
 
+      let reminderHTML = '';
+      let reminderCount = 0;
+
       if (h1Bookings.length > 0) {
+        reminderCount += h1Bookings.length;
+        h1Bookings.forEach(b => {
+          reminderHTML += `
+            <div class="bg-amber-50 border border-amber-200 p-3 rounded-2xl space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-extrabold text-amber-800 uppercase tracking-wider">Otomatis H-1 Email</span>
+                <span class="text-[10px] font-bold text-slate-500">${b.jam}</span>
+              </div>
+              <div class="font-bold text-slate-900 text-xs">${b.kegiatan}</div>
+              <div class="text-[11px] text-slate-600">Ruangan: <b>${b.ruangan}</b></div>
+              <div class="text-[10px] text-slate-400">Terkirim ke: ${b.email}</div>
+            </div>`;
+        });
+      }
+
+      const todayBookings = appState.bookings.filter(b => b.tanggal === todayStr && b.status === 'Disetujui');
+      todayBookings.forEach(b => {
+        const parts = (b.jam || '').split(' - ');
+        if (parts.length >= 2) {
+          const startHM = parts[0].trim().split(':');
+          const startH = parseInt(startHM[0], 10) || 0;
+          const startM = parseInt(startHM[1], 10) || 0;
+          
+          const bookingStart = new Date(now);
+          bookingStart.setHours(startH, startM, 0, 0);
+
+          const diffMs = bookingStart - now;
+          const diffHours = diffMs / (1000 * 60 * 60);
+
+          if (diffHours > 0 && diffHours <= 3.1) {
+            reminderCount++;
+            reminderHTML += `
+              <div class="bg-rose-50 border border-rose-200 p-3 rounded-2xl space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-extrabold text-rose-800 uppercase tracking-wider">Otomatis H-3 Jam Email</span>
+                  <span class="text-[10px] font-bold text-rose-600">Segera</span>
+                </div>
+                <div class="font-bold text-slate-900 text-xs">${b.kegiatan}</div>
+                <div class="text-[11px] text-slate-600">Ruangan: <b>${b.ruangan}</b> (${b.jam})</div>
+                <div class="text-[10px] text-slate-400">Reminder H-3 jam terkirim ke: ${b.email}</div>
+              </div>`;
+          }
+        }
+      });
+
+      if (reminderCount > 0) {
         if (badge) {
-          badge.innerText = h1Bookings.length;
+          badge.innerText = reminderCount;
           badge.classList.remove('hidden');
         }
         if (container) {
-          container.innerHTML = '';
-          h1Bookings.forEach(b => {
-            container.innerHTML += `
-              <div class="bg-amber-50 border border-amber-200 p-3 rounded-2xl space-y-1">
-                <div class="flex items-center justify-between">
-                  <span class="text-[10px] font-extrabold text-amber-800 uppercase tracking-wider">H-1 Penggunaan</span>
-                  <span class="text-[10px] font-bold text-slate-500">${b.jam}</span>
-                </div>
-                <div class="font-bold text-slate-900 text-xs">${b.kegiatan}</div>
-                <div class="text-[11px] text-slate-600">Ruangan: <b>${b.ruangan}</b></div>
-                <div class="text-[10px] text-slate-400">Pemohon: ${b.pemohon} (${b.email})</div>
-              </div>`;
-          });
+          container.innerHTML = reminderHTML;
         }
       } else {
         if (badge) badge.classList.add('hidden');
-        if (container) container.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs font-medium">Tidak ada pengingat H-1 aktif saat ini.</div>`;
+        if (container) container.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs font-medium">Tidak ada pemberitahuan baru.</div>`;
       }
     }
 
     function toggleNotificationDropdown() {
       const dropdown = document.getElementById('notifDropdown');
       if (dropdown) dropdown.classList.toggle('hidden');
-    }
-
-    async function manualSyncDatabase() {
-      const icon = document.getElementById('dashboardSyncIcon');
-      const syncIcon = document.getElementById('syncIcon');
-      if (icon) icon.classList.add('fa-spin');
-      if (syncIcon) syncIcon.classList.add('fa-spin');
-      showToast('Menyelaraskan seluruh data database secara real-time...', 'info');
-      
-      await syncDataFromDatabase();
-      
-      if (icon) icon.classList.remove('fa-spin');
-      if (syncIcon) syncIcon.classList.remove('fa-spin');
-      showToast('Dashboard & database berhasil disinkronkan!', 'success');
     }
 
     async function syncDataFromDatabase() {
@@ -870,6 +985,10 @@
           if (json.bookings && Array.isArray(json.bookings)) appState.bookings = json.bookings;
           if (json.rooms && Array.isArray(json.rooms)) appState.rooms = json.rooms;
           if (json.admins && Array.isArray(json.admins)) appState.adminAccounts = json.admins;
+          if (json.announcement) {
+            appState.announcementText = json.announcement;
+            updateAnnouncementDisplay();
+          }
           
           renderBookingTable();
           updateDashboardCounts();
@@ -877,7 +996,7 @@
           renderAdminPendingTable();
           renderAdminAccountsList();
           renderRoomCards();
-          checkH1Reminders();
+          checkAutomatedReminders();
           initAnalyticsCharts();
         }
       } catch (err) {
@@ -885,18 +1004,26 @@
       }
     }
 
-    async function handleAdminRefresh() {
-      showToast('Menyinkronkan data dashboard & database secara real-time...', 'info');
-      await syncDataFromDatabase();
-      renderAdminPendingTable();
-      renderAdminRoomList();
-      initAnalyticsCharts();
-      updateDashboardCounts();
-      showToast('Dashboard dan database berhasil disinkronkan!', 'success');
-    }
-
     async function sendDataToDatabase(action, payload) {
       return await apiService.sendRequest(action, payload);
+    }
+
+    function updateAnnouncementDisplay() {
+      const marquee = document.getElementById('announcementMarqueeText');
+      if (marquee) marquee.innerText = appState.announcementText;
+    }
+
+    async function saveAnnouncement() {
+      const input = document.getElementById('adminAnnouncementInput');
+      if (!input || !input.value.trim()) {
+        showToast('Teks pengumuman tidak boleh kosong!', 'warning');
+        return;
+      }
+      appState.announcementText = input.value.trim();
+      updateAnnouncementDisplay();
+      showToast('Menyimpan dan mempublikasikan pengumuman secara real-time...', 'info');
+      await sendDataToDatabase('saveAnnouncement', { announcement: appState.announcementText });
+      showToast('Pengumuman berhasil dipublikasikan ke seluruh sistem!', 'success');
     }
 
     function initClock() {
@@ -971,6 +1098,8 @@
           renderAdminRoomList();
           renderAdminPendingTable();
           renderAdminAccountsList();
+          const annInput = document.getElementById('adminAnnouncementInput');
+          if (annInput) annInput.value = appState.announcementText;
         } else {
           loginContainer.classList.remove('hidden');
           panelContainer.classList.add('hidden');
@@ -1113,10 +1242,10 @@
         const photo = (room.images && room.images[0]) ? room.images[0] : 'https://placehold.co/800x400/e2e8f0/64748b?text=Ruangan';
 
         container.innerHTML += `
-          <div class="bg-white rounded-3xl border border-slate-200 shadow-xs hover:shadow-md transition duration-200 overflow-hidden flex flex-col justify-between">
+          <div class="bg-white rounded-3xl border border-slate-200 shadow-xs hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 overflow-hidden flex flex-col justify-between">
             <div>
               <div class="relative h-48 sm:h-56 w-full overflow-hidden bg-slate-100">
-                <img src="${photo}" alt="${room.name}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/800x400/e2e8f0/64748b?text=Ruangan'">
+                <img src="${photo}" alt="${room.name}" class="w-full h-full object-cover transform hover:scale-105 transition duration-500" onerror="this.src='https://placehold.co/800x400/e2e8f0/64748b?text=Ruangan'">
                 <span class="absolute top-3 right-3 sm:top-4 sm:right-4 bg-white/90 backdrop-blur-md text-slate-800 text-[11px] sm:text-xs font-semibold px-3.5 py-1.5 rounded-full shadow-sm flex items-center"><i class="fa-solid fa-users text-blue-600 mr-1.5"></i> ${room.capacity}</span>
                 <span class="absolute top-3 left-3 sm:top-4 sm:left-4 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">${room.unit || 'Umum'}</span>
               </div>
@@ -1257,8 +1386,20 @@
         });
       }
 
+      const searchInput = document.getElementById('adminSearchPendingInput');
+      const searchQuery = searchInput ? searchInput.value.trim().toLowerCase() : '';
+      if (searchQuery !== '') {
+        visibleBookings = visibleBookings.filter(b => {
+          const p = (b.pemohon || '').toLowerCase();
+          const k = (b.kegiatan || '').toLowerCase();
+          const r = (b.ruangan || '').toLowerCase();
+          const id = (b.id || '').toLowerCase();
+          return p.includes(searchQuery) || k.includes(searchQuery) || r.includes(searchQuery) || id.includes(searchQuery);
+        });
+      }
+
       if (visibleBookings.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 text-xs">Tidak ada permintaan peminjaman.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 text-xs">Tidak ada permintaan peminjaman ditemukan.</td></tr>`;
         return;
       }
 
@@ -1547,48 +1688,53 @@
 
     async function handleBookingSubmit(e) {
       e.preventDefault();
-      const pemohon = document.getElementById('inputPemohon').value;
-      const email = document.getElementById('inputEmail').value;
-      const unit = document.getElementById('inputUnit').value;
+
+      await syncDataFromDatabase();
+
+      const pemohon = document.getElementById('inputPemohon').value.trim();
+      const email = document.getElementById('inputEmail').value.trim();
+      const unit = document.getElementById('inputUnit').value.trim();
       const kategori = document.getElementById('inputKategori').value;
-      const kegiatan = document.getElementById('inputKegiatan').value;
-      const ruangan = document.getElementById('inputRuangan').value;
+      const kegiatan = document.getElementById('inputKegiatan').value.trim();
+      const ruangan = document.getElementById('inputRuangan').value.trim();
       const tanggal = document.getElementById('inputTanggal').value;
       const jamMulai = document.getElementById('inputJamMulai').value;
       const jamSelesai = document.getElementById('inputJamSelesai').value;
       const jam = `${jamMulai} - ${jamSelesai} WIB`;
-      const peserta = parseInt(document.getElementById('inputPeserta').value);
-      const catatan = document.getElementById('inputCatatan').value;
+      const peserta = parseInt(document.getElementById('inputPeserta').value) || 0;
+      const catatan = document.getElementById('inputCatatan').value.trim();
       const berkasInput = document.getElementById('inputBerkas');
 
+      // 1. VALIDASI WAKTU LAMPAU (PAST TIME CHECK)
       const now = new Date();
-      const bookingEndDateTime = new Date(`${tanggal}T${jamSelesai}:00`);
-      if (bookingEndDateTime < now) {
-        triggerDoubleBookingWarning(ruangan, tanggal, `${jamMulai} - ${jamSelesai}`, {
-          kegiatan: "Waktu Telah Lewat",
-          pemohon: pemohon,
-          unit: unit
-        });
+      const todayStr = now.toISOString().split('T')[0];
+      if (tanggal === todayStr) {
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+        const startMinutes = timeToMinutes(jamMulai);
+        if (startMinutes <= currentMinutes) {
+          triggerPastTimeWarning(`Waktu mulai (${jamMulai} WIB) yang Anda pilih sudah terlewat atau sama dengan waktu saat ini (${now.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' })} WIB). Silakan pilih waktu mendatang.`);
+          return;
+        }
+      } else if (tanggal < todayStr) {
+        triggerPastTimeWarning(`Tanggal pelaksanaan (${tanggal}) sudah lewat dari hari ini. Silakan pilih tanggal yang valid.`);
         return;
       }
 
-      showToast('Memeriksa ketersediaan real-time ke database...', 'info');
-      await syncDataFromDatabase();
-
-      // Validasi ketat lokal
+      // 2. VALIDASI BENTROK JADWAL
       const conflict = checkBookingConflictWithTime(ruangan, tanggal, jamMulai, jamSelesai, null);
       if (conflict) {
         triggerDoubleBookingWarning(ruangan, tanggal, `${jamMulai} - ${jamSelesai}`, conflict);
-        return;
+        return; 
       }
 
+      // 3. VALIDASI KAPASITAS
       const currentRoom = appState.rooms.find(r => r.name === ruangan);
       if (currentRoom) {
         const maxCapNum = parseInt(currentRoom.capacity) || 100;
         if (peserta > maxCapNum) {
           document.getElementById('popupCapacityText').innerText = `Jumlah peserta (${peserta}) melebihi kapasitas maksimal ruangan ${ruangan} (${currentRoom.capacity}).`;
           document.getElementById('capacityPopupModal').classList.remove('hidden');
-          return;
+          return; 
         }
       }
 
@@ -1600,16 +1746,14 @@
 
       showToast('Mengirim dan menyinkronkan data & file ke Google Spreadsheet...', 'info');
 
-      // Kirim langsung ke Cloud Backend untuk verifikasi server-side LockService
       let serverResult = { status: 'success' };
       if (berkasInput && berkasInput.files[0]) {
         const file = berkasInput.files[0];
         const reader = new FileReader();
-        
         await new Promise((resolve) => {
           reader.onload = async function(uploadEvent) {
             const base64String = uploadEvent.target.result.split(',')[1];
-            serverResult = await sendDataToDatabase('addBooking', {
+            serverResult = await apiService.sendRequest('addBooking', {
               ...newBooking,
               fileBase64: base64String,
               fileName: file.name,
@@ -1620,21 +1764,19 @@
           reader.readAsDataURL(file);
         });
       } else {
-        serverResult = await sendDataToDatabase('addBooking', newBooking);
+        serverResult = await apiService.sendRequest('addBooking', newBooking);
       }
 
-      // Jika server mendeteksi bentrok (LockService / Double Input terdeteksi)
       if (serverResult && serverResult.status === 'conflict') {
         triggerDoubleBookingWarning(ruangan, tanggal, `${jamMulai} - ${jamSelesai}`, {
-          kegiatan: "Agenda Lain (Terdeteksi Server Lain)",
+          kegiatan: "Agenda Terdaftar (Server Collision)",
           pemohon: "Pengguna Lain",
           unit: "-"
         });
         await syncDataFromDatabase();
-        return;
+        return; 
       }
 
-      // Jika berhasil lolos validasi server
       appState.bookings.unshift(newBooking);
       if (serverResult && serverResult.berkasUrl) {
         newBooking.berkasUrl = serverResult.berkasUrl;
@@ -1645,17 +1787,10 @@
       renderAdminPendingTable();
       renderCalendar();
       closeBookingModal();
-      checkH1Reminders();
+      checkAutomatedReminders();
+      initAnalyticsCharts();
 
-      showToast(`Peminjaman berhasil dikirim & disimpan (ID: ${newBooking.id})! Email konfirmasi telah dikirim ke ${email}.`, 'success');
-    }
-
-    function closeDoubleInputModal() {
-      const modal = document.getElementById('doubleInputWarningModal');
-      if (modal) {
-        modal.classList.add('hidden');
-        modal.style.display = 'none';
-      }
+      showToast(`Peminjaman berhasil dikirim & disimpan (ID: ${newBooking.id})! Email konfirmasi terkirim ke ${email}.`, 'success');
     }
 
     function checkCapacityLimit() {
@@ -1696,7 +1831,8 @@
         renderBookingTable();
         updateDashboardCounts();
         renderCalendar();
-        checkH1Reminders();
+        checkAutomatedReminders();
+        initAnalyticsCharts();
         showToast('Peminjaman dibatalkan.', 'info');
       } else {
         showToast('ID Peminjaman tidak ditemukan.', 'error');
@@ -1712,9 +1848,7 @@
           const eTime = parts[1] ? parts[1].replace(/WIB/gi, '').trim() : '17:00';
           const conflict = checkBookingConflictWithTime(item.ruangan, item.tanggal, sTime, eTime, item.id);
           if (conflict) {
-            document.getElementById('doubleInputModalTitle').innerText = "Peringatan: Jadwal Bentrok!";
-            document.getElementById('doubleInputModalText').innerHTML = `Tidak dapat menyetujui peminjaman <b>${item.id}</b> (${item.kegiatan}). Ruangan <b>${item.ruangan}</b> pada tanggal <b>${item.tanggal}</b> jam <b>${item.jam}</b> bersinggungan dengan agenda <b>"${conflict.kegiatan}"</b> (${conflict.id}).`;
-            document.getElementById('doubleInputWarningModal').classList.remove('hidden');
+            triggerDoubleBookingWarning(item.ruangan, item.tanggal, item.jam, conflict);
             return;
           }
         }
@@ -1725,10 +1859,10 @@
         updateDashboardCounts();
         renderCalendar();
         renderRoomCards();
-        checkH1Reminders();
+        checkAutomatedReminders();
         initAnalyticsCharts();
 
-        showToast(`Status pengajuan ${id} diubah menjadi: ${newStatus}. Email notifikasi terkirim ke ${item.email}`, newStatus === 'Disetujui' ? 'success' : 'warning');
+        showToast(`Status pengajuan ${id} diubah menjadi: ${newStatus}. Email pengingat otomatis (H-1 & H-3 Jam) diaktifkan untuk ${item.email}`, newStatus === 'Disetujui' ? 'success' : 'warning');
         await sendDataToDatabase('updateStatus', { id, status: newStatus });
       }
     }
@@ -1806,10 +1940,12 @@
     }
 
     function initAnalyticsCharts() {
+      // 1. Doughnut: Room Usage Distribution
       const roomCounts = {};
       appState.rooms.forEach(r => roomCounts[r.name] = 0);
       appState.bookings.filter(b => b.status === 'Disetujui').forEach(b => {
         if (roomCounts[b.ruangan] !== undefined) roomCounts[b.ruangan]++;
+        else roomCounts[b.ruangan] = (roomCounts[b.ruangan] || 0) + 1;
       });
 
       if (chartInstances.penggunaan) chartInstances.penggunaan.destroy();
@@ -1819,39 +1955,76 @@
           type: 'doughnut',
           data: {
             labels: Object.keys(roomCounts),
-            datasets: [{ data: Object.values(roomCounts), backgroundColor: ['#2563eb', '#38bdf8', '#6366f1', '#f59e0b', '#10b981'] }]
+            datasets: [{ data: Object.values(roomCounts), backgroundColor: ['#2563eb', '#38bdf8', '#6366f1', '#f59e0b', '#10b981', '#ec4899', '#8b5cf6'] }]
           },
-          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } }
+          options: { responsive: true, maintainAspectRatio: false, animation: { duration: 1200, easing: 'easeOutQuart' }, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } }
         });
       }
+
+      // 2. Line: Yearly Trend starting from 2026 onwards
+      const yearlyCounts = { 2026: 0, 2027: 0, 2028: 0, 2029: 0 };
+      appState.bookings.filter(b => b.status === 'Disetujui').forEach(b => {
+        let yr = 2026;
+        if (b.tanggal && b.tanggal.length >= 4) {
+          yr = parseInt(b.tanggal.substring(0, 4), 10) || 2026;
+        } else if (b.tahun) {
+          yr = parseInt(b.tahun, 10) || 2026;
+        }
+        if (yr >= 2026 && yearlyCounts[yr] !== undefined) {
+          yearlyCounts[yr]++;
+        } else if (yr >= 2026) {
+          yearlyCounts[yr] = (yearlyCounts[yr] || 0) + 1;
+        }
+      });
+      const yearsArr = Object.keys(yearlyCounts).sort();
+      const countsArr = yearsArr.map(y => yearlyCounts[y]);
 
       if (chartInstances.tahunan) chartInstances.tahunan.destroy();
       const ctx2 = document.getElementById('chartPemakaianTahun');
       if (ctx2) {
         chartInstances.tahunan = new Chart(ctx2, {
           type: 'line',
-          data: { labels: [2024, 2025, 2026], datasets: [{ label: 'Jumlah Kegiatan', data: [4, 9, 12], borderColor: '#6366f1', backgroundColor: 'rgba(99, 102, 241, 0.1)', fill: true, tension: 0.35 }] },
-          options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+          data: { labels: yearsArr, datasets: [{ label: 'Jumlah Kegiatan', data: countsArr, borderColor: '#6366f1', backgroundColor: 'rgba(99, 102, 241, 0.1)', fill: true, tension: 0.35 }] },
+          options: { responsive: true, maintainAspectRatio: false, animation: { duration: 1200, easing: 'easeOutQuart' }, scales: { y: { beginAtZero: true } } }
         });
       }
+
+      // 3. Bar: Activity Categories
+      const catCounts = { 'Rapat Dinas': 0, 'Seminar / Sosialisasi': 0, 'Workshop': 0, 'Diklat / Pelatihan': 0 };
+      appState.bookings.filter(b => b.status === 'Disetujui').forEach(b => {
+        const cat = b.kategori || 'Rapat Dinas';
+        if (catCounts[cat] !== undefined) catCounts[cat]++;
+        else catCounts[cat] = (catCounts[cat] || 0) + 1;
+      });
 
       if (chartInstances.peserta) chartInstances.peserta.destroy();
       const ctx3 = document.getElementById('chartPesertaKategori');
       if (ctx3) {
         chartInstances.peserta = new Chart(ctx3, {
           type: 'bar',
-          data: { labels: ['Rapat Dinas', 'Seminar', 'Workshop', 'Diklat'], datasets: [{ data: [10, 8, 6, 4], backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6'], borderRadius: 8 }] },
-          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+          data: { labels: Object.keys(catCounts), datasets: [{ data: Object.values(catCounts), backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#ec4899'], borderRadius: 8 }] },
+          options: { responsive: true, maintainAspectRatio: false, animation: { duration: 1200, easing: 'easeOutQuart' }, plugins: { legend: { display: false } } }
         });
       }
+
+      // 4. Polar Area: Unit Proportions
+      const unitCounts = {};
+      appState.rooms.forEach(r => {
+        const u = r.unit || 'Umum';
+        unitCounts[u] = 0;
+      });
+      appState.bookings.filter(b => b.status === 'Disetujui').forEach(b => {
+        const u = b.unit || 'Umum';
+        unitCounts[u] = (unitCounts[u] || 0) + 1;
+      });
 
       if (chartInstances.unit) chartInstances.unit.destroy();
       const ctx4 = document.getElementById('chartUnit');
       if (ctx4) {
         chartInstances.unit = new Chart(ctx4, {
           type: 'polarArea',
-          data: { labels: ['Bagian Umum', 'Bappeda & IT', 'Diskominfo', 'BKPSDM'], datasets: [{ data: [12, 8, 6, 4], backgroundColor: ['rgba(37, 99, 235, 0.7)', 'rgba(16, 185, 129, 0.7)', 'rgba(245, 158, 11, 0.7)', 'rgba(236, 72, 153, 0.7)'] }] },
-          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } } } }
+          data: { labels: Object.keys(unitCounts), datasets: [{ data: Object.values(unitCounts), backgroundColor: ['rgba(37, 99, 235, 0.7)', 'rgba(16, 185, 129, 0.7)', 'rgba(245, 158, 11, 0.7)', 'rgba(236, 72, 153, 0.7)', 'rgba(99, 102, 241, 0.7)'] }] },
+          options: { responsive: true, maintainAspectRatio: false, animation: { duration: 1200, easing: 'easeOutQuart' }, plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } } } }
         });
       }
     }
@@ -1877,7 +2050,7 @@
 
       const toast = document.createElement('div');
       toast.id = toastId;
-      toast.className = `backdrop-blur-xl border shadow-2xl rounded-2xl p-4 flex items-start space-x-3 text-xs font-medium transition-all transform translate-y-3 opacity-0 pointer-events-auto max-w-sm w-full ${bgClass}`;
+      toast.className = `backdrop-blur-xl border shadow-2xl rounded-2xl p-4 flex items-start space-x-3 text-xs font-medium transition-all transform translate-y-3 opacity-0 pointer-events-auto max-w-sm w-full ${bgClass} animate-fade-in`;
       toast.innerHTML = `
         <div class="mt-0.5">${iconHtml}</div>
         <div class="flex-grow space-y-0.5">
