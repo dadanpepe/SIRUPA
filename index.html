@@ -476,7 +476,13 @@
           </form>
 
           <div class="space-y-3">
-            <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Daftar Akun Admin Aktif (Tersinkronisasi)</h4>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Daftar Akun Admin Aktif (Tersinkronisasi)</h4>
+              <div class="relative w-full sm:w-64">
+                <input type="text" id="searchAdminTableInput" onkeyup="filterAdminTable()" oninput="filterAdminTable()" placeholder="Cari nama admin / username..." class="w-full bg-slate-50 border border-slate-200 text-xs text-slate-700 rounded-xl py-2 pl-8 pr-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:bg-white transition">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+              </div>
+            </div>
             <div class="overflow-x-auto border border-slate-200 rounded-2xl bg-white shadow-xs">
               <table class="w-full text-left border-collapse min-w-[550px]">
                 <thead>
@@ -489,6 +495,15 @@
                 </thead>
                 <tbody id="adminAccountsTableBody" class="divide-y divide-slate-100 text-xs text-slate-700"></tbody>
               </table>
+            </div>
+            <!-- Admin Pagination Controls -->
+            <div class="p-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 bg-slate-50/50 rounded-b-2xl">
+              <span id="adminPaginationInfo">Menampilkan 0-0 dari 0 data</span>
+              <div class="flex items-center space-x-2">
+                <button onclick="changeAdminTablePage(-1)" id="adminPrevPageBtn" class="px-3 py-1 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg font-bold transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed text-[11px]">Sebelumnya</button>
+                <span id="adminPageIndicator" class="font-bold text-slate-700 px-2">1 / 1</span>
+                <button onclick="changeAdminTablePage(1)" id="adminNextPageBtn" class="px-3 py-1 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg font-bold transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed text-[11px]">Berikutnya</button>
+              </div>
             </div>
           </div>
         </div>
@@ -889,6 +904,8 @@
       currentMonth: 7, // August (0-indexed)
       currentTablePage: 1,
       itemsPerPage: 5,
+      currentAdminTablePage: 1,
+      adminItemsPerPage: 5,
       announcementsList: [
         "Sistem Informasi Ruangan dan Peminjaman (SIRUPA) aktif. Proteksi anti double-input, validasi jam lampau, & pop-up bentrok ketat real-time."
       ],
@@ -1942,10 +1959,40 @@
     }
 
     function renderAdminAccountsList() {
+      const searchInput = document.getElementById('searchAdminTableInput');
+      const q = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+      let list = appState.adminAccounts;
+      if (q !== '') {
+        list = list.filter(acc => 
+          (acc.name || '').toLowerCase().includes(q) || 
+          (acc.username || '').toLowerCase().includes(q) || 
+          (acc.unit || '').toLowerCase().includes(q)
+        );
+      }
+
+      const totalItems = list.length;
+      const totalPages = Math.ceil(totalItems / appState.adminItemsPerPage) || 1;
+      if (appState.currentAdminTablePage > totalPages) appState.currentAdminTablePage = totalPages;
+      if (appState.currentAdminTablePage < 1) appState.currentAdminTablePage = 1;
+
+      const startIndex = (appState.currentAdminTablePage - 1) * appState.adminItemsPerPage;
+      const paginatedList = list.slice(startIndex, startIndex + appState.adminItemsPerPage);
+
       const tbody = document.getElementById('adminAccountsTableBody');
       if (!tbody) return;
       tbody.innerHTML = '';
-      appState.adminAccounts.forEach(acc => {
+
+      if (totalItems === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-400 text-xs font-medium">Tidak ada akun admin yang cocok dengan pencarian.</td></tr>`;
+        document.getElementById('adminPaginationInfo').innerText = `Menampilkan 0 dari 0 data`;
+        document.getElementById('adminPageIndicator').innerText = `1 / 1`;
+        document.getElementById('adminPrevPageBtn').disabled = true;
+        document.getElementById('adminNextPageBtn').disabled = true;
+        return;
+      }
+
+      paginatedList.forEach(acc => {
         const isSuperBadge = acc.isSuper 
           ? '<span class="bg-purple-50 text-purple-700 border border-purple-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center"><i class="fa-solid fa-shield-halved mr-1 text-purple-600"></i> Super Admin</span>' 
           : '<span class="bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center"><i class="fa-solid fa-user-shield mr-1 text-blue-600"></i> Admin Dinas</span>';
@@ -1959,7 +2006,7 @@
             <td class="p-3">${isSuperBadge}</td>
             <td class="p-3 text-slate-600 font-medium">${acc.unit}</td>
             <td class="p-3 pr-4 text-center">
-              <div class="inline-flex items-center space-x-1.5">
+              <div class="inline-flex items-center space-x-1.5 justify-center">
                 <button onclick="openEditAdminModal('${acc.username}')" title="Edit Akun" class="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold rounded-xl text-[11px] transition inline-flex items-center border border-blue-200 cursor-pointer">
                   <i class="fa-solid fa-pen-to-square mr-1"></i> Edit
                 </button>
@@ -1970,6 +2017,22 @@
             </td>
           </tr>`;
       });
+
+      const endDisplayIndex = Math.min(startIndex + appState.adminItemsPerPage, totalItems);
+      document.getElementById('adminPaginationInfo').innerText = `Menampilkan ${startIndex + 1}-${endDisplayIndex} dari ${totalItems} data`;
+      document.getElementById('adminPageIndicator').innerText = `${appState.currentAdminTablePage} / ${totalPages}`;
+      document.getElementById('adminPrevPageBtn').disabled = appState.currentAdminTablePage <= 1;
+      document.getElementById('adminNextPageBtn').disabled = appState.currentAdminTablePage >= totalPages;
+    }
+
+    function changeAdminTablePage(direction) {
+      appState.currentAdminTablePage += direction;
+      renderAdminAccountsList();
+    }
+
+    function filterAdminTable() {
+      appState.currentAdminTablePage = 1;
+      renderAdminAccountsList();
     }
 
     function openEditAdminModal(username) {
