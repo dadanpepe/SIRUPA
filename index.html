@@ -86,7 +86,7 @@
       <i class="fa-solid fa-bullhorn mr-1"></i> PENGUMUMAN
     </div>
     <marquee id="announcementMarqueeText" scrollamount="5" class="font-medium text-slate-300">
-      Sistem Informasi Ruangan dan Peminjaman (SIRUPA) aktif. Proteksi anti double-input, validasi jam lampau, & pop-up bentrok ketat real-time.
+      Sistem Informasi Ruangan dan Peminjaman (SIRUPA) aktif. Fitur pembatalan otomatis untuk pengajuan kadaluarsa, proteksi anti double-input, & pop-up bentrok real-time.
     </marquee>
   </div>
 
@@ -207,6 +207,7 @@
         </div>
       </div>
 
+      <!-- Analytics Charts -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs hover:shadow-xl transition duration-500 space-y-4 animate-chart">
           <div class="flex items-center justify-between"><h4 class="text-xs sm:text-sm font-bold text-slate-900">Distribusi Penggunaan Ruangan</h4><span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full animate-pulse">Doughnut</span></div>
@@ -226,6 +227,7 @@
         </div>
       </div>
 
+      <!-- Booking History Table -->
       <div class="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden">
         <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
@@ -233,7 +235,7 @@
             <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Terhubung otomatis dengan Google Spreadsheet secara real-time.</p>
           </div>
           <div class="relative w-full sm:w-72">
-            <input type="text" id="searchTableInput" onkeyup="filterBookingTable()" placeholder="Cari pemohon / kegiatan..." class="w-full bg-slate-50 border border-slate-200 text-xs text-slate-700 rounded-full py-2.5 pl-9 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
+            <input type="text" id="searchTableInput" onkeyup="filterBookingTable()" oninput="filterBookingTable()" placeholder="Cari pemohon / kegiatan..." class="w-full bg-slate-50 border border-slate-200 text-xs text-slate-700 rounded-full py-2.5 pl-9 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
             <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
           </div>
         </div>
@@ -344,7 +346,7 @@
             </form>
           </div>
 
-          <!-- Step 2: 2FA Google Authenticator with Live QR Scan -->
+          <!-- Step 2: 2FA Google Authenticator with Live QR Scan & TOTP Code -->
           <div id="authStep2" class="space-y-4 hidden animate-fade-in">
             <div class="text-center space-y-1">
               <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl mx-auto flex items-center justify-center text-xl mb-1 shadow-xs border border-blue-100 animate-float"><i class="fa-brands fa-google text-lg"></i></div>
@@ -464,7 +466,7 @@
               </div>
             </div>
             <div class="relative">
-              <input type="text" id="adminSearchRoomInput" onkeyup="renderAdminRoomList()" placeholder="Cari nama ruangan / dinas..." class="w-full bg-slate-50 border border-slate-200 text-xs text-slate-700 rounded-xl py-2.5 pl-9 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+              <input type="text" id="adminSearchRoomInput" onkeyup="renderAdminRoomList()" oninput="renderAdminRoomList()" placeholder="Cari nama ruangan / dinas..." class="w-full bg-slate-50 border border-slate-200 text-xs text-slate-700 rounded-xl py-2.5 pl-9 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
               <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
             </div>
             <div id="adminRoomList" class="space-y-3 max-h-[440px] overflow-y-auto pr-1"></div>
@@ -479,7 +481,7 @@
             </div>
             <div class="p-4 bg-slate-50 border-b border-slate-100">
               <div class="relative w-full">
-                <input type="text" id="adminSearchPendingInput" onkeyup="renderAdminPendingTable()" placeholder="Cari nama pemohon, kegiatan, atau ruangan..." class="w-full bg-white border border-slate-200 text-xs text-slate-700 rounded-xl py-2.5 pl-9 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                <input type="text" id="adminSearchPendingInput" onkeyup="renderAdminPendingTable()" oninput="renderAdminPendingTable()" placeholder="Cari nama pemohon, kegiatan, atau ruangan..." class="w-full bg-white border border-slate-200 text-xs text-slate-700 rounded-xl py-2.5 pl-9 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
               </div>
             </div>
@@ -1202,13 +1204,30 @@
       }, 4000);
     }
 
-    function renderBookingTable(filteredList = null) {
-      const list = filteredList || appState.bookings;
+    function renderBookingTable() {
+      const searchInput = document.getElementById('searchTableInput');
+      const q = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+      let list = appState.bookings;
+      if (q !== '') {
+        list = list.filter(b => 
+          (b.pemohon || '').toLowerCase().includes(q) || 
+          (b.kegiatan || '').toLowerCase().includes(q) || 
+          (b.ruangan || '').toLowerCase().includes(q) || 
+          (b.id || '').toLowerCase().includes(q) ||
+          (b.unit || '').toLowerCase().includes(q) ||
+          (b.status || '').toLowerCase().includes(q)
+        );
+      }
+
       const tbody = document.getElementById('bookingTableBody');
       if (!tbody) return;
       tbody.innerHTML = '';
       if (list.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 font-medium">Tidak ada data peminjaman.</td></tr>`;
+        const message = q !== '' 
+          ? `Tidak ada data peminjaman yang cocok dengan kata kunci "${q}".`
+          : `Tidak ada data peminjaman.`;
+        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 font-medium">${message}</td></tr>`;
         return;
       }
       list.forEach(item => {
@@ -1230,18 +1249,7 @@
     }
 
     function filterBookingTable() {
-      const q = document.getElementById('searchTableInput').value.toLowerCase().trim();
-      if (!q) {
-        renderBookingTable();
-        return;
-      }
-      const filtered = appState.bookings.filter(b => 
-        (b.pemohon || '').toLowerCase().includes(q) || 
-        (b.kegiatan || '').toLowerCase().includes(q) || 
-        (b.ruangan || '').toLowerCase().includes(q) || 
-        (b.id || '').toLowerCase().includes(q)
-      );
-      renderBookingTable(filtered);
+      renderBookingTable();
     }
 
     function updateDashboardCounts() {
@@ -2468,7 +2476,6 @@
         document.getElementById('activeAuthAvatar').innerText = foundAcc.name.charAt(0).toUpperCase();
         document.getElementById('credentialsError').classList.add('hidden');
 
-        // Setup QR Code for Google Authenticator
         const secretKey = foundAcc.secret;
         document.getElementById('secretKeyText').innerText = secretKey;
         const totpUri = `otpauth://totp/SIRUPA:${encodeURIComponent(foundAcc.username)}?secret=${secretKey}&issuer=SIRUPA%20Instansi`;
@@ -2482,7 +2489,6 @@
           };
         }
 
-        // Immediately update live TOTP code display
         generateTOTP(secretKey, 0).then(code => {
           const liveDisplay = document.getElementById('liveTotpCodeDisplay');
           if (liveDisplay && code) liveDisplay.innerText = code;
@@ -2508,7 +2514,6 @@
         if (bar) bar.style.width = (remaining / 30) * 100 + '%';
         if (counterEl) counterEl.innerText = `${remaining}s`;
 
-        // Real-time auto-update for active Authenticator TOTP code
         if (appState.currentAdmin && appState.currentAdmin.secret) {
           const liveCode = await generateTOTP(appState.currentAdmin.secret, 0);
           const liveDisplay = document.getElementById('liveTotpCodeDisplay');
@@ -2517,7 +2522,6 @@
           }
         }
 
-        // Lockout timer handler
         if (appState.lockoutUntil > Date.now()) {
           const secsLeft = Math.ceil((appState.lockoutUntil - Date.now()) / 1000);
           const lockoutWarn = document.getElementById('lockoutWarning');
@@ -2562,7 +2566,6 @@
       const secret = appState.currentAdmin ? appState.currentAdmin.secret : 'JBSWY3DPEHPK3PXP';
       const otpErr = document.getElementById('otpError');
 
-      // Real RFC 6238 TOTP verification
       const isValidTotp = await verifyTOTP(secret, otpVal);
       const isMasterBypass = (otpVal === "123456" || otpVal === "000000");
 
