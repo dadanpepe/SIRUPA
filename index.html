@@ -6,6 +6,11 @@
   <title>SIRUPA - Sistem Informasi Ruangan dan Peminjaman</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    }
+  </script>
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Chart.js -->
@@ -13,7 +18,7 @@
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-    body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; transition: background-color 0.3s ease, color 0.3s ease; }
     .modal-blur { backdrop-filter: blur(8px); }
 
     @keyframes pulseGlow {
@@ -70,7 +75,7 @@
     body { overflow-y: auto !important; }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white pb-24 sm:pb-0">
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white pb-24 sm:pb-0">
 
   <div id="toastContainer" class="fixed top-4 left-4 right-4 sm:left-auto sm:right-5 z-[9999999] flex flex-col space-y-3 pointer-events-none"></div>
 
@@ -84,32 +89,37 @@
     </marquee>
   </div>
 
-  <header class="bg-white/95 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200 shadow-xs transition-all duration-300">
+  <header class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200 dark:border-slate-800 shadow-xs transition-all duration-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
       <div class="flex items-center space-x-3 cursor-pointer group" onclick="switchView('dashboard')">
         <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-2xl flex items-center justify-center shadow-md shadow-blue-500/10 shrink-0 transform group-hover:scale-110 group-hover:rotate-3 transition duration-300 overflow-hidden border border-slate-100 p-1">
           <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=200&q=80" alt="SIRUPA Logo" class="w-full h-full object-cover rounded-xl" onerror="this.onerror=null; this.src='https://placehold.co/100x100/2563eb/ffffff?text=SR';">
         </div>
         <div>
-          <h1 id="headerTitle" class="text-sm sm:text-lg font-black tracking-tight text-slate-900 leading-tight group-hover:text-blue-600 transition">SIRUPA <span class="text-slate-400 font-normal hidden sm:inline">| Ruangan dan Peminjaman</span></h1>
-          <p id="headerSubtitle" class="text-[10px] sm:text-[11px] font-semibold text-blue-600">Sistem Informasi Ruangan dan Peminjaman</p>
+          <h1 id="headerTitle" class="text-sm sm:text-lg font-black tracking-tight text-slate-900 dark:text-white leading-tight group-hover:text-blue-600 transition">SIRUPA <span class="text-slate-400 font-normal hidden sm:inline">| Ruangan dan Peminjaman</span></h1>
+          <p id="headerSubtitle" class="text-[10px] sm:text-[11px] font-semibold text-blue-600 dark:text-blue-400">Sistem Informasi Ruangan dan Peminjaman</p>
         </div>
       </div>
 
       <div class="flex items-center space-x-3 sm:space-x-4">
+        <!-- Theme Toggle (Siang / Malam) -->
+        <button onclick="toggleDarkMode()" class="w-10 h-10 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-2xl flex items-center justify-center transition transform active:scale-95 cursor-pointer relative shadow-xs border border-slate-200 dark:border-slate-700" title="Ganti Tema Siang/Malam">
+          <i id="themeIcon" class="fa-solid fa-moon text-sm"></i>
+        </button>
+
         <!-- Notification Bell Dropdown -->
         <div class="relative">
-          <button onclick="toggleNotificationDropdown()" class="w-10 h-10 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl flex items-center justify-center transition transform active:scale-95 cursor-pointer relative shadow-xs border border-slate-200">
+          <button onclick="toggleNotificationDropdown()" class="w-10 h-10 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-2xl flex items-center justify-center transition transform active:scale-95 cursor-pointer relative shadow-xs border border-slate-200 dark:border-slate-700">
             <i id="bellIcon" class="fa-solid fa-bell text-sm"></i>
             <span id="notifBadge" class="hidden absolute -top-1 -right-1 w-5 h-5 bg-rose-600 text-white font-black text-[10px] rounded-full flex items-center justify-center live-pulse shadow-sm">0</span>
           </button>
           
-          <div id="notifDropdown" class="hidden absolute right-0 mt-3 w-80 sm:w-96 bg-white rounded-3xl shadow-2xl border border-slate-200 p-4 z-50 space-y-3 transform transition-all animate-fade-in">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
-              <h4 class="font-black text-slate-900 text-xs uppercase tracking-wider flex items-center">
+          <div id="notifDropdown" class="hidden absolute right-0 mt-3 w-80 sm:w-96 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 p-4 z-50 space-y-3 transform transition-all animate-fade-in">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
+              <h4 class="font-black text-slate-900 dark:text-slate-100 text-xs uppercase tracking-wider flex items-center">
                 <i class="fa-solid fa-bell mr-1.5 text-blue-600 animate-bounce"></i> Notifikasi dan Pengingat
               </h4>
-              <button onclick="toggleNotificationDropdown()" class="text-slate-400 hover:text-slate-600 text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+              <button onclick="toggleNotificationDropdown()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div id="notifListContainer" class="space-y-2 max-h-64 overflow-y-auto pr-1">
               <div class="text-center py-6 text-slate-400 text-xs font-medium">Tidak ada pemberitahuan baru.</div>
@@ -117,19 +127,19 @@
           </div>
         </div>
 
-        <div class="hidden md:flex flex-col text-right border-r border-slate-200 pr-4">
-          <span id="liveClock" class="text-xs font-mono font-bold text-slate-800">00:00:00 WIB</span>
-          <span id="liveDate" class="text-[10px] text-slate-400 font-medium">Loading tanggal...</span>
+        <div class="hidden md:flex flex-col text-right border-r border-slate-200 dark:border-slate-700 pr-4">
+          <span id="liveClock" class="text-xs font-mono font-bold text-slate-800 dark:text-slate-200">00:00:00 WIB</span>
+          <span id="liveDate" class="text-[10px] text-slate-400 dark:text-slate-500 font-medium">Loading tanggal...</span>
         </div>
 
-        <nav class="hidden sm:flex items-center bg-slate-100 p-1 rounded-full border border-slate-200 space-x-1">
+        <nav class="hidden sm:flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-full border border-slate-200 dark:border-slate-700 space-x-1">
           <button id="navDashboard" onclick="switchView('dashboard')" class="flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold transition-all bg-blue-600 text-white shadow-xs cursor-pointer transform active:scale-95">
             <i class="fa-solid fa-gauge-high mr-1.5"></i> Dashboard
           </button>
-          <button id="navCheckRoom" onclick="switchView('checkRoom')" class="flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold transition-all text-slate-600 hover:text-blue-600 cursor-pointer transform active:scale-95">
+          <button id="navCheckRoom" onclick="switchView('checkRoom')" class="flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold transition-all text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer transform active:scale-95">
             <i class="fa-solid fa-magnifying-glass-chart mr-1.5"></i> Cek Ruangan
           </button>
-          <button id="navAdmin" onclick="switchView('admin')" class="flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold transition-all text-slate-600 hover:text-blue-600 cursor-pointer transform active:scale-95">
+          <button id="navAdmin" onclick="switchView('admin')" class="flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold transition-all text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer transform active:scale-95">
             <i class="fa-solid fa-user-shield mr-1.5"></i> Admin
           </button>
         </nav>
@@ -137,16 +147,17 @@
     </div>
   </header>
 
-  <div class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-6 py-2.5 flex justify-around items-center shadow-2xl">
+  <!-- Mobile Bottom Nav -->
+  <div class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-6 py-2.5 flex justify-around items-center shadow-2xl">
     <button onclick="switchView('dashboard')" id="mobNavDashboard" class="flex flex-col items-center text-blue-600 space-y-0.5 cursor-pointer transform active:scale-90 transition">
       <i class="fa-solid fa-gauge-high text-lg"></i>
       <span class="text-[10px] font-bold">Dashboard</span>
     </button>
-    <button onclick="switchView('checkRoom')" id="mobNavCheckRoom" class="flex flex-col items-center text-slate-400 space-y-0.5 cursor-pointer transform active:scale-90 transition">
+    <button onclick="switchView('checkRoom')" id="mobNavCheckRoom" class="flex flex-col items-center text-slate-400 dark:text-slate-500 space-y-0.5 cursor-pointer transform active:scale-90 transition">
       <i class="fa-solid fa-magnifying-glass-chart text-lg"></i>
       <span class="text-[10px] font-bold">Cek Ruang</span>
     </button>
-    <button onclick="switchView('admin')" id="mobNavAdmin" class="flex flex-col items-center text-slate-400 space-y-0.5 cursor-pointer transform active:scale-90 transition">
+    <button onclick="switchView('admin')" id="mobNavAdmin" class="flex flex-col items-center text-slate-400 dark:text-slate-500 space-y-0.5 cursor-pointer transform active:scale-90 transition">
       <i class="fa-solid fa-user-shield text-lg"></i>
       <span class="text-[10px] font-bold">Admin</span>
     </button>
@@ -154,6 +165,7 @@
 
   <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6 sm:space-y-8 animate-fade-in">
 
+    <!-- Dashboard View -->
     <section id="viewDashboard" class="space-y-6 sm:space-y-8">
       <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 p-6 sm:p-10 text-white shadow-xl shadow-blue-500/10 animate-shimmer">
         <div class="absolute -right-10 -bottom-10 opacity-10 text-white text-9xl font-black pointer-events-none animate-float">
@@ -169,31 +181,31 @@
 
       <!-- KPI Cards -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
-        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex items-center justify-between group overflow-hidden relative">
+        <div class="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex items-center justify-between group overflow-hidden relative">
           <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-gradient-to-tr from-blue-500/10 to-indigo-500/20 rounded-full group-hover:scale-150 transition duration-500 pointer-events-none"></div>
           <div class="space-y-1 relative z-10">
             <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Total Ruangan</p>
-            <h4 class="text-2xl sm:text-3xl font-black text-slate-900 group-hover:text-blue-600 transition" id="kpiTotalRuangan">0</h4>
+            <h4 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white group-hover:text-blue-600 transition" id="kpiTotalRuangan">0</h4>
           </div>
           <div class="w-16 h-16 bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-500 text-white rounded-2xl flex items-center justify-center text-2xl shadow-xl shadow-blue-500/30 group-hover:scale-110 group-hover:rotate-12 transition duration-500 shrink-0 relative z-10 animate-float">
             <i class="fa-solid fa-building-user"></i>
           </div>
         </div>
-        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex items-center justify-between group overflow-hidden relative">
+        <div class="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex items-center justify-between group overflow-hidden relative">
           <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-gradient-to-tr from-emerald-500/10 to-teal-500/20 rounded-full group-hover:scale-150 transition duration-500 pointer-events-none"></div>
           <div class="space-y-1 relative z-10">
             <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Peminjaman Disetujui</p>
-            <h4 class="text-2xl sm:text-3xl font-black text-slate-900 group-hover:text-emerald-600 transition" id="kpiDisetujuiCount">0</h4>
+            <h4 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white group-hover:text-emerald-600 transition" id="kpiDisetujuiCount">0</h4>
           </div>
           <div class="w-16 h-16 bg-gradient-to-tr from-emerald-600 via-teal-600 to-emerald-400 text-white rounded-2xl flex items-center justify-center text-2xl shadow-xl shadow-emerald-500/30 group-hover:scale-110 group-hover:rotate-12 transition duration-500 shrink-0 relative z-10 animate-float" style="animation-delay: 1s;">
             <i class="fa-solid fa-circle-check"></i>
           </div>
         </div>
-        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex items-center justify-between group overflow-hidden relative">
+        <div class="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex items-center justify-between group overflow-hidden relative">
           <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-gradient-to-tr from-amber-500/10 to-orange-500/20 rounded-full group-hover:scale-150 transition duration-500 pointer-events-none"></div>
           <div class="space-y-1 relative z-10">
             <p class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">Menunggu Verifikasi</p>
-            <h4 class="text-2xl sm:text-3xl font-black text-slate-900 group-hover:text-amber-600 transition" id="kpiMenungguCount">0</h4>
+            <h4 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white group-hover:text-amber-600 transition" id="kpiMenungguCount">0</h4>
           </div>
           <div class="w-16 h-16 bg-gradient-to-tr from-amber-500 via-orange-600 to-amber-400 text-white rounded-2xl flex items-center justify-center text-2xl shadow-xl shadow-amber-500/30 group-hover:scale-110 group-hover:rotate-12 transition duration-500 shrink-0 relative z-10 animate-float" style="animation-delay: 2s;">
             <i class="fa-solid fa-clock-rotate-left"></i>
@@ -203,40 +215,40 @@
 
       <!-- Analytics Charts -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs hover:shadow-xl transition duration-500 space-y-4">
-          <div class="flex items-center justify-between"><h4 class="text-xs sm:text-sm font-bold text-slate-900">Distribusi Penggunaan Ruangan</h4><span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full animate-pulse">Doughnut</span></div>
+        <div class="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-xl transition duration-500 space-y-4">
+          <div class="flex items-center justify-between"><h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">Distribusi Penggunaan Ruangan</h4><span class="text-[10px] font-bold text-blue-600 bg-blue-50 dark:bg-blue-950/50 px-2.5 py-1 rounded-full animate-pulse">Doughnut</span></div>
           <div class="h-56 sm:h-64 relative flex items-center justify-center"><canvas id="chartPenggunaanRuangan"></canvas></div>
         </div>
-        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs hover:shadow-xl transition duration-500 space-y-4">
-          <div class="flex items-center justify-between"><h4 class="text-xs sm:text-sm font-bold text-slate-900">Tren Pemakaian Per Tahun</h4><span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full animate-pulse">Line</span></div>
+        <div class="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-xl transition duration-500 space-y-4">
+          <div class="flex items-center justify-between"><h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">Tren Pemakaian Per Tahun</h4><span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 dark:bg-indigo-950/50 px-2.5 py-1 rounded-full animate-pulse">Line</span></div>
           <div class="h-56 sm:h-64 relative"><canvas id="chartPemakaianTahun"></canvas></div>
         </div>
-        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs hover:shadow-xl transition duration-500 space-y-4">
-          <div class="flex items-center justify-between"><h4 class="text-xs sm:text-sm font-bold text-slate-900">Kategori Kegiatan</h4><span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full animate-pulse">Bar</span></div>
+        <div class="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-xl transition duration-500 space-y-4">
+          <div class="flex items-center justify-between"><h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">Kategori Kegiatan</h4><span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/50 px-2.5 py-1 rounded-full animate-pulse">Bar</span></div>
           <div class="h-56 sm:h-64 relative"><canvas id="chartPesertaKategori"></canvas></div>
         </div>
-        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs hover:shadow-xl transition duration-500 space-y-4">
-          <div class="flex items-center justify-between"><h4 class="text-xs sm:text-sm font-bold text-slate-900">Proporsi Unit Dinas</h4><span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full animate-pulse">Polar Area</span></div>
+        <div class="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-xl transition duration-500 space-y-4">
+          <div class="flex items-center justify-between"><h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">Proporsi Unit Dinas</h4><span class="text-[10px] font-bold text-amber-600 bg-amber-50 dark:bg-amber-950/50 px-2.5 py-1 rounded-full animate-pulse">Polar Area</span></div>
           <div class="h-56 sm:h-64 relative flex items-center justify-center"><canvas id="chartUnit"></canvas></div>
         </div>
       </div>
 
       <!-- Booking History Table with Pagination (5 items per page) -->
-      <div class="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden">
-        <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
+        <div class="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h3 class="text-sm sm:text-base font-bold text-slate-900">Daftar & Riwayat Peminjaman Ruangan</h3>
+            <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Daftar & Riwayat Peminjaman Ruangan</h3>
             <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Menampilkan 5 data terbaru per halaman</p>
           </div>
           <div class="relative w-full sm:w-72">
-            <input type="text" id="searchTableInput" onkeyup="filterBookingTable()" oninput="filterBookingTable()" placeholder="Cari pemohon / kegiatan..." class="w-full bg-slate-50 border border-slate-200 text-xs text-slate-700 rounded-full py-2.5 pl-9 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
+            <input type="text" id="searchTableInput" onkeyup="filterBookingTable()" oninput="filterBookingTable()" placeholder="Cari pemohon / kegiatan..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-200 rounded-full py-2.5 pl-9 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800 transition">
             <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
           </div>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse min-w-[600px]">
             <thead>
-              <tr class="bg-slate-50/70 border-b border-slate-100 text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
+              <tr class="bg-slate-50/70 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
                 <th class="p-3 sm:p-4 pl-5 sm:pl-6">ID / Pemohon</th>
                 <th class="p-3 sm:p-4">Kegiatan</th>
                 <th class="p-3 sm:p-4">Ruangan</th>
@@ -244,56 +256,57 @@
                 <th class="p-3 sm:p-4 pr-5 sm:pr-6">Status</th>
               </tr>
             </thead>
-            <tbody id="bookingTableBody" class="divide-y divide-slate-100 text-xs text-slate-700"></tbody>
+            <tbody id="bookingTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-xs text-slate-700 dark:text-slate-300"></tbody>
           </table>
         </div>
         <!-- Pagination Controls -->
-        <div class="p-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 bg-slate-50/50">
+        <div class="p-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 bg-slate-50/50 dark:bg-slate-800/30">
           <span id="paginationInfo">Menampilkan 0-0 dari 0 data</span>
           <div class="flex items-center space-x-2">
-            <button onclick="changeTablePage(-1)" id="prevPageBtn" class="px-3.5 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl font-bold transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">Sebelumnya</button>
-            <span id="pageIndicator" class="font-bold text-slate-700 px-2">1 / 1</span>
-            <button onclick="changeTablePage(1)" id="nextPageBtn" class="px-3.5 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl font-bold transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">Berikutnya</button>
+            <button onclick="changeTablePage(-1)" id="prevPageBtn" class="px-3.5 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl font-bold transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">Sebelumnya</button>
+            <span id="pageIndicator" class="font-bold text-slate-700 dark:text-slate-300 px-2">1 / 1</span>
+            <button onclick="changeTablePage(1)" id="nextPageBtn" class="px-3.5 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl font-bold transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">Berikutnya</button>
           </div>
         </div>
       </div>
     </section>
 
+    <!-- Check Room View -->
     <section id="viewCheckRoom" class="space-y-6 sm:space-y-8 hidden">
-      <div class="bg-sky-50 border border-sky-200 text-sky-800 p-4 rounded-2xl text-xs font-medium flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs animate-fade-in">
+      <div class="bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-900 text-sky-800 dark:text-sky-200 p-4 rounded-2xl text-xs font-medium flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs animate-fade-in">
         <div class="flex items-start sm:items-center">
-          <i class="fa-solid fa-circle-info text-sky-600 mr-2.5 text-base mt-0.5 sm:mt-0 shrink-0"></i>
+          <i class="fa-solid fa-circle-info text-sky-600 dark:text-sky-400 mr-2.5 text-base mt-0.5 sm:mt-0 shrink-0"></i>
           <span>Note : Tanggal ditandai merah menandakan adanya agenda peminjaman disetujui (Klik / tap untuk detail)</span>
         </div>
-        <button onclick="openCancelModal()" class="w-full sm:w-auto px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-xs transition border border-rose-200 cursor-pointer shrink-0 flex items-center justify-center transform active:scale-95">
+        <button onclick="openCancelModal()" class="w-full sm:w-auto px-4 py-2 bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-300 font-bold rounded-xl text-xs transition border border-rose-200 dark:border-rose-800 cursor-pointer shrink-0 flex items-center justify-center transform active:scale-95">
           <i class="fa-solid fa-ban mr-1.5"></i> Batal Pinjam
         </button>
       </div>
 
-      <div class="bg-white rounded-3xl border border-slate-200 p-4 sm:p-6 shadow-xs space-y-4 sm:space-y-6">
+      <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-4 sm:p-6 shadow-xs space-y-4 sm:space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <h3 class="text-xs sm:text-sm font-black text-slate-900 tracking-wide uppercase">CEK RUANG</h3>
-          <span class="text-xs sm:text-sm font-black text-slate-900 tracking-wider text-center" id="calendarMonthTitle">AGUSTUS 2026</span>
+          <h3 class="text-xs sm:text-sm font-black text-slate-900 dark:text-white tracking-wide uppercase">CEK RUANG</h3>
+          <span class="text-xs sm:text-sm font-black text-slate-900 dark:text-white tracking-wider text-center" id="calendarMonthTitle">AGUSTUS 2026</span>
           <div class="flex items-center justify-end space-x-2">
-            <button onclick="changeMonth(-1)" class="w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center justify-center cursor-pointer shadow-xs transform active:scale-90"><i class="fa-solid fa-chevron-left"></i></button>
+            <button onclick="changeMonth(-1)" class="w-9 h-9 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold transition flex items-center justify-center cursor-pointer shadow-xs transform active:scale-90"><i class="fa-solid fa-chevron-left"></i></button>
             <button id="nextMonthBtn" onclick="changeMonth(1)" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-sm cursor-pointer transform active:scale-95">September 2026</button>
-            <button onclick="changeMonth(1)" class="w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center justify-center cursor-pointer shadow-xs transform active:scale-90"><i class="fa-solid fa-chevron-right"></i></button>
+            <button onclick="changeMonth(1)" class="w-9 h-9 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold transition flex items-center justify-center cursor-pointer shadow-xs transform active:scale-90"><i class="fa-solid fa-chevron-right"></i></button>
           </div>
         </div>
-        <div class="overflow-x-auto border border-slate-200 rounded-2xl">
+        <div class="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-2xl">
           <table class="w-full text-center border-collapse min-w-[500px]">
             <thead>
-              <tr class="bg-slate-50 border-b border-slate-200 text-[11px] sm:text-xs font-extrabold text-slate-600">
-                <th class="py-2.5 sm:py-3 border-r border-slate-200">Min</th>
-                <th class="py-2.5 sm:py-3 border-r border-slate-200">Sen</th>
-                <th class="py-2.5 sm:py-3 border-r border-slate-200">Sel</th>
-                <th class="py-2.5 sm:py-3 border-r border-slate-200">Rab</th>
-                <th class="py-2.5 sm:py-3 border-r border-slate-200">Kam</th>
-                <th class="py-2.5 sm:py-3 border-r border-slate-200">Jum</th>
+              <tr class="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-[11px] sm:text-xs font-extrabold text-slate-600 dark:text-slate-300">
+                <th class="py-2.5 sm:py-3 border-r border-slate-200 dark:border-slate-800">Min</th>
+                <th class="py-2.5 sm:py-3 border-r border-slate-200 dark:border-slate-800">Sen</th>
+                <th class="py-2.5 sm:py-3 border-r border-slate-200 dark:border-slate-800">Sel</th>
+                <th class="py-2.5 sm:py-3 border-r border-slate-200 dark:border-slate-800">Rab</th>
+                <th class="py-2.5 sm:py-3 border-r border-slate-200 dark:border-slate-800">Kam</th>
+                <th class="py-2.5 sm:py-3 border-r border-slate-200 dark:border-slate-800">Jum</th>
                 <th class="py-2.5 sm:py-3">Sab</th>
               </tr>
             </thead>
-            <tbody id="calendarBody" class="divide-y divide-slate-200 text-xs font-medium"></tbody>
+            <tbody id="calendarBody" class="divide-y divide-slate-200 dark:divide-slate-800 text-xs font-medium"></tbody>
           </table>
         </div>
       </div>
@@ -301,11 +314,11 @@
       <div class="space-y-4 pt-2">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h3 class="text-sm sm:text-lg font-bold text-slate-900">Daftar Ruangan & Fasilitas</h3>
-            <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Informasi fasilitas dan status operasional ruangan terkini. Klik "Pinjam Ruangan" di bawah kartu.</p>
+            <h3 class="text-sm sm:text-lg font-bold text-slate-900 dark:text-white">Daftar Ruangan & Fasilitas</h3>
+            <p class="text-[11px] sm:text-xs text-slate-400 dark:text-slate-400 mt-0.5">Informasi fasilitas dan status operasional ruangan terkini. Klik "Pinjam Ruangan" di bawah kartu.</p>
           </div>
           <div class="w-full sm:w-64">
-            <select id="filterUnitSelect" onchange="renderRoomCards()" class="w-full bg-white border border-slate-200 text-xs font-bold text-slate-700 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-2xs">
+            <select id="filterUnitSelect" onchange="renderRoomCards()" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-2xs">
               <option value="Semua">Semua Dinas / Bidang</option>
             </select>
           </div>
@@ -314,27 +327,28 @@
       </div>
     </section>
 
+    <!-- Admin View -->
     <section id="viewAdmin" class="space-y-6 hidden">
       <div id="adminLoginContainer" class="flex items-center justify-center py-6 sm:py-12 animate-fade-in">
-        <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 p-6 sm:p-8 relative transition-all duration-300">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 relative transition-all duration-300">
           
           <!-- Step 1: Username & Password -->
           <div id="authStep1" class="space-y-5 sm:space-y-6">
             <div class="text-center space-y-2">
-              <div class="w-12 h-12 sm:w-14 sm:h-14 bg-slate-900 text-white rounded-2xl mx-auto flex items-center justify-center text-xl sm:text-2xl shadow-md animate-float"><i class="fa-solid fa-user-shield"></i></div>
-              <h3 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight">Login Administrator</h3>
+              <div class="w-12 h-12 sm:w-14 sm:h-14 bg-slate-900 dark:bg-slate-800 text-white rounded-2xl mx-auto flex items-center justify-center text-xl sm:text-2xl shadow-md animate-float"><i class="fa-solid fa-user-shield"></i></div>
+              <h3 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">Login Administrator</h3>
               <p class="text-xs text-slate-500 leading-relaxed max-w-xs mx-auto">Masuk sebagai Super Admin atau Admin Dinas/Bidang.</p>
             </div>
             <form onsubmit="handleCredentialsSubmit(event)" class="space-y-4 text-xs">
               <div>
-                <label class="block font-bold text-slate-700 mb-1.5">Username Admin</label>
-                <input type="text" id="adminUsername" required placeholder="superadmin / admin_umum" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 font-medium focus:ring-2 focus:ring-slate-900 outline-none">
+                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Username Admin</label>
+                <input type="text" id="adminUsername" required placeholder="superadmin / admin_umum" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-slate-800 dark:text-slate-200 font-medium focus:ring-2 focus:ring-slate-900 outline-none">
               </div>
               <div>
-                <label class="block font-bold text-slate-700 mb-1.5">Password</label>
+                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Password</label>
                 <div class="relative">
-                  <input type="password" id="adminPassword" required placeholder="••••••••" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 pr-10 text-slate-800 font-medium focus:ring-2 focus:ring-slate-900 outline-none">
-                  <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"><i id="eyeIcon" class="fa-solid fa-eye text-xs"></i></button>
+                  <input type="password" id="adminPassword" required placeholder="••••••••" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 pr-10 text-slate-800 dark:text-slate-200 font-medium focus:ring-2 focus:ring-slate-900 outline-none">
+                  <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 focus:outline-none cursor-pointer"><i id="eyeIcon" class="fa-solid fa-eye text-xs"></i></button>
                 </div>
               </div>
               <div id="credentialsError" class="hidden bg-rose-50 border border-rose-200 text-rose-700 p-3 rounded-xl text-xs font-semibold flex items-center space-x-2 animate-shake">
@@ -342,31 +356,31 @@
                 <span id="credentialsErrorText">Username atau Password tidak sesuai!</span>
               </div>
               <div class="pt-2">
-                <button type="submit" class="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-md transition transform active:scale-95 flex items-center justify-center space-x-2 cursor-pointer text-xs">
+                <button type="submit" class="w-full py-3.5 bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition transform active:scale-95 flex items-center justify-center space-x-2 cursor-pointer text-xs">
                   <span>Lanjutkan Verifikasi</span><i class="fa-solid fa-arrow-right ml-1"></i>
                 </button>
               </div>
             </form>
           </div>
 
-          <!-- Step 2: 2FA Google Authenticator with Live QR Scan & TOTP Code -->
+          <!-- Step 2: 2FA Google Authenticator -->
           <div id="authStep2" class="space-y-4 hidden animate-fade-in">
             <div class="text-center space-y-1">
-              <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl mx-auto flex items-center justify-center text-xl mb-1 shadow-xs border border-blue-100 animate-float"><i class="fa-brands fa-google text-lg"></i></div>
-              <h3 class="text-sm sm:text-base font-extrabold text-slate-900">Autentikasi Google Authenticator</h3>
+              <div class="w-12 h-12 bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 rounded-2xl mx-auto flex items-center justify-center text-xl mb-1 shadow-xs border border-blue-100 dark:border-blue-900 animate-float"><i class="fa-brands fa-google text-lg"></i></div>
+              <h3 class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white">Autentikasi Google Authenticator</h3>
               <p class="text-[11px] text-slate-500">Pindai QR Code di bawah dengan aplikasi Google Authenticator HP Anda</p>
             </div>
 
-            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 text-xs">
-              <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+            <div class="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 space-y-3 text-xs">
+              <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-2">
                 <div class="flex items-center space-x-2.5 overflow-hidden">
                   <div id="activeAuthAvatar" class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs shrink-0">S</div>
                   <div class="truncate">
-                    <h4 id="activeAuthEmail" class="text-xs font-bold text-slate-900 truncate">superadmin@instansi.go.id</h4>
+                    <h4 id="activeAuthEmail" class="text-xs font-bold text-slate-900 dark:text-white truncate">superadmin@instansi.go.id</h4>
                     <span class="text-[10px] text-emerald-600 font-semibold inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1 live-pulse"></span> Enkripsi TLS & TOTP Aktif</span>
                   </div>
                 </div>
-                <button type="button" onclick="toggleQrScanView()" class="px-2.5 py-1 bg-white hover:bg-slate-100 text-blue-600 border border-slate-200 rounded-lg text-[10px] font-bold transition flex items-center shrink-0 cursor-pointer">
+                <button type="button" onclick="toggleQrScanView()" class="px-2.5 py-1 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-blue-600 dark:text-blue-400 border border-slate-200 dark:border-slate-700 rounded-lg text-[10px] font-bold transition flex items-center shrink-0 cursor-pointer">
                   <i class="fa-solid fa-qrcode mr-1"></i> <span id="toggleQrBtnText">Tampilkan QR</span>
                 </button>
               </div>
@@ -388,23 +402,21 @@
               <div class="space-y-1">
                 <div class="flex justify-between text-[10px] text-slate-400 font-medium">
                   <span>Siklus OTP (30 Detik)</span>
-                  <span id="totpSecCounter" class="font-mono text-blue-600 font-bold">30s</span>
+                  <span id="totpSecCounter" class="font-mono text-blue-600 dark:text-blue-400 font-bold">30s</span>
                 </div>
-                <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden"><div id="totpProgress" class="bg-blue-600 h-full w-full transition-all duration-1000"></div></div>
+                <div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden"><div id="totpProgress" class="bg-blue-600 h-full w-full transition-all duration-1000"></div></div>
               </div>
             </div>
 
-            <!-- Lockout Warning Banner -->
             <div id="lockoutWarning" class="hidden bg-rose-50 border border-rose-200 text-rose-800 p-3 rounded-xl text-xs space-y-1 animate-shake">
               <div class="font-bold flex items-center"><i class="fa-solid fa-shield-cat text-rose-600 mr-1.5 text-sm"></i> Akses Terkunci Sementara (Keamanan Sistem)</div>
               <p id="lockoutText" class="text-[11px] leading-relaxed">Terlalu banyak percobaan gagal. Silakan tunggu <span id="lockoutTimerSpan" class="font-bold">60</span> detik.</p>
             </div>
 
-            <!-- Live Auto-Updating TOTP Code Display -->
-            <div id="autoFillSection" class="hidden bg-blue-50/80 border border-blue-200/80 rounded-xl p-2.5 flex items-center justify-between text-xs mt-1 animate-fade-in">
+            <div id="autoFillSection" class="hidden bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-900 rounded-xl p-2.5 flex items-center justify-between text-xs mt-1 animate-fade-in">
               <div>
-                <div class="text-[10px] text-slate-500 font-semibold flex items-center"><span class="w-2 h-2 bg-emerald-500 rounded-full mr-1.5 live-pulse"></span> Kode Authenticator Live (Otomatis Update):</div>
-                <div id="liveTotpCodeDisplay" class="font-mono font-extrabold text-blue-700 text-sm tracking-[0.2em]">------</div>
+                <div class="text-[10px] text-slate-500 dark:text-slate-400 font-semibold flex items-center"><span class="w-2 h-2 bg-emerald-500 rounded-full mr-1.5 live-pulse"></span> Kode Authenticator Live:</div>
+                <div id="liveTotpCodeDisplay" class="font-mono font-extrabold text-blue-700 dark:text-blue-400 text-sm tracking-[0.2em]">------</div>
               </div>
               <button type="button" onclick="autoFillCurrentOtp()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[10px] font-bold transition shadow-xs cursor-pointer flex items-center active:scale-95">
                 <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Isi Otomatis
@@ -412,14 +424,14 @@
             </div>
 
             <div class="text-left space-y-1">
-              <label class="block text-xs font-bold text-slate-700 text-center">Masukkan 6-Digit Kode Authenticator</label>
-              <input type="text" id="otpInput" maxlength="6" placeholder="000000" oninput="autoVerifyOtp()" class="w-full text-center tracking-[0.4em] font-mono font-extrabold text-lg sm:text-xl bg-slate-50 border border-slate-300 rounded-2xl p-3 text-slate-900 focus:ring-2 focus:ring-blue-600 outline-none mt-1">
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 text-center">Masukkan 6-Digit Kode Authenticator</label>
+              <input type="text" id="otpInput" maxlength="6" placeholder="000000" oninput="autoVerifyOtp()" class="w-full text-center tracking-[0.4em] font-mono font-extrabold text-lg sm:text-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl p-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600 outline-none mt-1">
             </div>
 
             <div id="otpError" class="hidden bg-rose-50 border border-rose-200 text-rose-700 p-2.5 rounded-xl text-xs font-semibold text-center animate-fade-in">Kode OTP Google Authenticator tidak sesuai!</div>
 
             <div class="grid grid-cols-2 gap-3 pt-1">
-              <button type="button" onclick="backToStep1()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold text-xs rounded-xl transition cursor-pointer flex items-center justify-center"><i class="fa-solid fa-arrow-left mr-1.5"></i> Ganti</button>
+              <button type="button" onclick="backToStep1()" class="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-semibold text-xs rounded-xl transition cursor-pointer flex items-center justify-center"><i class="fa-solid fa-arrow-left mr-1.5"></i> Ganti</button>
               <button type="button" id="verifyTotpBtn" onclick="verifyGoogleAuthenticator2FA()" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition transform active:scale-95 cursor-pointer flex items-center justify-center"><i class="fa-solid fa-shield-halved mr-1.5"></i> Autentikasi</button>
             </div>
           </div>
@@ -427,99 +439,99 @@
       </div>
 
       <div id="adminPanelContainer" class="space-y-6 hidden animate-fade-in">
-        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div class="flex items-center space-x-3.5">
-            <div id="adminPanelIconBg" class="w-11 h-11 sm:w-12 sm:h-12 bg-slate-900 text-white rounded-2xl flex items-center justify-center text-lg sm:text-xl shadow-md shrink-0"><i class="fa-solid fa-user-shield"></i></div>
+            <div id="adminPanelIconBg" class="w-11 h-11 sm:w-12 sm:h-12 bg-slate-900 dark:bg-slate-800 text-white rounded-2xl flex items-center justify-center text-lg sm:text-xl shadow-md shrink-0"><i class="fa-solid fa-user-shield"></i></div>
             <div class="space-y-0.5">
               <span id="adminRoleBadge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200"><span class="w-1.5 h-1.5 bg-purple-500 rounded-full mr-1.5 live-pulse"></span> Super Administrator</span>
-              <h2 id="adminWelcomeTitle" class="text-base sm:text-lg font-black text-slate-900">Panel Kendali & Manajemen Ruangan</h2>
+              <h2 id="adminWelcomeTitle" class="text-base sm:text-lg font-black text-slate-900 dark:text-white">Panel Kendali & Manajemen Ruangan</h2>
             </div>
           </div>
           <div class="flex items-center space-x-2.5 flex-wrap gap-y-2">
             <button onclick="openAddRoomModal()" class="inline-flex items-center px-3.5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition shadow-sm cursor-pointer transform active:scale-95"><i class="fa-solid fa-plus mr-1.5"></i> Tambah Ruangan</button>
-            <button onclick="adminLogout()" class="inline-flex items-center px-3.5 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-xs transition border border-rose-200 cursor-pointer transform active:scale-95"><i class="fa-solid fa-right-from-bracket mr-1.5"></i> Keluar</button>
+            <button onclick="adminLogout()" class="inline-flex items-center px-3.5 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 dark:text-rose-300 font-bold rounded-xl text-xs transition border border-rose-200 dark:border-rose-800 cursor-pointer transform active:scale-95"><i class="fa-solid fa-right-from-bracket mr-1.5"></i> Keluar</button>
           </div>
         </div>
 
         <!-- EMBEDDED SUPER ADMIN ACCOUNT MANAGEMENT FORM -->
-        <div id="superAdminEmbeddedSection" class="hidden bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs space-y-6 animate-fade-in">
-          <div class="border-b border-slate-100 pb-3">
-            <h3 class="text-xs sm:text-sm font-bold text-slate-900 flex items-center"><i class="fa-solid fa-users-gear mr-2 text-purple-600"></i> Manajemen Akun Admin Dinas & Bidang</h3>
+        <div id="superAdminEmbeddedSection" class="hidden bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6 animate-fade-in">
+          <div class="border-b border-slate-100 dark:border-slate-800 pb-3">
+            <h3 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white flex items-center"><i class="fa-solid fa-users-gear mr-2 text-purple-600"></i> Manajemen Akun Admin Dinas & Bidang</h3>
             <p class="text-[11px] text-slate-400">Tambah, edit, dan kelola akun admin serta kunci TOTP langsung dari panel.</p>
           </div>
 
-          <form onsubmit="handleCreateAdminSubmit(event)" class="bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200 space-y-4 text-xs">
+          <form onsubmit="handleCreateAdminSubmit(event)" class="bg-slate-50 dark:bg-slate-800/50 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-4 text-xs">
             <input type="hidden" id="editAdminUsernameKey">
-            <h4 id="adminFormTitle" class="font-bold text-slate-900 flex items-center"><i class="fa-solid fa-user-plus mr-2 text-purple-600"></i> Tambah Akun Admin Baru</h4>
+            <h4 id="adminFormTitle" class="font-bold text-slate-900 dark:text-white flex items-center"><i class="fa-solid fa-user-plus mr-2 text-purple-600"></i> Tambah Akun Admin Baru</h4>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div><label class="block font-bold text-slate-700 mb-1">Nama Admin</label><input type="text" id="newAdminName" required placeholder="Contoh: Budi Santoso" class="w-full bg-white border border-slate-200 rounded-xl p-3 outline-none"></div>
-              <div><label class="block font-bold text-slate-700 mb-1">Username</label><input type="text" id="newAdminUsername" required placeholder="Contoh: admin_umum" class="w-full bg-white border border-slate-200 rounded-xl p-3 outline-none font-mono"></div>
+              <div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Nama Admin</label><input type="text" id="newAdminName" required placeholder="Contoh: Budi Santoso" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-3 outline-none text-slate-800 dark:text-slate-200"></div>
+              <div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Username</label><input type="text" id="newAdminUsername" required placeholder="Contoh: admin_umum" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-3 outline-none font-mono text-slate-800 dark:text-slate-200"></div>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div><label class="block font-bold text-slate-700 mb-1">Password</label><input type="text" id="newAdminPassword" required placeholder="••••••••" class="w-full bg-white border border-slate-200 rounded-xl p-3 outline-none"></div>
+              <div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Password</label><input type="text" id="newAdminPassword" required placeholder="••••••••" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-3 outline-none text-slate-800 dark:text-slate-200"></div>
               <div>
-                <label class="block font-bold text-slate-700 mb-1">Level Akses Admin</label>
-                <select id="newAdminLevel" onchange="toggleUnitDropdown()" class="w-full bg-white border border-slate-200 rounded-xl p-3 outline-none cursor-pointer font-bold text-purple-700">
+                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Level Akses Admin</label>
+                <select id="newAdminLevel" onchange="toggleUnitDropdown()" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-3 outline-none cursor-pointer font-bold text-purple-700 dark:text-purple-400">
                   <option value="dinas">Admin Dinas / Bidang</option>
                   <option value="super">Super Administrator</option>
                 </select>
               </div>
             </div>
             <div id="unitSelectionGroup">
-              <label class="block font-bold text-slate-700 mb-1">Nama Dinas / Instansi / Bidang <span class="text-slate-400 font-normal">(Ketik Manual)</span></label>
-              <input type="text" id="newAdminUnit" placeholder="Contoh: Bagian Umum / Dinas Pendidikan" class="w-full bg-white border border-slate-200 rounded-xl p-3 outline-none">
+              <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Nama Dinas / Instansi / Bidang <span class="text-slate-400 font-normal">(Ketik Manual)</span></label>
+              <input type="text" id="newAdminUnit" placeholder="Contoh: Bagian Umum / Dinas Pendidikan" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-3 outline-none text-slate-800 dark:text-slate-200">
             </div>
             <div class="flex items-center justify-end space-x-2 pt-1">
-              <button type="button" id="cancelEditAdminBtn" onclick="resetAdminForm()" class="hidden px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl transition cursor-pointer">Batal</button>
+              <button type="button" id="cancelEditAdminBtn" onclick="resetAdminForm()" class="hidden px-4 py-2.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold rounded-xl transition cursor-pointer">Batal</button>
               <button type="submit" id="submitAdminBtn" class="w-full sm:w-auto px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-md transition transform active:scale-95 cursor-pointer flex items-center justify-center"><i class="fa-solid fa-floppy-disk mr-2"></i> Simpan Akun Admin</button>
             </div>
           </form>
 
           <div class="space-y-3">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Daftar Akun Admin Aktif (Tersinkronisasi)</h4>
+              <h4 class="font-bold text-slate-900 dark:text-white text-xs uppercase tracking-wider">Daftar Akun Admin Aktif (Tersinkronisasi)</h4>
               <div class="relative w-full sm:w-64">
-                <input type="text" id="searchAdminTableInput" onkeyup="filterAdminTable()" oninput="filterAdminTable()" placeholder="Cari nama admin / username..." class="w-full bg-slate-50 border border-slate-200 text-xs text-slate-700 rounded-xl py-2 pl-8 pr-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:bg-white transition">
+                <input type="text" id="searchAdminTableInput" onkeyup="filterAdminTable()" oninput="filterAdminTable()" placeholder="Cari nama admin / username..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-200 rounded-xl py-2 pl-8 pr-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:bg-white dark:focus:bg-slate-800 transition">
                 <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
               </div>
             </div>
-            <div class="overflow-x-auto border border-slate-200 rounded-2xl bg-white shadow-xs">
+            <div class="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900 shadow-xs">
               <table class="w-full text-left border-collapse min-w-[550px]">
                 <thead>
-                  <tr class="bg-slate-50/70 border-b border-slate-100 text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
+                  <tr class="bg-slate-50/70 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
                     <th class="p-3 pl-4">Admin / Username</th>
                     <th class="p-3">Level Akses</th>
                     <th class="p-3">Unit / Dinas</th>
                     <th class="p-3 pr-4 text-center">Aksi</th>
                   </tr>
                 </thead>
-                <tbody id="adminAccountsTableBody" class="divide-y divide-slate-100 text-xs text-slate-700"></tbody>
+                <tbody id="adminAccountsTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-xs text-slate-700 dark:text-slate-300"></tbody>
               </table>
             </div>
-            <!-- Admin Pagination Controls -->
-            <div class="p-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 bg-slate-50/50 rounded-b-2xl">
+            <!-- Admin Pagination Controls (5 items per page) -->
+            <div class="p-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 bg-slate-50/50 dark:bg-slate-800/30 rounded-b-2xl">
               <span id="adminPaginationInfo">Menampilkan 0-0 dari 0 data</span>
               <div class="flex items-center space-x-2">
-                <button onclick="changeAdminTablePage(-1)" id="adminPrevPageBtn" class="px-3 py-1 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg font-bold transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed text-[11px]">Sebelumnya</button>
-                <span id="adminPageIndicator" class="font-bold text-slate-700 px-2">1 / 1</span>
-                <button onclick="changeAdminTablePage(1)" id="adminNextPageBtn" class="px-3 py-1 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg font-bold transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed text-[11px]">Berikutnya</button>
+                <button onclick="changeAdminTablePage(-1)" id="adminPrevPageBtn" class="px-3 py-1 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg font-bold transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed text-[11px]">Sebelumnya</button>
+                <span id="adminPageIndicator" class="font-bold text-slate-700 dark:text-slate-300 px-2">1 / 1</span>
+                <button onclick="changeAdminTablePage(1)" id="adminNextPageBtn" class="px-3 py-1 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg font-bold transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed text-[11px]">Berikutnya</button>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
-          <div class="flex items-center justify-between border-b border-slate-100 pb-3 flex-wrap gap-2">
+        <div class="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3 flex-wrap gap-2">
             <div>
-              <h3 class="text-xs sm:text-sm font-bold text-slate-900 flex items-center"><i class="fa-solid fa-bullhorn mr-2 text-blue-600 animate-bounce"></i> Pengelolaan Papan Pengumuman (Real-Time)</h3>
+              <h3 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white flex items-center"><i class="fa-solid fa-bullhorn mr-2 text-blue-600 animate-bounce"></i> Pengelolaan Papan Pengumuman (Real-Time)</h3>
               <p class="text-[11px] text-slate-400">Pesan baru yang dimasukkan akan ditambahkan ke papan pengumuman tanpa menghapus publikasi sebelumnya.</p>
             </div>
-            <button id="superAdminClearAnnounceBtn" onclick="clearAllAnnouncements()" class="hidden px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition items-center space-x-1.5 cursor-pointer">
+            <button id="superAdminClearAnnounceBtn" onclick="clearAllAnnouncements()" class="hidden px-3 py-1.5 bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 rounded-xl text-xs font-bold transition items-center space-x-1.5 cursor-pointer">
               <i class="fa-solid fa-trash-can"></i> <span>Hapus Semua Pengumuman</span>
             </button>
           </div>
           <div class="flex flex-col sm:flex-row items-center gap-3">
-            <input type="text" id="adminAnnouncementInput" placeholder="Tulis pengumuman terbaru instansi..." class="w-full bg-slate-50 border border-slate-200 text-xs text-slate-800 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
+            <input type="text" id="adminAnnouncementInput" placeholder="Tulis pengumuman terbaru instansi..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-slate-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
             <button onclick="saveAnnouncement()" class="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition shadow-sm cursor-pointer shrink-0 flex items-center justify-center transform active:scale-95">
               <i class="fa-solid fa-paper-plane mr-2"></i> Tambah Pengumuman
             </button>
@@ -527,37 +539,37 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div class="lg:col-span-5 bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
-            <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
+          <div class="lg:col-span-5 bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
+            <div class="border-b border-slate-100 dark:border-slate-800 pb-3 flex justify-between items-center">
               <div>
-                <h3 class="text-xs sm:text-sm font-bold text-slate-900">Ruangan Berdasarkan Dinas/Bidang</h3>
+                <h3 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">Ruangan Berdasarkan Dinas/Bidang</h3>
                 <p id="adminRoomPermissionNote" class="text-[11px] text-slate-400">Daftar ruangan instansi.</p>
               </div>
             </div>
             <div class="relative">
-              <input type="text" id="adminSearchRoomInput" onkeyup="renderAdminRoomList()" oninput="renderAdminRoomList()" placeholder="Cari nama ruangan / dinas..." class="w-full bg-slate-50 border border-slate-200 text-xs text-slate-700 rounded-xl py-2.5 pl-9 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+              <input type="text" id="adminSearchRoomInput" onkeyup="renderAdminRoomList()" oninput="renderAdminRoomList()" placeholder="Cari nama ruangan / dinas..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-200 rounded-xl py-2.5 pl-9 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
               <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
             </div>
             <div id="adminRoomList" class="space-y-3 max-h-[440px] overflow-y-auto pr-1"></div>
           </div>
 
-          <div class="lg:col-span-7 bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
-            <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="lg:col-span-7 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden flex flex-col">
+            <div class="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h3 class="text-sm sm:text-base font-bold text-slate-900">Daftar Masuk Permintaan Peminjaman</h3>
+                <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Daftar Masuk Permintaan Peminjaman</h3>
                 <p id="adminTableSubtext" class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Setujui atau tolak pengajuan secara real-time.</p>
               </div>
             </div>
-            <div class="p-4 bg-slate-50 border-b border-slate-100">
+            <div class="p-4 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
               <div class="relative w-full">
-                <input type="text" id="adminSearchPendingInput" onkeyup="renderAdminPendingTable()" oninput="renderAdminPendingTable()" placeholder="Cari nama pemohon, kegiatan, atau ruangan..." class="w-full bg-white border border-slate-200 text-xs text-slate-700 rounded-xl py-2.5 pl-9 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                <input type="text" id="adminSearchPendingInput" onkeyup="renderAdminPendingTable()" oninput="renderAdminPendingTable()" placeholder="Cari nama pemohon, kegiatan, atau ruangan..." class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-200 rounded-xl py-2.5 pl-9 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
               </div>
             </div>
             <div class="overflow-x-auto flex-grow">
               <table class="w-full text-left border-collapse min-w-[600px]">
                 <thead>
-                  <tr class="bg-slate-50/70 border-b border-slate-100 text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
+                  <tr class="bg-slate-50/70 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
                     <th class="p-3 sm:p-4 pl-5">ID / Pemohon</th>
                     <th class="p-3 sm:p-4">Kegiatan</th>
                     <th class="p-3 sm:p-4">Ruangan</th>
@@ -566,7 +578,7 @@
                     <th class="p-3 sm:p-4 pr-5 text-center">Aksi</th>
                   </tr>
                 </thead>
-                <tbody id="adminPendingTableBody" class="divide-y divide-slate-100 text-xs text-slate-700"></tbody>
+                <tbody id="adminPendingTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-xs text-slate-700 dark:text-slate-300"></tbody>
               </table>
             </div>
           </div>
@@ -575,56 +587,56 @@
     </section>
   </main>
 
-  <footer class="bg-white border-t border-slate-200 py-6 mt-12 text-center text-xs text-slate-400">
+  <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 mt-12 text-center text-xs text-slate-400">
     © 2026 SIRUPA - Sistem Informasi Ruangan dan Peminjaman.| @ DANPE
   </footer>
 
   <div id="bookingModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto animate-fade-in">
-    <div class="bg-white rounded-3xl max-w-xl w-full p-5 sm:p-8 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto space-y-5">
-      <button onclick="closeBookingModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
+    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-xl w-full p-5 sm:p-8 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto space-y-5">
+      <button onclick="closeBookingModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
       
       <div class="space-y-1">
-        <span id="bookingRoomContextBadge" class="inline-block px-3 py-1 bg-blue-50 text-blue-600 border border-blue-200 rounded-full text-[11px] font-bold">Pilihan Ruangan: Ruang Rapat Utama</span>
-        <h3 id="bookingModalMainTitle" class="text-base sm:text-lg font-black text-slate-900 tracking-tight">Formulir Peminjaman Ruangan</h3>
+        <span id="bookingRoomContextBadge" class="inline-block px-3 py-1 bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900 rounded-full text-[11px] font-bold">Pilihan Ruangan: Ruang Rapat Utama</span>
+        <h3 id="bookingModalMainTitle" class="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">Formulir Peminjaman Ruangan</h3>
       </div>
 
-      <div id="bookingConflictBanner" class="hidden bg-amber-50 border border-amber-200 rounded-2xl p-3.5 text-xs text-amber-800 space-y-1">
+      <div id="bookingConflictBanner" class="hidden bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 rounded-2xl p-3.5 text-xs text-amber-800 dark:text-amber-300 space-y-1">
         <div class="font-bold flex items-center"><i class="fa-solid fa-triangle-exclamation mr-1.5 text-amber-600"></i> Peringatan Bentrok Jadwal!</div>
         <p id="bookingConflictText"></p>
       </div>
 
-      <div id="capacityWarningBanner" class="hidden bg-rose-50 border border-rose-200 rounded-2xl p-3.5 text-xs text-rose-800 space-y-1">
+      <div id="capacityWarningBanner" class="hidden bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 rounded-2xl p-3.5 text-xs text-rose-800 dark:text-rose-300 space-y-1">
         <div class="font-bold flex items-center"><i class="fa-solid fa-triangle-exclamation mr-1.5 text-rose-600"></i> Melebihi Kapasitas Maksimal!</div>
         <p id="capacityWarningText"></p>
       </div>
 
       <form id="bookingForm" onsubmit="handleBookingSubmit(event)" class="space-y-4 text-xs">
         <div>
-          <label class="block font-bold text-slate-700 mb-1.5">Pilih Ruangan</label>
-          <select id="inputRuangan" onchange="checkBookingAvailability(); checkCapacityLimit();" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none font-medium cursor-pointer">
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Pilih Ruangan</label>
+          <select id="inputRuangan" onchange="checkBookingAvailability(); checkCapacityLimit();" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none font-medium cursor-pointer">
           </select>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block font-bold text-slate-700 mb-1.5">Nama Pemohon</label>
-            <input type="text" id="inputPemohon" required placeholder="Contoh: Ahmad Fauzi" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none">
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Nama Pemohon</label>
+            <input type="text" id="inputPemohon" required placeholder="Contoh: Ahmad Fauzi" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none">
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1.5">Email Pemohon (Untuk Pengingat H-1 & H-3 Jam)</label>
-            <input type="email" id="inputEmail" required placeholder="nama@email.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none">
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Email Pemohon (Untuk Pengingat H-1 & H-3 Jam)</label>
+            <input type="email" id="inputEmail" required placeholder="nama@email.com" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none">
           </div>
         </div>
 
         <div>
-          <label class="block font-bold text-slate-700 mb-1.5">Bidang / Unit Kerja</label>
-          <input type="text" id="inputUnit" required placeholder="Contoh: Bagian Umum" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none">
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Bidang / Unit Kerja</label>
+          <input type="text" id="inputUnit" required placeholder="Contoh: Bagian Umum" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none">
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block font-bold text-slate-700 mb-1.5">Kategori Kegiatan</label>
-            <select id="inputKategori" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none cursor-pointer">
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Kategori Kegiatan</label>
+            <select id="inputKategori" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none cursor-pointer">
               <option value="Rapat Dinas">Rapat Dinas</option>
               <option value="Seminar / Sosialisasi">Seminar / Sosialisasi</option>
               <option value="Workshop">Workshop</option>
@@ -632,34 +644,34 @@
             </select>
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1.5">Jumlah Peserta</label>
-            <input type="number" id="inputPeserta" required value="25" min="1" oninput="checkCapacityLimit()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none">
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Jumlah Peserta</label>
+            <input type="number" id="inputPeserta" required value="25" min="1" oninput="checkCapacityLimit()" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none">
           </div>
         </div>
 
         <div>
-          <label class="block font-bold text-slate-700 mb-1.5">Nama Kegiatan</label>
-          <input type="text" id="inputKegiatan" required placeholder="Contoh: Rapat Koordinasi Triwulan" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none">
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Nama Kegiatan</label>
+          <input type="text" id="inputKegiatan" required placeholder="Contoh: Rapat Koordinasi Triwulan" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none">
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block font-bold text-slate-700 mb-1.5">Tanggal Pelaksanaan</label>
-            <input type="date" id="inputTanggal" required onchange="checkBookingAvailability()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none font-medium">
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Tanggal Pelaksanaan</label>
+            <input type="date" id="inputTanggal" required onchange="checkBookingAvailability()" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none font-medium">
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1.5">Waktu / Jam Pelaksanaan <span class="text-slate-400 font-normal">(HH:MM - HH:MM WIB)</span></label>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Waktu / Jam Pelaksanaan <span class="text-slate-400 font-normal">(HH:MM - HH:MM WIB)</span></label>
             <div class="grid grid-cols-2 gap-2">
-              <input type="time" id="inputJamMulai" required value="08:00" onchange="checkBookingAvailability()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-center outline-none">
-              <input type="time" id="inputJamSelesai" required value="17:00" onchange="checkBookingAvailability()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-center outline-none">
+              <input type="time" id="inputJamMulai" required value="08:00" onchange="checkBookingAvailability()" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 text-center outline-none">
+              <input type="time" id="inputJamSelesai" required value="17:00" onchange="checkBookingAvailability()" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 text-center outline-none">
             </div>
           </div>
         </div>
 
         <div>
-          <label class="block font-bold text-slate-700 mb-1.5">Upload Berkas / Surat Izin <span class="text-rose-600">(PDF)</span></label>
-          <div class="flex items-center space-x-2 bg-slate-50 border border-slate-200 rounded-xl p-2">
-            <label class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-lg cursor-pointer text-[11px] transition">
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Upload Berkas / Surat Izin <span class="text-rose-600">(PDF)</span></label>
+          <div class="flex items-center space-x-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-2">
+            <label class="px-3 py-1.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold rounded-lg cursor-pointer text-[11px] transition">
               Pilih Berkas
               <input type="file" id="inputBerkas" accept=".pdf" class="hidden" onchange="document.getElementById('fileNameSpan').innerText = this.files[0] ? this.files[0].name : 'Tidak ada berkas dipilih'">
             </label>
@@ -668,12 +680,12 @@
         </div>
 
         <div>
-          <label class="block font-bold text-slate-700 mb-1.5">Catatan Tambahan <span class="text-slate-400 font-normal">(Opsional)</span></label>
-          <textarea id="inputCatatan" rows="2" placeholder="Catatan khusus fasilitas..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none resize-none"></textarea>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Catatan Tambahan <span class="text-slate-400 font-normal">(Opsional)</span></label>
+          <textarea id="inputCatatan" rows="2" placeholder="Catatan khusus fasilitas..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none resize-none"></textarea>
         </div>
 
-        <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100">
-          <button type="button" onclick="closeBookingModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition cursor-pointer">Batal</button>
+        <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+          <button type="button" onclick="closeBookingModal()" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold rounded-xl transition cursor-pointer">Batal</button>
           <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition transform active:scale-95 cursor-pointer flex items-center space-x-2">
             <i class="fa-solid fa-paper-plane text-xs"></i>
             <span>Kirim Pengajuan</span>
@@ -685,50 +697,50 @@
 
   <!-- MODAL: CONFLICT WARNING -->
   <div id="doubleInputWarningModal" class="fixed inset-0 z-[999999] bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden animate-fade-in">
-    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center space-y-4">
-      <div class="w-14 h-14 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-sm animate-bounce"><i class="fa-solid fa-triangle-exclamation"></i></div>
-      <h3 id="doubleInputModalTitle" class="text-base font-black text-slate-900">Peringatan Bentrok Jadwal!</h3>
+    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center space-y-4">
+      <div class="w-14 h-14 bg-rose-50 dark:bg-rose-950/50 text-rose-600 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-sm animate-bounce"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <h3 id="doubleInputModalTitle" class="text-base font-black text-slate-900 dark:text-white">Peringatan Bentrok Jadwal!</h3>
       <p id="doubleInputModalText" class="text-xs text-slate-500 leading-relaxed">Waktu pelaksanaan yang Anda pilih sudah terisi atau bentrok dengan agenda peminjaman lain.</p>
-      <button onclick="closeDoubleInputModal()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition transform active:scale-95 cursor-pointer">Mengerti</button>
+      <button onclick="closeDoubleInputModal()" class="w-full py-3 bg-slate-900 dark:bg-slate-800 text-white font-bold rounded-xl text-xs transition transform active:scale-95 cursor-pointer">Mengerti</button>
     </div>
   </div>
 
   <!-- MODAL: BOOKING SUCCESS CONFIRMATION -->
   <div id="bookingSuccessModal" class="fixed inset-0 z-[999999] bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden animate-fade-in">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl text-center space-y-5 my-auto relative">
-      <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto text-3xl shadow-lg shadow-emerald-500/20 animate-bounce">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl text-center space-y-5 my-auto relative">
+      <div class="w-16 h-16 bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto text-3xl shadow-lg shadow-emerald-500/20 animate-bounce">
         <i class="fa-solid fa-circle-check"></i>
       </div>
       
       <div class="space-y-1.5">
-        <span class="text-[10px] font-extrabold text-emerald-600 uppercase tracking-widest bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">Pengajuan Berhasil Dikirim</span>
-        <h3 class="text-lg font-black text-slate-900">Peminjaman Sedang Diproses</h3>
+        <span class="text-[10px] font-extrabold text-emerald-600 uppercase tracking-widest bg-emerald-50 dark:bg-emerald-950/50 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">Pengajuan Berhasil Dikirim</span>
+        <h3 class="text-lg font-black text-slate-900 dark:text-white">Peminjaman Sedang Diproses</h3>
       </div>
 
-      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-xs text-left space-y-2.5">
-        <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+      <div class="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 text-xs text-left space-y-2.5">
+        <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-2">
           <span class="text-slate-500 font-medium">ID Peminjaman:</span>
-          <span id="successBookingId" class="font-mono font-extrabold text-blue-600 text-sm">PMJ-0000</span>
+          <span id="successBookingId" class="font-mono font-extrabold text-blue-600 dark:text-blue-400 text-sm">PMJ-0000</span>
         </div>
         <div class="flex justify-between items-center">
           <span class="text-slate-500 font-medium">Ruangan:</span>
-          <span id="successBookingRoom" class="font-bold text-slate-800">Ruang Rapat</span>
+          <span id="successBookingRoom" class="font-bold text-slate-800 dark:text-slate-200">Ruang Rapat</span>
         </div>
         <div class="flex justify-between items-center">
           <span class="text-slate-500 font-medium">Jadwal:</span>
-          <span id="successBookingDate" class="font-bold text-slate-800">01/01/2026</span>
+          <span id="successBookingDate" class="font-bold text-slate-800 dark:text-slate-200">01/01/2026</span>
         </div>
-        <div class="bg-blue-50/80 border border-blue-200 rounded-xl p-3 text-slate-700 space-y-1">
-          <div class="font-bold flex items-center text-blue-800 text-[11px]">
+        <div class="bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-900 rounded-xl p-3 text-slate-700 dark:text-slate-300 space-y-1">
+          <div class="font-bold flex items-center text-blue-800 dark:text-blue-300 text-[11px]">
             <i class="fa-solid fa-paper-plane mr-1.5 text-blue-600"></i> Notifikasi Gmail Aktif
           </div>
-          <p class="text-[11px] leading-relaxed text-slate-600">
-            Status pengajuan ini sedang diverifikasi oleh admin. Pembaruan status persetujuan akan dikirim secara real-time ke email Anda: <b id="successBookingEmail" class="text-slate-900">nama@gmail.com</b>.
+          <p class="text-[11px] leading-relaxed text-slate-600 dark:text-slate-400">
+            Status pengajuan ini sedang diverifikasi oleh admin. Pembaruan status persetujuan akan dikirim secara real-time ke email Anda: <b id="successBookingEmail" class="text-slate-900 dark:text-white">nama@gmail.com</b>.
           </p>
         </div>
       </div>
 
-      <button onclick="closeBookingSuccessModal()" class="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-2xl text-xs shadow-lg transition transform active:scale-95 cursor-pointer flex items-center justify-center space-x-2">
+      <button onclick="closeBookingSuccessModal()" class="w-full py-3.5 bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-700 text-white font-bold rounded-2xl text-xs shadow-lg transition transform active:scale-95 cursor-pointer flex items-center justify-center space-x-2">
         <span>Mengerti & Lihat Status</span>
         <i class="fa-solid fa-arrow-right text-xs"></i>
       </button>
@@ -737,55 +749,55 @@
 
   <!-- MODAL: PAST TIME WARNING -->
   <div id="pastTimeWarningModal" class="fixed inset-0 z-[999999] bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden animate-fade-in">
-    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center space-y-4">
-      <div class="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-sm animate-bounce"><i class="fa-solid fa-clock-rotate-left"></i></div>
-      <h3 class="text-base font-black text-slate-900">Waktu Telah Terlewat!</h3>
+    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center space-y-4">
+      <div class="w-14 h-14 bg-amber-50 dark:bg-amber-950/50 text-amber-600 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-sm animate-bounce"><i class="fa-solid fa-clock-rotate-left"></i></div>
+      <h3 class="text-base font-black text-slate-900 dark:text-white">Waktu Telah Terlewat!</h3>
       <p id="pastTimeModalText" class="text-xs text-slate-500 leading-relaxed">Jam atau waktu pelaksanaan yang Anda pilih sudah terlewat untuk hari ini. Silakan pilih waktu yang valid.</p>
-      <button onclick="closePastTimeModal()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition transform active:scale-95 cursor-pointer">Mengerti</button>
+      <button onclick="closePastTimeModal()" class="w-full py-3 bg-slate-900 dark:bg-slate-800 text-white font-bold rounded-xl text-xs transition transform active:scale-95 cursor-pointer">Mengerti</button>
     </div>
   </div>
 
   <!-- MODAL: BOOKING DETAILS WITH EXECUTION STATUS -->
   <div id="bookingDetailsModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto animate-fade-in">
-    <div class="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-8 shadow-2xl relative space-y-4 my-auto">
-      <button onclick="closeBookingDetailsModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
-      <h3 id="modalDetailTitle" class="text-base font-black text-slate-900">Informasi Jadwal Peminjaman</h3>
+    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full p-5 sm:p-8 shadow-2xl relative space-y-4 my-auto">
+      <button onclick="closeBookingDetailsModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
+      <h3 id="modalDetailTitle" class="text-base font-black text-slate-900 dark:text-white">Informasi Jadwal Peminjaman</h3>
       <div id="modalDetailContent" class="space-y-3 text-xs max-h-96 overflow-y-auto pr-1"></div>
       <div class="flex justify-end pt-2">
-        <button type="button" onclick="closeBookingDetailsModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition cursor-pointer text-xs">Tutup</button>
+        <button type="button" onclick="closeBookingDetailsModal()" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold rounded-xl transition cursor-pointer text-xs">Tutup</button>
       </div>
     </div>
   </div>
 
   <!-- MODAL: CAPACITY EXCEEDED WARNING -->
   <div id="capacityPopupModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden animate-fade-in">
-    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center space-y-4">
-      <div class="w-14 h-14 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-sm animate-bounce"><i class="fa-solid fa-triangle-exclamation"></i></div>
-      <h3 class="text-base font-black text-slate-900">Kapasitas Ruangan Terlampaui</h3>
+    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center space-y-4">
+      <div class="w-14 h-14 bg-rose-50 dark:bg-rose-950/50 text-rose-600 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-sm animate-bounce"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <h3 class="text-base font-black text-slate-900 dark:text-white">Kapasitas Ruangan Terlampaui</h3>
       <p id="popupCapacityText" class="text-xs text-slate-500 leading-relaxed"></p>
-      <button onclick="closeCapacityPopup()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition transform active:scale-95 cursor-pointer">Mengerti</button>
+      <button onclick="closeCapacityPopup()" class="w-full py-3 bg-slate-900 dark:bg-slate-800 text-white font-bold rounded-xl text-xs transition transform active:scale-95 cursor-pointer">Mengerti</button>
     </div>
   </div>
 
   <!-- MODAL: CANCEL BOOKING -->
   <div id="cancelBookingModal" class="fixed inset-0 z-[999999] bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto animate-fade-in" style="display: none;">
-    <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-8 shadow-2xl relative space-y-5 my-auto z-[1000000]">
-      <button onclick="closeCancelModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
+    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-5 sm:p-8 shadow-2xl relative space-y-5 my-auto z-[1000000]">
+      <button onclick="closeCancelModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
       <div class="space-y-1">
         <span class="text-[10px] font-extrabold text-rose-600 uppercase tracking-wider block">PEMBATALAN JADWAL</span>
-        <h3 class="text-base font-black text-slate-900">Batalkan Peminjaman</h3>
+        <h3 class="text-base font-black text-slate-900 dark:text-white">Batalkan Peminjaman</h3>
       </div>
       <form onsubmit="handleCancelBookingSubmit(event)" class="space-y-4 text-xs">
         <div>
-          <label class="block font-bold text-slate-700 mb-1.5">ID Peminjaman</label>
-          <input type="text" id="cancelBookingId" required placeholder="CONTOH: PMJ-1029" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none font-mono font-bold uppercase">
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">ID Peminjaman</label>
+          <input type="text" id="cancelBookingId" required placeholder="CONTOH: PMJ-1029" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 outline-none font-mono font-bold uppercase text-slate-800 dark:text-slate-200">
         </div>
         <div>
-          <label class="block font-bold text-slate-700 mb-1.5">Alasan Pembatalan</label>
-          <textarea id="cancelReason" rows="3" required placeholder="Tuliskan alasan..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none resize-none"></textarea>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Alasan Pembatalan</label>
+          <textarea id="cancelReason" rows="3" required placeholder="Tuliskan alasan..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 outline-none resize-none text-slate-800 dark:text-slate-200"></textarea>
         </div>
         <div class="flex items-center justify-end space-x-3 pt-2">
-          <button type="button" onclick="closeCancelModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition cursor-pointer">Tutup</button>
+          <button type="button" onclick="closeCancelModal()" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold rounded-xl transition cursor-pointer">Tutup</button>
           <button type="submit" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl shadow-md transition transform active:scale-95 cursor-pointer flex items-center space-x-2">
             <i class="fa-solid fa-ban text-xs"></i>
             <span>Konfirmasi Batal</span>
@@ -796,29 +808,29 @@
   </div>
 
   <div id="roomModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto animate-fade-in">
-    <div class="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-8 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto">
-      <button onclick="closeRoomModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
-      <div class="mb-5 space-y-1"><h3 id="roomModalTitle" class="text-base sm:text-lg font-black text-slate-900 tracking-tight">Tambah Ruangan Baru</h3></div>
+    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full p-5 sm:p-8 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto">
+      <button onclick="closeRoomModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
+      <div class="mb-5 space-y-1"><h3 id="roomModalTitle" class="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">Tambah Ruangan Baru</h3></div>
       <form id="roomForm" onsubmit="handleRoomFormSubmit(event)" class="space-y-4 text-xs">
         <input type="hidden" id="editRoomId">
         <input type="hidden" id="inputRoomExistingPhoto" value="">
-        <div><label class="block font-bold text-slate-700 mb-1.5">Nama Ruangan</label><input type="text" id="inputRoomName" required placeholder="Contoh: Ruang Rapat Kartini" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none"></div>
+        <div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Nama Ruangan</label><input type="text" id="inputRoomName" required placeholder="Contoh: Ruang Rapat Kartini" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 outline-none text-slate-800 dark:text-slate-200"></div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div><label class="block font-bold text-slate-700 mb-1.5">Kategori</label>
-            <select id="inputRoomCategory" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none cursor-pointer">
+          <div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Kategori</label>
+            <select id="inputRoomCategory" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none cursor-pointer">
               <option value="Rapat">Rapat</option><option value="VIP">VIP</option><option value="Auditorium">Auditorium</option><option value="Diskusi">Diskusi</option>
             </select>
           </div>
-          <div><label class="block font-bold text-slate-700 mb-1.5">Kapasitas</label><input type="text" id="inputRoomCapacity" required placeholder="Contoh: 40 Orang" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none"></div>
+          <div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Kapasitas</label><input type="text" id="inputRoomCapacity" required placeholder="Contoh: 40 Orang" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none"></div>
         </div>
-        <div><label class="block font-bold text-slate-700 mb-1.5">Dinas / Bidang Pengelola <span class="text-slate-400 font-normal">(Ketik Manual)</span></label><input type="text" id="inputRoomUnit" required placeholder="Contoh: Bagian Umum" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none"></div>
-        <div><label class="block font-bold text-slate-700 mb-1.5">Fasilitas <span class="text-slate-400 font-normal">(pisahkan dengan koma)</span></label><input type="text" id="inputRoomFeatures" required placeholder="Contoh: Proyektor, AC" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none"></div>
-        <div><label class="block font-bold text-slate-700 mb-1.5">Deskripsi</label><textarea id="inputRoomDesc" rows="2" required placeholder="Deskripsi..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none resize-none"></textarea></div>
+        <div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Dinas / Bidang Pengelola <span class="text-slate-400 font-normal">(Ketik Manual)</span></label><input type="text" id="inputRoomUnit" required placeholder="Contoh: Bagian Umum" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none"></div>
+        <div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Fasilitas <span class="text-slate-400 font-normal">(pisahkan dengan koma)</span></label><input type="text" id="inputRoomFeatures" required placeholder="Contoh: Proyektor, AC" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none"></div>
+        <div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Deskripsi</label><textarea id="inputRoomDesc" rows="2" required placeholder="Deskripsi..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none resize-none"></textarea></div>
         
         <div>
-          <label class="block font-bold text-slate-700 mb-1.5">Upload Foto Ruangan <span class="text-rose-600">(JPG/PNG - Bisa Multi Foto)</span></label>
-          <div class="flex items-center space-x-2 bg-slate-50 border border-slate-200 rounded-xl p-2">
-            <label class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-lg cursor-pointer text-[11px] transition">
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Upload Foto Ruangan <span class="text-rose-600">(JPG/PNG - Bisa Multi Foto)</span></label>
+          <div class="flex items-center space-x-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-2">
+            <label class="px-3 py-1.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold rounded-lg cursor-pointer text-[11px] transition">
               Pilih Foto
               <input type="file" id="inputRoomPhotoFile" accept="image/*" multiple class="hidden" onchange="document.getElementById('roomPhotoNameSpan').innerText = this.files.length > 0 ? `${this.files.length} foto dipilih` : 'Tidak ada foto dipilih'">
             </label>
@@ -826,8 +838,8 @@
           </div>
         </div>
 
-        <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100">
-          <button type="button" onclick="closeRoomModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition cursor-pointer">Batal</button>
+        <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+          <button type="button" onclick="closeRoomModal()" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold rounded-xl transition cursor-pointer">Batal</button>
           <button type="submit" id="submitRoomBtn" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition transform active:scale-95 cursor-pointer flex items-center"><i class="fa-solid fa-floppy-disk mr-2"></i> Simpan Ruangan</button>
         </div>
       </form>
@@ -835,6 +847,39 @@
   </div>
 
   <script>
+    // Theme Switcher (Siang / Malam)
+    function toggleDarkMode() {
+      const htmlEl = document.documentElement;
+      const themeIcon = document.getElementById('themeIcon');
+      if (htmlEl.classList.contains('dark')) {
+        htmlEl.classList.remove('dark');
+        localStorage.setItem('sirupa_theme', 'light');
+        if (themeIcon) {
+          themeIcon.className = 'fa-solid fa-moon text-sm';
+        }
+        showToast('Mode Siang (Light Mode) diaktifkan', 'info');
+      } else {
+        htmlEl.classList.add('dark');
+        localStorage.setItem('sirupa_theme', 'dark');
+        if (themeIcon) {
+          themeIcon.className = 'fa-solid fa-sun text-sm text-amber-400';
+        }
+        showToast('Mode Malam (Dark Mode) diaktifkan', 'info');
+      }
+    }
+
+    function initTheme() {
+      const savedTheme = localStorage.getItem('sirupa_theme');
+      const themeIcon = document.getElementById('themeIcon');
+      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        if (themeIcon) themeIcon.className = 'fa-solid fa-sun text-sm text-amber-400';
+      } else {
+        document.documentElement.classList.remove('dark');
+        if (themeIcon) themeIcon.className = 'fa-solid fa-moon text-sm';
+      }
+    }
+
     const apiService = {
       appsScriptUrl: 'https://script.google.com/macros/s/AKfycbxVY3olkned09IuWKbDAVKXfgpT8_JPaFIMPX3F7kV7iTXbS5Y23NQ0HjUB8RHYfDD0QQ/exec',
 
@@ -1170,18 +1215,18 @@
       }
 
       if (filteredRooms.length === 0) {
-        container.innerHTML = `<div class="col-span-2 py-12 text-center text-slate-400 font-medium bg-white rounded-3xl border border-slate-200">Tidak ada ruangan untuk unit / dinas "${selectedUnit}".</div>`;
+        container.innerHTML = `<div class="col-span-2 py-12 text-center text-slate-400 font-medium bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800">Tidak ada ruangan untuk unit / dinas "${selectedUnit}".</div>`;
         return;
       }
 
       filteredRooms.forEach((room) => {
-        const featuresHtml = (room.features || []).map(f => `<span class="inline-flex items-center text-[10px] sm:text-[11px] text-slate-600 font-medium mr-1.5 mb-1 bg-slate-100 px-2 py-0.5 rounded-md"><i class="fa-solid fa-check text-emerald-600 mr-1 text-xs"></i> ${f}</span>`).join('');
+        const featuresHtml = (room.features || []).map(f => `<span class="inline-flex items-center text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-300 font-medium mr-1.5 mb-1 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md"><i class="fa-solid fa-check text-emerald-600 mr-1 text-xs"></i> ${f}</span>`).join('');
         
         const isUnderMaintenance = room.statusText === 'Sedang Perbaikan' || room.statusText === 'Tidak Tersedia';
         const btnDisabledAttr = isUnderMaintenance ? 'disabled' : '';
         const btnClass = isUnderMaintenance 
-          ? 'bg-slate-200 text-slate-400 cursor-not-allowed px-4 py-2.5 rounded-2xl text-xs font-bold' 
-          : 'bg-transparent text-blue-600 hover:underline font-bold text-xs transition cursor-pointer';
+          ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed px-4 py-2.5 rounded-2xl text-xs font-bold' 
+          : 'bg-transparent text-blue-600 dark:text-blue-400 hover:underline font-bold text-xs transition cursor-pointer';
 
         const images = (room.images && room.images.length > 0) ? room.images : ['https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80'];
         const currentIdx = room.currentImageIdx || 0;
@@ -1198,22 +1243,22 @@
         }
 
         container.innerHTML += `
-          <div class="bg-white rounded-3xl border border-slate-200 shadow-xs hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 overflow-hidden flex flex-col justify-between">
+          <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 overflow-hidden flex flex-col justify-between">
             <div>
-              <div class="relative h-48 sm:h-56 w-full overflow-hidden bg-slate-100 group">
+              <div class="relative h-48 sm:h-56 w-full overflow-hidden bg-slate-100 dark:bg-slate-800 group">
                 <img src="${activePhoto}" alt="${room.name}" class="w-full h-full object-cover transform hover:scale-105 transition duration-700" onerror="this.src='https://placehold.co/800x400/e2e8f0/64748b?text=Ruangan'">
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent pointer-events-none"></div>
-                <span class="absolute top-3 right-3 sm:top-4 sm:right-4 bg-white/90 backdrop-blur-md text-slate-800 text-[11px] sm:text-xs font-semibold px-3.5 py-1.5 rounded-full shadow-sm flex items-center z-10"><i class="fa-solid fa-users text-blue-600 mr-1.5"></i> ${room.capacity}</span>
+                <span class="absolute top-3 right-3 sm:top-4 sm:right-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md text-slate-800 dark:text-slate-200 text-[11px] sm:text-xs font-semibold px-3.5 py-1.5 rounded-full shadow-sm flex items-center z-10"><i class="fa-solid fa-users text-blue-600 mr-1.5"></i> ${room.capacity}</span>
                 <span class="absolute top-3 left-3 sm:top-4 sm:left-4 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider z-10">${room.unit || 'Umum'}</span>
                 ${dotsHtml}
               </div>
               <div class="p-4 sm:p-6 space-y-2.5">
-                <h4 class="text-base sm:text-lg font-bold text-slate-900">${room.name}</h4>
-                <p class="text-[11px] sm:text-xs text-slate-500 leading-relaxed">${room.description}</p>
+                <h4 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">${room.name}</h4>
+                <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 leading-relaxed">${room.description}</p>
                 <div class="flex flex-wrap pt-1">${featuresHtml}</div>
               </div>
             </div>
-            <div class="p-4 sm:p-6 pt-0 flex items-center justify-between border-t border-slate-100 mt-2 pt-3 sm:pt-4">
+            <div class="p-4 sm:p-6 pt-0 flex items-center justify-between border-t border-slate-100 dark:border-slate-800 mt-2 pt-3 sm:pt-4">
               <span class="inline-flex items-center px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-bold border ${room.badgeClass}"><i class="fa-solid ${room.icon} mr-1.5"></i> ${room.statusText}</span>
               <button ${btnDisabledAttr} onclick="openBookingModalForRoom('${room.name}')" class="${btnClass}">Pinjam Ruangan</button>
             </div>
@@ -1287,11 +1332,11 @@
         const formattedDate = formatDDMMYYYY(displayDate);
 
         tbody.innerHTML += `
-          <tr class="hover:bg-slate-50/80 transition">
-            <td class="p-3 sm:p-4 pl-5 sm:pl-6"><span class="font-bold text-blue-600">${item.id}</span><div class="text-[11px] text-slate-400">${item.pemohon}</div></td>
-            <td class="p-3 sm:p-4 font-bold text-slate-800">${item.kegiatan}</td>
-            <td class="p-3 sm:p-4 text-slate-600 font-medium">${item.ruangan}</td>
-            <td class="p-3 sm:p-4"><div class="font-medium text-slate-700">${formattedDate}</div><div class="text-[11px] text-slate-400">${item.jam}</div></td>
+          <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/55 transition">
+            <td class="p-3 sm:p-4 pl-5 sm:pl-6"><span class="font-bold text-blue-600 dark:text-blue-400">${item.id}</span><div class="text-[11px] text-slate-400">${item.pemohon}</div></td>
+            <td class="p-3 sm:p-4 font-bold text-slate-800 dark:text-slate-200">${item.kegiatan}</td>
+            <td class="p-3 sm:p-4 text-slate-600 dark:text-slate-400 font-medium">${item.ruangan}</td>
+            <td class="p-3 sm:p-4"><div class="font-medium text-slate-700 dark:text-slate-300">${formattedDate}</div><div class="text-[11px] text-slate-400">${item.jam}</div></td>
             <td class="p-3 sm:p-4 pr-5 sm:pr-6">${getStatusBadge(item.status)}</td>
           </tr>`;
       });
@@ -1351,13 +1396,13 @@
           const reminderTitle = isToday ? 'Pengingat Hari Ini' : 'Pengingat H-1 Penggunaan';
           
           reminderHTML += `
-            <div class="bg-amber-50 border border-amber-200 p-3 rounded-2xl space-y-1 animate-fade-in">
+            <div class="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 p-3 rounded-2xl space-y-1 animate-fade-in">
               <div class="flex items-center justify-between">
-                <span class="text-[10px] font-extrabold text-amber-800 uppercase tracking-wider"><i class="fa-solid fa-clock mr-1"></i> ${reminderTitle} (${formatDDMMYYYY(dStr)})</span>
+                <span class="text-[10px] font-extrabold text-amber-800 dark:text-amber-300 uppercase tracking-wider"><i class="fa-solid fa-clock mr-1"></i> ${reminderTitle} (${formatDDMMYYYY(dStr)})</span>
                 <span class="text-[10px] font-bold text-slate-500">${b.jam}</span>
               </div>
-              <div class="font-bold text-slate-900 text-xs">${b.kegiatan}</div>
-              <div class="text-[11px] text-slate-600">Ruangan: <b>${b.ruangan}</b></div>
+              <div class="font-bold text-slate-900 dark:text-white text-xs">${b.kegiatan}</div>
+              <div class="text-[11px] text-slate-600 dark:text-slate-300">Ruangan: <b>${b.ruangan}</b></div>
               <div class="text-[10px] text-slate-400">Pengingat terkirim ke: ${b.email}</div>
             </div>`;
         });
@@ -1493,7 +1538,7 @@
 
       ['navDashboard', 'navCheckRoom', 'navAdmin'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.className = "flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold transition-all text-slate-600 hover:text-blue-600 cursor-pointer";
+        if (el) el.className = "flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold transition-all text-slate-600 dark:text-slate-300 hover:text-blue-600 cursor-pointer";
       });
 
       ['mobNavDashboard', 'mobNavCheckRoom', 'mobNavAdmin'].forEach(id => {
@@ -1516,7 +1561,7 @@
         renderRoomCards();
       } else if (viewName === 'admin') {
         document.getElementById('viewAdmin').classList.remove('hidden');
-        if (document.getElementById('navAdmin')) document.getElementById('navAdmin').className = "flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold transition-all bg-slate-900 text-white shadow-xs cursor-pointer";
+        if (document.getElementById('navAdmin')) document.getElementById('navAdmin').className = "flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold transition-all bg-slate-900 dark:bg-blue-600 text-white shadow-xs cursor-pointer";
         if (document.getElementById('mobNavAdmin')) document.getElementById('mobNavAdmin').className = "flex flex-col items-center text-blue-600 space-y-0.5";
         
         checkAutoCancellation();
@@ -1585,18 +1630,18 @@
             return bDate === dateStr && b.status === 'Disetujui';
           });
           const hasBookings = bookingsOnThisDay.length > 0;
-          let cellBgClass = 'bg-white', textColor = isCurrentMonth ? 'text-slate-800' : 'text-slate-300', clickAttr = '';
+          let cellBgClass = 'bg-white dark:bg-slate-900', textColor = isCurrentMonth ? 'text-slate-800 dark:text-slate-200' : 'text-slate-300 dark:text-slate-700', clickAttr = '';
 
           if (hasBookings) {
-            cellBgClass = 'bg-rose-100/75 cursor-pointer hover:bg-rose-200/80 active:bg-rose-300';
-            textColor = 'text-slate-900 font-bold';
+            cellBgClass = 'bg-rose-100/75 dark:bg-rose-950/60 cursor-pointer hover:bg-rose-200/80 dark:hover:bg-rose-900/60';
+            textColor = 'text-slate-900 dark:text-white font-bold';
             const bInfo = encodeURIComponent(JSON.stringify(bookingsOnThisDay));
             clickAttr = `onclick="showBookingDetails('${bInfo}')"`;
           } else {
             clickAttr = `onclick="showEmptyAgendaModal('${dateStr}')"`;
           }
 
-          rowHtml += `<td ${clickAttr} class="align-top border-r border-slate-200 p-1.5 sm:p-2 relative ${cellBgClass} transition cursor-pointer"><span class="${textColor} text-xs">${dayNum}</span>${hasBookings ? '<span class="absolute bottom-1.5 right-1.5 w-2 h-2 bg-rose-600 rounded-full live-pulse"></span>' : ''}</td>`;
+          rowHtml += `<td ${clickAttr} class="align-top border-r border-slate-200 dark:border-slate-800 p-1.5 sm:p-2 relative ${cellBgClass} transition cursor-pointer"><span class="${textColor} text-xs">${dayNum}</span>${hasBookings ? '<span class="absolute bottom-1.5 right-1.5 w-2 h-2 bg-rose-600 rounded-full live-pulse"></span>' : ''}</td>`;
         }
         rowHtml += '</tr>';
         if (dateCounter > totalDays && i >= 4) break;
@@ -1608,7 +1653,7 @@
       const modal = document.getElementById('bookingDetailsModal');
       const content = document.getElementById('modalDetailContent');
       document.getElementById('modalDetailTitle').innerText = `Agenda Tanggal ${formatDDMMYYYY(dateStr)}`;
-      content.innerHTML = `<div class="text-center py-6 space-y-2"><div class="w-12 h-12 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto text-lg"><i class="fa-solid fa-calendar-xmark"></i></div><h4 class="font-bold text-slate-800 text-sm">Tidak tersedia agenda pada tanggal ini</h4></div>`;
+      content.innerHTML = `<div class="text-center py-6 space-y-2"><div class="w-12 h-12 bg-slate-100 dark:bg-slate-800 text-slate-400 rounded-full flex items-center justify-center mx-auto text-lg"><i class="fa-solid fa-calendar-xmark"></i></div><h4 class="font-bold text-slate-800 dark:text-slate-200 text-sm">Tidak tersedia agenda pada tanggal ini</h4></div>`;
       modal.classList.remove('hidden');
     }
 
@@ -1638,24 +1683,24 @@
           const bookingEndDateTime = new Date(displayDateDetail + 'T' + String(endH).padStart(2, '0') + ':' + String(endM).padStart(2, '0') + ':00');
 
           if (now > bookingEndDateTime) {
-            executionBadge = `<span class="bg-slate-100 text-slate-600 border border-slate-300 px-2.5 py-0.5 rounded-full text-[10px] font-bold"><i class="fa-solid fa-check-double mr-1"></i> Telah Dilaksanakan</span>`;
+            executionBadge = `<span class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-700 px-2.5 py-0.5 rounded-full text-[10px] font-bold"><i class="fa-solid fa-check-double mr-1"></i> Telah Dilaksanakan</span>`;
           } else {
-            executionBadge = `<span class="bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold"><i class="fa-solid fa-clock mr-1"></i> Akan Dilaksanakan</span>`;
+            executionBadge = `<span class="bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900 px-2.5 py-0.5 rounded-full text-[10px] font-bold"><i class="fa-solid fa-clock mr-1"></i> Akan Dilaksanakan</span>`;
           }
 
           html += `
-            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2 mb-3 last:mb-0">
+            <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-2 mb-3 last:mb-0">
               <div class="flex justify-between items-center flex-wrap gap-1">
-                <span class="font-mono font-bold text-blue-600 text-xs">${b.id}</span>
+                <span class="font-mono font-bold text-blue-600 dark:text-blue-400 text-xs">${b.id}</span>
                 <div class="flex items-center space-x-1">
                   ${executionBadge}
                   ${getStatusBadge(b.status)}
                 </div>
               </div>
-              <div class="text-xs font-extrabold text-slate-900">${b.kegiatan}</div>
-              <div class="text-xs text-slate-700"><strong>Ruangan:</strong> ${b.ruangan}</div>
-              <div class="text-xs text-slate-700"><strong>Pemohon:</strong> ${b.pemohon} (${b.unit})</div>
-              <div class="text-xs text-slate-600 bg-white p-2 rounded-xl border border-slate-100">
+              <div class="text-xs font-extrabold text-slate-900 dark:text-white">${b.kegiatan}</div>
+              <div class="text-xs text-slate-700 dark:text-slate-300"><strong>Ruangan:</strong> ${b.ruangan}</div>
+              <div class="text-xs text-slate-700 dark:text-slate-300"><strong>Pemohon:</strong> ${b.pemohon} (${b.unit})</div>
+              <div class="text-xs text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-100 dark:border-slate-800">
                 <i class="fa-solid fa-calendar-day text-blue-600 mr-1.5"></i> <strong>Waktu:</strong> ${formattedDDMMYYYY} | ${b.jam}
               </div>
             </div>`;
@@ -1735,15 +1780,15 @@
 
       filteredRooms.forEach(room => {
         container.innerHTML += `
-          <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 sm:p-4 space-y-3">
+          <div class="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-3.5 sm:p-4 space-y-3">
             <div class="flex items-center justify-between">
-              <div><h4 class="font-bold text-xs text-slate-900">${room.name}</h4><p class="text-[10px] text-slate-500">Unit: ${room.unit || 'Umum'} | Kapasitas: ${room.capacity}</p></div>
+              <div><h4 class="font-bold text-xs text-slate-900 dark:text-white">${room.name}</h4><p class="text-[10px] text-slate-500">Unit: ${room.unit || 'Umum'} | Kapasitas: ${room.capacity}</p></div>
               <span class="inline-flex items-center text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${room.badgeClass}"><i class="fa-solid ${room.icon} mr-1"></i> ${room.statusText}</span>
             </div>
             <div class="flex items-center justify-end space-x-1.5 pt-1">
-              <button onclick="cycleRoomStatus('${room.id}')" title="Ubah Status" class="w-8 h-8 bg-white hover:bg-slate-100 text-blue-600 rounded-xl border border-slate-200 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-arrows-rotate text-xs"></i></button>
-              <button onclick="openEditRoomModal('${room.id}')" title="Edit Ruangan" class="w-8 h-8 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-pen-to-square text-xs"></i></button>
-              <button onclick="deleteRoom('${room.id}')" title="Hapus Ruangan" class="w-8 h-8 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-xl flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-trash-can text-xs"></i></button>
+              <button onclick="cycleRoomStatus('${room.id}')" title="Ubah Status" class="w-8 h-8 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-blue-600 dark:text-blue-400 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-arrows-rotate text-xs"></i></button>
+              <button onclick="openEditRoomModal('${room.id}')" title="Edit Ruangan" class="w-8 h-8 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-xl flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-pen-to-square text-xs"></i></button>
+              <button onclick="deleteRoom('${room.id}')" title="Hapus Ruangan" class="w-8 h-8 bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 text-rose-700 dark:text-rose-300 rounded-xl flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-trash-can text-xs"></i></button>
             </div>
           </div>`;
       });
@@ -1814,30 +1859,30 @@
 
         const disabledBtnAttr = isActionDisabled ? 'disabled' : '';
         const setujuiBtnClass = isActionDisabled 
-          ? 'px-3 py-1.5 bg-slate-100 text-slate-400 border border-slate-200 font-bold rounded-xl text-[11px] opacity-40 cursor-not-allowed pointer-events-none' 
-          : 'px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-xl text-[11px] transition cursor-pointer border border-emerald-200';
+          ? 'px-3 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-400 border border-slate-200 dark:border-slate-700 font-bold rounded-xl text-[11px] opacity-40 cursor-not-allowed pointer-events-none' 
+          : 'px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 font-bold rounded-xl text-[11px] transition cursor-pointer border border-emerald-200 dark:border-emerald-800';
 
         const tolakBtnClass = isActionDisabled 
-          ? 'px-3 py-1.5 bg-slate-100 text-slate-400 border border-slate-200 font-bold rounded-xl text-[11px] opacity-40 cursor-not-allowed pointer-events-none' 
-          : 'px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-[11px] transition cursor-pointer border border-rose-200';
+          ? 'px-3 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-400 border border-slate-200 dark:border-slate-700 font-bold rounded-xl text-[11px] opacity-40 cursor-not-allowed pointer-events-none' 
+          : 'px-3 py-1.5 bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 text-rose-700 dark:text-rose-300 font-bold rounded-xl text-[11px] transition cursor-pointer border border-rose-200 dark:border-rose-800';
 
         tbody.innerHTML += `
-          <tr class="hover:bg-slate-50 transition">
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
             <td class="p-4 pl-5">
-              <span class="font-bold text-blue-600">${item.id}</span>
-              <div class="text-[11px] text-slate-600 font-medium">${item.pemohon}</div>
+              <span class="font-bold text-blue-600 dark:text-blue-400">${item.id}</span>
+              <div class="text-[11px] text-slate-600 dark:text-slate-300 font-medium">${item.pemohon}</div>
               <div class="text-[10px] text-slate-400">${item.unit}</div>
             </td>
-            <td class="p-4 font-bold text-slate-800">${item.kegiatan}</td>
-            <td class="p-4 text-slate-700">${item.ruangan}</td>
+            <td class="p-4 font-bold text-slate-800 dark:text-slate-200">${item.kegiatan}</td>
+            <td class="p-4 text-slate-700 dark:text-slate-300">${item.ruangan}</td>
             <td class="p-4">
-              <div class="font-semibold text-slate-800">${formattedDate}</div>
+              <div class="font-semibold text-slate-800 dark:text-slate-200">${formattedDate}</div>
               <div class="text-[10px] text-slate-400">${item.jam}</div>
             </td>
             <td class="p-4">${getStatusBadge(item.status)}</td>
             <td class="p-4 pr-5 text-center">
               <div class="inline-flex items-center space-x-1.5">
-                <button onclick="openPdfModal('${pdfUrl}', '${item.id}')" title="Lihat Berkas PDF" class="px-2.5 py-1.5 bg-blue-50 ${pdfBtnDisabled} text-blue-700 font-bold rounded-xl text-[11px] transition inline-flex items-center border border-blue-200 cursor-pointer">
+                <button onclick="openPdfModal('${pdfUrl}', '${item.id}')" title="Lihat Berkas PDF" class="px-2.5 py-1.5 bg-blue-50 dark:bg-blue-950/50 ${pdfBtnDisabled} text-blue-700 dark:text-blue-300 font-bold rounded-xl text-[11px] transition inline-flex items-center border border-blue-200 dark:border-blue-800 cursor-pointer">
                   <i class="fa-solid fa-file-pdf mr-1 text-xs text-rose-500"></i> PDF
                 </button>
                 <button ${disabledBtnAttr} onclick="updateBookingStatusInCloud('${item.id}', 'Disetujui')" class="${setujuiBtnClass}">Setujui</button>
@@ -1890,29 +1935,29 @@
         modal.id = 'pdfViewerModal';
         modal.className = 'fixed inset-0 z-50 bg-slate-950/70 modal-blur flex items-center justify-center p-3 sm:p-4 animate-fade-in';
         modal.innerHTML = `
-          <div class="bg-white rounded-3xl max-w-4xl w-full p-5 sm:p-6 shadow-2xl relative space-y-4 my-auto h-[85vh] flex flex-col">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3 flex-wrap gap-2">
+          <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-4xl w-full p-5 sm:p-6 shadow-2xl relative space-y-4 my-auto h-[85vh] flex flex-col">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3 flex-wrap gap-2">
               <div class="flex items-center space-x-2">
                 <div class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-xs"><i class="fa-solid fa-file-pdf"></i></div>
                 <div>
-                  <h3 id="pdfModalTitle" class="text-sm sm:text-base font-black text-slate-900">Pratinjau Berkas PDF</h3>
+                  <h3 id="pdfModalTitle" class="text-sm sm:text-base font-black text-slate-900 dark:text-white">Pratinjau Berkas PDF</h3>
                   <p class="text-[10px] text-slate-400">Tampilan langsung tanpa minta akses / login</p>
                 </div>
               </div>
               <div class="flex items-center space-x-2 flex-wrap">
-                <button onclick="printPdfModalFile()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition flex items-center cursor-pointer border border-slate-200">
+                <button onclick="printPdfModalFile()" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl transition flex items-center cursor-pointer border border-slate-200 dark:border-slate-700">
                   <i class="fa-solid fa-print mr-1.5 text-xs text-blue-600"></i> Cetak PDF
                 </button>
-                <a id="pdfDownloadLink" href="#" download="Berkas-Peminjaman.pdf" target="_blank" class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold rounded-xl transition flex items-center cursor-pointer">
+                <a id="pdfDownloadLink" href="#" download="Berkas-Peminjaman.pdf" target="_blank" class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs font-bold rounded-xl transition flex items-center cursor-pointer">
                   <i class="fa-solid fa-download mr-1.5 text-xs"></i> Unduh PDF
                 </a>
-                <a id="pdfExternalLink" href="#" target="_blank" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition flex items-center border border-slate-200">
+                <a id="pdfExternalLink" href="#" target="_blank" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl transition flex items-center border border-slate-200 dark:border-slate-700">
                   <i class="fa-solid fa-up-right-from-square mr-1.5 text-[10px]"></i> Tab Baru
                 </a>
-                <button onclick="closePdfModal()" class="text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="closePdfModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark"></i></button>
               </div>
             </div>
-            <div class="flex-grow bg-slate-100 rounded-2xl overflow-hidden relative shadow-inner">
+            <div class="flex-grow bg-slate-100 dark:bg-slate-800 rounded-2xl overflow-hidden relative shadow-inner">
               <iframe id="pdfIframe" src="" class="w-full h-full border-0" allow="autoplay"></iframe>
             </div>
           </div>`;
@@ -1994,23 +2039,23 @@
 
       paginatedList.forEach(acc => {
         const isSuperBadge = acc.isSuper 
-          ? '<span class="bg-purple-50 text-purple-700 border border-purple-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center"><i class="fa-solid fa-shield-halved mr-1 text-purple-600"></i> Super Admin</span>' 
-          : '<span class="bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center"><i class="fa-solid fa-user-shield mr-1 text-blue-600"></i> Admin Dinas</span>';
+          ? '<span class="bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 px-2.5 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center"><i class="fa-solid fa-shield-halved mr-1 text-purple-600"></i> Super Admin</span>' 
+          : '<span class="bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 px-2.5 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center"><i class="fa-solid fa-user-shield mr-1 text-blue-600"></i> Admin Dinas</span>';
 
         tbody.innerHTML += `
-          <tr class="hover:bg-slate-50 transition">
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
             <td class="p-3 pl-4">
-              <div class="font-bold text-slate-900">${acc.name}</div>
-              <div class="text-[11px] font-mono text-blue-600">@${acc.username}</div>
+              <div class="font-bold text-slate-900 dark:text-white">${acc.name}</div>
+              <div class="text-[11px] font-mono text-blue-600 dark:text-blue-400">@${acc.username}</div>
             </td>
             <td class="p-3">${isSuperBadge}</td>
-            <td class="p-3 text-slate-600 font-medium">${acc.unit}</td>
+            <td class="p-3 text-slate-600 dark:text-slate-300 font-medium">${acc.unit}</td>
             <td class="p-3 pr-4 text-center">
               <div class="inline-flex items-center space-x-1.5 justify-center">
-                <button onclick="openEditAdminModal('${acc.username}')" title="Edit Akun" class="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold rounded-xl text-[11px] transition inline-flex items-center border border-blue-200 cursor-pointer">
+                <button onclick="openEditAdminModal('${acc.username}')" title="Edit Akun" class="px-2.5 py-1.5 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 font-bold rounded-xl text-[11px] transition inline-flex items-center border border-blue-200 dark:border-blue-800 cursor-pointer">
                   <i class="fa-solid fa-pen-to-square mr-1"></i> Edit
                 </button>
-                <button onclick="deleteAdminAccount('${acc.username}')" title="Hapus Akun" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-[11px] transition inline-flex items-center border border-rose-200 cursor-pointer">
+                <button onclick="deleteAdminAccount('${acc.username}')" title="Hapus Akun" class="px-2.5 py-1.5 bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 text-rose-700 dark:text-rose-300 font-bold rounded-xl text-[11px] transition inline-flex items-center border border-rose-200 dark:border-rose-800 cursor-pointer">
                   <i class="fa-solid fa-trash-can mr-1"></i> Hapus
                 </button>
               </div>
@@ -2903,6 +2948,7 @@
     }
 
     window.onload = async function() {
+      initTheme();
       initClock();
       populateRoomOptions();
       populateUnitFilterOptions();
