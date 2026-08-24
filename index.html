@@ -7,8 +7,10 @@
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwind.config = {
-      darkMode: 'class',
+    if (typeof tailwind !== 'undefined') {
+      tailwind.config = {
+        darkMode: 'class',
+      }
     }
   </script>
   <!-- FontAwesome Icons -->
@@ -847,7 +849,6 @@
   </div>
 
   <script>
-    // Theme Switcher (Siang / Malam)
     function toggleDarkMode() {
       const htmlEl = document.documentElement;
       const themeIcon = document.getElementById('themeIcon');
@@ -946,7 +947,7 @@
       failedOtpAttempts: 0,
       lockoutUntil: 0,
       currentYear: 2026,
-      currentMonth: 7, // August (0-indexed)
+      currentMonth: 7,
       currentTablePage: 1,
       itemsPerPage: 5,
       currentAdminTablePage: 1,
@@ -1009,7 +1010,7 @@
     function base32ToBuf(base32) {
       const base32chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
       let bits = "";
-      const clean = base32.replace(/=/g, "").toUpperCase();
+      const clean = String(base32 || "").replace(/=/g, "").toUpperCase();
       for (let i = 0; i < clean.length; i++) {
         const val = base32chars.indexOf(clean.charAt(i));
         if (val === -1) continue;
@@ -1062,10 +1063,10 @@
     }
 
     async function verifyTOTP(secretBase32, inputOtp) {
-      if (!secretBase32 || !inputOtp || inputOtp.length !== 6) return false;
+      if (!secretBase32 || !inputOtp || String(inputOtp).length !== 6) return false;
       for (let step = -1; step <= 1; step++) {
         const validOtp = await generateTOTP(secretBase32, step);
-        if (validOtp && validOtp === inputOtp) {
+        if (validOtp && validOtp === String(inputOtp)) {
           return true;
         }
       }
@@ -1129,7 +1130,7 @@
 
     function timeToMinutes(timeStr) {
       if (!timeStr) return 0;
-      const clean = timeStr.replace(/WIB/gi, '').trim();
+      const clean = String(timeStr).replace(/WIB/gi, '').trim();
       const parts = clean.split(':');
       const hours = parseInt(parts[0], 10) || 0;
       const minutes = parseInt(parts[1], 10) || 0;
@@ -1147,12 +1148,13 @@
     function checkBookingConflictWithTime(ruangan, tanggal, jamMulaiBaru, jamSelesaiBaru, excludeId = null) {
       return appState.bookings.find(b => {
         const isSameRoom = (b.ruangan || '').trim().toLowerCase() === (ruangan || '').trim().toLowerCase();
-        const isSameDate = (b.tanggal || '').split('T')[0] === (tanggal || '').split('T')[0];
+        const isSameDate = (String(b.tanggal || '')).split('T')[0] === (String(tanggal || '')).split('T')[0];
         const isActiveStatus = (b.status === 'Disetujui' || b.status === 'Menunggu');
         const isNotSelf = b.id !== excludeId;
 
         if (isSameRoom && isSameDate && isActiveStatus && isNotSelf) {
-          const parts = (b.jam || '').split(' - ');
+          const jamString = String(b.jam || '');
+          const parts = jamString.split(' - ');
           if (parts.length >= 2) {
             const existingStart = parts[0].trim();
             const existingEnd = parts[1].replace(/WIB/gi, '').trim();
@@ -1169,11 +1171,12 @@
 
       appState.bookings.forEach(b => {
         if (b.status === 'Menunggu') {
-          let displayDateDetail = (b.tanggal || '').split('T')[0];
+          let displayDateDetail = (String(b.tanggal || '')).split('T')[0];
           if (!displayDateDetail) return;
 
           let endH = 23, endM = 59;
-          const parts = (b.jam || '').split(' - ');
+          const jamString = String(b.jam || '');
+          const parts = jamString.split(' - ');
           if (parts.length >= 2) {
             const endHM = parts[1].replace(/WIB/gi, '').trim().split(':');
             endH = parseInt(endHM[0], 10) || 23;
@@ -1325,8 +1328,8 @@
       }
 
       paginatedList.forEach(item => {
-        let displayDate = item.tanggal;
-        if (displayDate && displayDate.includes('T')) {
+        let displayDate = String(item.tanggal || '');
+        if (displayDate.includes('T')) {
           displayDate = displayDate.split('T')[0];
         }
         const formattedDate = formatDDMMYYYY(displayDate);
@@ -1377,7 +1380,7 @@
       const activeBookings = appState.bookings.filter(b => b.status === 'Disetujui');
 
       const h1Bookings = activeBookings.filter(b => {
-        let bDate = (b.tanggal || '').split('T')[0];
+        let bDate = (String(b.tanggal || '')).split('T')[0];
         return bDate === tomorrowStr || bDate === todayStr;
       });
 
@@ -1391,7 +1394,7 @@
       if (h1Bookings.length > 0) {
         reminderCount += h1Bookings.length;
         h1Bookings.forEach(b => {
-          let dStr = (b.tanggal || '').split('T')[0];
+          let dStr = (String(b.tanggal || '')).split('T')[0];
           const isToday = dStr === todayStr;
           const reminderTitle = isToday ? 'Pengingat Hari Ini' : 'Pengingat H-1 Penggunaan';
           
@@ -1626,7 +1629,7 @@
           }
 
           const bookingsOnThisDay = appState.bookings.filter(b => {
-            let bDate = (b.tanggal || '').split('T')[0];
+            let bDate = (String(b.tanggal || '')).split('T')[0];
             return bDate === dateStr && b.status === 'Disetujui';
           });
           const hasBookings = bookingsOnThisDay.length > 0;
@@ -1668,11 +1671,12 @@
         const now = new Date();
 
         bookings.forEach(b => {
-          let displayDateDetail = (b.tanggal || '').split('T')[0];
+          let displayDateDetail = (String(b.tanggal || '')).split('T')[0];
           const formattedDDMMYYYY = formatDDMMYYYY(displayDateDetail);
 
           let executionBadge = '';
-          const parts = (b.jam || '').split(' - ');
+          const jamString = String(b.jam || '');
+          const parts = jamString.split(' - ');
           let endH = 23, endM = 59;
           if (parts.length >= 2) {
             const endHM = parts[1].replace(/WIB/gi, '').trim().split(':');
@@ -1839,11 +1843,12 @@
         const pdfUrl = (item.berkasUrl && item.berkasUrl !== '#') ? item.berkasUrl : '#';
         const pdfBtnDisabled = pdfUrl === '#' ? 'opacity-40 cursor-not-allowed pointer-events-none' : 'hover:bg-blue-100 cursor-pointer';
         
-        let displayDateAdmin = (item.tanggal || '').split('T')[0];
+        let displayDateAdmin = (String(item.tanggal || '')).split('T')[0];
         const formattedDate = formatDDMMYYYY(displayDateAdmin);
 
         let endH = 23, endM = 59;
-        const parts = (item.jam || '').split(' - ');
+        const jamString = String(item.jam || '');
+        const parts = jamString.split(' - ');
         if (parts.length >= 2) {
           const endHM = parts[1].replace(/WIB/gi, '').trim().split(':');
           endH = parseInt(endHM[0], 10) || 23;
@@ -1894,6 +1899,7 @@
     }
 
     let activePdfViewerUrl = '';
+    let activePdfDownloadUrl = '';
 
     function openPdfModal(url, bookingId) {
       if (!url || url === '#') {
@@ -1901,7 +1907,26 @@
         return;
       }
 
+      if (appState.currentAdmin && !appState.currentAdmin.isSuper) {
+        const bookingItem = appState.bookings.find(b => b.id === bookingId);
+        if (bookingItem) {
+          const adminUnit = (appState.currentAdmin.unit || '').trim().toLowerCase();
+          const bookingUnit = (bookingItem.unit || '').trim().toLowerCase();
+          const targetRoom = appState.rooms.find(r => r.name === bookingItem.ruangan);
+          const roomUnit = targetRoom ? (targetRoom.unit || '').trim().toLowerCase() : '';
+
+          const hasAccess = bookingUnit.includes(adminUnit) || adminUnit.includes(bookingUnit) ||
+                            roomUnit.includes(adminUnit) || adminUnit.includes(roomUnit);
+          
+          if (!hasAccess) {
+            showToast(`Akses Ditolak: Folder instansi "${bookingItem.unit}" hanya dapat diakses oleh admin instansi terkait atau Super Admin.`, 'error');
+            return;
+          }
+        }
+      }
+
       let formattedUrl = url;
+      activePdfDownloadUrl = url;
 
       if (formattedUrl.startsWith('data:application/pdf') || formattedUrl.startsWith('data:pdf')) {
         try {
@@ -1915,6 +1940,7 @@
           const byteArray = new Uint8Array(byteNumbers);
           const blob = new Blob([byteArray], { type: contentType });
           formattedUrl = URL.createObjectURL(blob);
+          activePdfDownloadUrl = formattedUrl;
         } catch (e) {
           console.error("Gagal mengonversi Base64 ke Blob PDF:", e);
         }
@@ -1923,6 +1949,7 @@
         const driveIdMatch = formattedUrl.match(/\/d\/([a-zA-Z0-9_-]+)/) || formattedUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/);
         if (driveIdMatch && driveIdMatch[1]) {
           formattedUrl = `https://drive.google.com/file/d/${driveIdMatch[1]}/preview`;
+          activePdfDownloadUrl = `https://drive.google.com/uc?export=download&id=${driveIdMatch[1]}`;
         }
       }
 
@@ -1940,18 +1967,15 @@
                 <div class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-xs"><i class="fa-solid fa-file-pdf"></i></div>
                 <div>
                   <h3 id="pdfModalTitle" class="text-sm sm:text-base font-black text-slate-900 dark:text-white">Pratinjau Berkas PDF</h3>
-                  <p class="text-[10px] text-slate-400">Tampilan langsung tanpa minta akses / login</p>
+                  <p class="text-[10px] text-slate-400">Google Drive Folder Instansi & Viewer Tersinkronisasi</p>
                 </div>
               </div>
               <div class="flex items-center space-x-2 flex-wrap">
-                <button onclick="printPdfModalFile()" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl transition flex items-center cursor-pointer border border-slate-200 dark:border-slate-700">
-                  <i class="fa-solid fa-print mr-1.5 text-xs text-blue-600"></i> Cetak PDF
+                <button onclick="openPdfPrintTab()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition flex items-center cursor-pointer shadow-md">
+                  <i class="fa-solid fa-print mr-2 text-xs"></i> Cetak / Buka PDF
                 </button>
-                <a id="pdfDownloadLink" href="#" download="Berkas-Peminjaman.pdf" target="_blank" class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs font-bold rounded-xl transition flex items-center cursor-pointer">
-                  <i class="fa-solid fa-download mr-1.5 text-xs"></i> Unduh PDF
-                </a>
-                <a id="pdfExternalLink" href="#" target="_blank" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl transition flex items-center border border-slate-200 dark:border-slate-700">
-                  <i class="fa-solid fa-up-right-from-square mr-1.5 text-[10px]"></i> Tab Baru
+                <a id="pdfDownloadLink" href="#" download="Berkas-Peminjaman.pdf" target="_blank" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition flex items-center cursor-pointer shadow-md">
+                  <i class="fa-solid fa-download mr-2 text-xs"></i> Unduh PDF
                 </a>
                 <button onclick="closePdfModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark"></i></button>
               </div>
@@ -1964,32 +1988,21 @@
       }
       document.getElementById('pdfModalTitle').innerText = `Pratinjau Berkas PDF (${bookingId})`;
       document.getElementById('pdfIframe').src = formattedUrl;
-      const extBtn = document.getElementById('pdfExternalLink');
-      if (extBtn) extBtn.href = formattedUrl;
       const dlBtn = document.getElementById('pdfDownloadLink');
       if (dlBtn) {
-        dlBtn.href = formattedUrl;
+        dlBtn.href = activePdfDownloadUrl;
         dlBtn.download = `Berkas-Peminjaman-${bookingId}.pdf`;
       }
       modal.classList.remove('hidden');
     }
 
-    function printPdfModalFile() {
-      const iframe = document.getElementById('pdfIframe');
-      if (iframe && iframe.contentWindow) {
-        try {
-          iframe.contentWindow.focus();
-          iframe.contentWindow.print();
-          return;
-        } catch (e) {
-          console.warn("Direct iframe print blocked, using fallback print window:", e);
-        }
-      }
+    function openPdfPrintTab() {
       if (activePdfViewerUrl) {
-        const printWindow = window.open(activePdfViewerUrl, '_blank');
-        if (printWindow) {
-          printWindow.focus();
-          printWindow.print();
+        const newWin = window.open(activePdfViewerUrl, '_blank');
+        if (newWin) {
+          newWin.focus();
+        } else {
+          showToast('Popup diblokir oleh browser. Izinkan popup untuk membuka pratinjau.', 'warning');
         }
       }
     }
@@ -2224,7 +2237,7 @@
           appState.rooms.push(targetRoom);
         }
 
-        showToast('Menyimpan ruangan ke Google Spreadsheet...', 'info');
+        showToast('Menyimpan ruangan ke Google Spreadsheet & Folder Drive Instansi...', 'info');
         await sendDataToDatabase('saveRoom', { room: targetRoom });
 
         renderRoomCards();
@@ -2356,7 +2369,6 @@
       const peserta = parseInt(pesertaInput ? pesertaInput.value : '25') || 1;
       const catatan = catatanInput ? catatanInput.value.trim() : '';
 
-      // Local time validation
       const now = new Date();
       const todayStr = now.toISOString().split('T')[0];
       if (tanggal === todayStr) {
@@ -2393,7 +2405,6 @@
         berkasUrl: '#', status: 'Menunggu', tahun: 2026, timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16)
       };
 
-      // Instant Optimistic Update
       appState.bookings.unshift(newBooking);
       closeBookingModal();
       renderBookingTable();
@@ -2403,11 +2414,9 @@
       checkAutomatedReminders();
       initAnalyticsCharts();
 
-      // Show Toast and Confirmation Pop-up
       showToast(`Peminjaman berhasil dikirim (ID: ${newBooking.id})! Email konfirmasi terkirim ke ${email}.`, 'success');
       openBookingSuccessModal(newBooking);
 
-      // Async background server sync with error handling
       try {
         let serverResult = { status: 'success' };
         if (berkasInput && berkasInput.files && berkasInput.files[0]) {
@@ -2618,7 +2627,8 @@
         }
 
         if (newStatus === 'Disetujui') {
-          const parts = item.jam.split(' - ');
+          const jamString = String(item.jam || '');
+          const parts = jamString.split(' - ');
           const sTime = parts[0] ? parts[0].trim() : '08:00';
           const eTime = parts[1] ? parts[1].replace(/WIB/gi, '').trim() : '17:00';
           const conflict = checkBookingConflictWithTime(item.ruangan, item.tanggal, sTime, eTime, item.id);
@@ -2844,8 +2854,8 @@
       const yearlyCounts = { 2026: 0, 2027: 0, 2028: 0, 2029: 0 };
       appState.bookings.filter(b => b.status === 'Disetujui').forEach(b => {
         let yr = 2026;
-        if (b.tanggal && b.tanggal.length >= 4) {
-          yr = parseInt(b.tanggal.substring(0, 4), 10) || 2026;
+        if (b.tanggal && String(b.tanggal).length >= 4) {
+          yr = parseInt(String(b.tanggal).substring(0, 4), 10) || 2026;
         } else if (b.tahun) {
           yr = parseInt(b.tahun, 10) || 2026;
         }
