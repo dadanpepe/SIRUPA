@@ -1533,6 +1533,15 @@
         const pdfUrl = (item.berkasUrl && item.berkasUrl !== '#') ? item.berkasUrl : '#';
         const pdfBtnDisabled = pdfUrl === '#' ? 'opacity-40 cursor-not-allowed pointer-events-none' : 'hover:bg-blue-100 cursor-pointer';
         
+        const isCancelled = item.status === 'Dibatalkan';
+        const actionBtnDisabledAttr = isCancelled ? 'disabled' : '';
+        const setujuiBtnClass = isCancelled 
+          ? 'px-3 py-1.5 bg-slate-100 text-slate-400 font-bold rounded-xl text-[11px] border border-slate-200 opacity-40 cursor-not-allowed pointer-events-none' 
+          : 'px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-xl text-[11px] transition cursor-pointer border border-emerald-200';
+        const tolakBtnClass = isCancelled 
+          ? 'px-3 py-1.5 bg-slate-100 text-slate-400 font-bold rounded-xl text-[11px] border border-slate-200 opacity-40 cursor-not-allowed pointer-events-none' 
+          : 'px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-[11px] transition cursor-pointer border border-rose-200';
+
         let displayDateAdmin = (item.tanggal || '').split('T')[0];
         const formattedDate = formatDDMMYYYY(displayDateAdmin);
 
@@ -1555,8 +1564,8 @@
                 <button onclick="openPdfModal('${pdfUrl}', '${item.id}')" title="Lihat Berkas PDF" class="px-2.5 py-1.5 bg-blue-50 ${pdfBtnDisabled} text-blue-700 font-bold rounded-xl text-[11px] transition inline-flex items-center border border-blue-200 cursor-pointer">
                   <i class="fa-solid fa-file-pdf mr-1 text-xs text-rose-500"></i> PDF
                 </button>
-                <button onclick="updateBookingStatusInCloud('${item.id}', 'Disetujui')" class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-xl text-[11px] transition cursor-pointer border border-emerald-200">Setujui</button>
-                <button onclick="updateBookingStatusInCloud('${item.id}', 'Ditolak')" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-[11px] transition cursor-pointer border border-rose-200">Tolak</button>
+                <button ${actionBtnDisabledAttr} onclick="updateBookingStatusInCloud('${item.id}', 'Disetujui')" class="${setujuiBtnClass}">Setujui</button>
+                <button ${actionBtnDisabledAttr} onclick="updateBookingStatusInCloud('${item.id}', 'Ditolak')" class="${tolakBtnClass}">Tolak</button>
               </div>
             </td>
           </tr>
@@ -2174,6 +2183,11 @@
     async function updateBookingStatusInCloud(id, newStatus) {
       const item = appState.bookings.find(b => b.id === id);
       if (item) {
+        if (item.status === 'Dibatalkan') {
+          showToast('Peminjaman yang telah dibatalkan tidak dapat diubah lagi statusnya.', 'warning');
+          return;
+        }
+
         if (newStatus === 'Disetujui') {
           const parts = item.jam.split(' - ');
           const sTime = parts[0] ? parts[0].trim() : '08:00';
