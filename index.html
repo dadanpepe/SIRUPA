@@ -70,16 +70,16 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white pb-24 sm:pb-0">
 
-  <!-- Toast Notification Container -->
+  <!-- Toast Container -->
   <div id="toastContainer" class="fixed top-4 left-4 right-4 sm:left-auto sm:right-5 z-[9999999] flex flex-col space-y-3 pointer-events-none"></div>
 
-  <!-- Announcement Marquee Bar -->
+  <!-- Announcement Bar -->
   <div class="bg-slate-900 text-slate-200 text-xs py-2 px-4 overflow-hidden whitespace-nowrap border-b border-slate-800 flex items-center shadow-inner">
     <div class="bg-blue-600 text-white font-bold px-2 py-0.5 rounded text-[10px] mr-3 shrink-0 flex items-center shadow-xs animate-pulse">
       <i class="fa-solid fa-bullhorn mr-1"></i> PENGUMUMAN
     </div>
     <marquee id="announcementMarqueeText" scrollamount="5" class="font-medium text-slate-300">
-      Sistem Informasi Ruangan dan Peminjaman (SIRUPA) aktif. Proteksi anti double-input, validasi jam lampau, & pop-up bentrok ketat real-time.
+      Sistem Informasi Ruangan dan Peminjaman (SIRUPA) aktif. Fitur pembatalan otomatis untuk pengajuan kadaluarsa, proteksi anti double-input, & pop-up bentrok real-time.
     </marquee>
   </div>
 
@@ -136,7 +136,6 @@
     </div>
   </header>
 
-  <!-- Mobile Nav Bottom -->
   <div class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-6 py-2.5 flex justify-around items-center shadow-2xl">
     <button onclick="switchView('dashboard')" id="mobNavDashboard" class="flex flex-col items-center text-blue-600 space-y-0.5 cursor-pointer transform active:scale-90 transition">
       <i class="fa-solid fa-gauge-high text-lg"></i>
@@ -168,7 +167,6 @@
         </div>
       </div>
 
-      <!-- KPI Cards -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
         <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex items-center justify-between group overflow-hidden relative">
           <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-gradient-to-tr from-blue-500/10 to-indigo-500/20 rounded-full group-hover:scale-150 transition duration-500 pointer-events-none"></div>
@@ -221,7 +219,6 @@
         </div>
       </div>
 
-      <!-- Booking History Table -->
       <div class="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden">
         <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
@@ -250,7 +247,7 @@
       </div>
     </section>
 
-    <!-- VIEW: CHECK ROOM / CALENDAR -->
+    <!-- VIEW: CHECK ROOM -->
     <section id="viewCheckRoom" class="space-y-6 sm:space-y-8 hidden">
       <div class="bg-sky-50 border border-sky-200 text-sky-800 p-4 rounded-2xl text-xs font-medium flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs animate-fade-in">
         <div class="flex items-start sm:items-center">
@@ -340,7 +337,6 @@
             </form>
           </div>
 
-          <!-- 2FA Step -->
           <div id="authStep2" class="space-y-4 hidden animate-fade-in">
             <div class="text-center">
               <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl mx-auto flex items-center justify-center text-xl mb-2 shadow-xs border border-blue-100 animate-float"><i class="fa-brands fa-google text-lg"></i></div>
@@ -369,7 +365,6 @@
         </div>
       </div>
 
-      <!-- Admin Panel Dashboard -->
       <div id="adminPanelContainer" class="space-y-6 hidden animate-fade-in">
         <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div class="flex items-center space-x-3.5">
@@ -563,7 +558,7 @@
     </div>
   </div>
 
-  <!-- MODAL: CONFLICT WARNING (DOUBLE INPUT) -->
+  <!-- MODAL: CONFLICT WARNING -->
   <div id="doubleInputWarningModal" class="fixed inset-0 z-[999999] bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden animate-fade-in">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center space-y-4">
       <div class="w-14 h-14 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-sm animate-bounce"><i class="fa-solid fa-triangle-exclamation"></i></div>
@@ -583,7 +578,7 @@
     </div>
   </div>
 
-  <!-- MODAL: BOOKING DETAILS -->
+  <!-- MODAL: BOOKING DETAILS WITH EXECUTION STATUS -->
   <div id="bookingDetailsModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto animate-fade-in">
     <div class="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-8 shadow-2xl relative space-y-4 my-auto">
       <button onclick="closeBookingDetailsModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
@@ -760,7 +755,6 @@
       }
     };
 
-    // Helper untuk Standarisasi Badge & Warna Status Peminjaman
     function getStatusBadge(status) {
       if (status === 'Disetujui') {
         return `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full text-xs font-bold inline-flex items-center"><i class="fa-solid fa-circle-check mr-1.5 text-emerald-600"></i> Disetujui</span>`;
@@ -782,7 +776,7 @@
       currentYear: 2026,
       currentMonth: 7, // August (0-indexed)
       announcementsList: [
-        "Sistem Informasi Ruangan dan Peminjaman (SIRUPA) aktif. Proteksi anti double-input, validasi jam lampau, & pop-up bentrok ketat real-time."
+        "Sistem Informasi Ruangan dan Peminjaman (SIRUPA) aktif. Fitur pembatalan otomatis untuk pengajuan kadaluarsa, proteksi anti double-input, & pop-up bentrok real-time."
       ],
       adminAccounts: [
         { username: 'superadmin', name: 'Super Administrator', pass: 'admin123', unit: 'Semua Dinas', isSuper: true },
@@ -888,6 +882,45 @@
         }
         return false;
       });
+    }
+
+    function checkAutoCancellation() {
+      const now = new Date();
+      let updatedCount = 0;
+
+      appState.bookings.forEach(b => {
+        if (b.status === 'Menunggu') {
+          let displayDateDetail = (b.tanggal || '').split('T')[0];
+          if (!displayDateDetail) return;
+
+          let endH = 23, endM = 59;
+          const parts = (b.jam || '').split(' - ');
+          if (parts.length >= 2) {
+            const endHM = parts[1].replace(/WIB/gi, '').trim().split(':');
+            endH = parseInt(endHM[0], 10) || 23;
+            endM = parseInt(endHM[1], 10) || 59;
+          }
+
+          const bookingEndDateTime = new Date(displayDateDetail + 'T' + String(endH).padStart(2, '0') + ':' + String(endM).padStart(2, '0') + ':00');
+
+          // Jika pengajuan Menunggu terlewati jam/tanggal pelaksanaannya, ubah otomatis jadi Dibatalkan
+          if (now > bookingEndDateTime) {
+            b.status = 'Dibatalkan';
+            b.catatanBatal = 'Dibatalkan otomatis oleh sistem karena melewati batas waktu pelaksanaan (Kadaluarsa).';
+            updatedCount++;
+            sendDataToDatabase('updateStatus', { id: b.id, status: 'Dibatalkan' });
+          }
+        }
+      });
+
+      if (updatedCount > 0) {
+        renderBookingTable();
+        updateDashboardCounts();
+        renderAdminPendingTable();
+        renderCalendar();
+        checkAutomatedReminders();
+        initAnalyticsCharts();
+      }
     }
 
     function renderRoomCards() {
@@ -1102,6 +1135,7 @@
             updateAnnouncementDisplay();
           }
           
+          checkAutoCancellation();
           renderBookingTable();
           updateDashboardCounts();
           renderCalendar();
@@ -1161,6 +1195,8 @@
         const dateStr = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         if (document.getElementById('liveClock')) document.getElementById('liveClock').innerText = timeStr;
         if (document.getElementById('liveDate')) document.getElementById('liveDate').innerText = dateStr;
+        
+        checkAutoCancellation();
       }, 1000);
     }
 
@@ -1218,6 +1254,7 @@
         if (document.getElementById('navAdmin')) document.getElementById('navAdmin').className = "flex items-center px-3.5 py-1.5 rounded-full text-xs font-bold transition-all bg-slate-900 text-white shadow-xs cursor-pointer";
         if (document.getElementById('mobNavAdmin')) document.getElementById('mobNavAdmin').className = "flex flex-col items-center text-blue-600 space-y-0.5";
         
+        checkAutoCancellation();
         const loginContainer = document.getElementById('adminLoginContainer');
         const panelContainer = document.getElementById('adminPanelContainer');
         if (appState.isAdminLoggedIn) {
@@ -1448,6 +1485,8 @@
     }
 
     function renderAdminPendingTable() {
+      checkAutoCancellation();
+
       const tbody = document.getElementById('adminPendingTableBody');
       if (!tbody) return;
       tbody.innerHTML = '';
@@ -1486,6 +1525,11 @@
       }
 
       visibleBookings.forEach(item => {
+        let statusTag = `<span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full text-[10px] font-bold inline-flex items-center"><i class="fa-solid fa-hourglass mr-1"></i> Menunggu</span>`;
+        if (item.status === 'Disetujui') statusTag = `<span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full text-[10px] font-bold inline-flex items-center"><i class="fa-solid fa-check mr-1"></i> Disetujui</span>`;
+        if (item.status === 'Dibatalkan') statusTag = `<span class="bg-rose-100 text-rose-800 px-2.5 py-1 rounded-full text-[10px] font-bold inline-flex items-center"><i class="fa-solid fa-ban mr-1"></i> Dibatalkan</span>`;
+        if (item.status === 'Ditolak') statusTag = `<span class="bg-rose-100 text-rose-800 px-2.5 py-1 rounded-full text-[10px] font-bold inline-flex items-center"><i class="fa-solid fa-xmark mr-1"></i> Ditolak</span>`;
+
         const pdfUrl = (item.berkasUrl && item.berkasUrl !== '#') ? item.berkasUrl : '#';
         const pdfBtnDisabled = pdfUrl === '#' ? 'opacity-40 cursor-not-allowed pointer-events-none' : 'hover:bg-blue-100 cursor-pointer';
         
@@ -1505,7 +1549,7 @@
               <div class="font-semibold text-slate-800">${formattedDate}</div>
               <div class="text-[10px] text-slate-400">${item.jam}</div>
             </td>
-            <td class="p-4">${getStatusBadge(item.status)}</td>
+            <td class="p-4">${statusTag}</td>
             <td class="p-4 pr-5 text-center">
               <div class="inline-flex items-center space-x-1.5">
                 <button onclick="openPdfModal('${pdfUrl}', '${item.id}')" title="Lihat Berkas PDF" class="px-2.5 py-1.5 bg-blue-50 ${pdfBtnDisabled} text-blue-700 font-bold rounded-xl text-[11px] transition inline-flex items-center border border-blue-200 cursor-pointer">
@@ -1520,31 +1564,104 @@
       });
     }
 
+    let activePdfViewerUrl = '';
+
     function openPdfModal(url, bookingId) {
       if (!url || url === '#') {
         showToast('Berkas PDF tidak tersedia untuk peminjaman ini.', 'warning');
         return;
       }
+
+      let formattedUrl = url;
+
+      if (formattedUrl.startsWith('data:application/pdf') || formattedUrl.startsWith('data:pdf')) {
+        try {
+          const base64Parts = formattedUrl.split(',');
+          const contentType = (base64Parts[0].match(/:(.*?);/) || [])[1] || 'application/pdf';
+          const byteCharacters = atob(base64Parts[1]);
+          const byteNumbers = new Array(byteCharacters.length);
+          for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+          }
+          const byteArray = new Uint8Array(byteNumbers);
+          const blob = new Blob([byteArray], { type: contentType });
+          formattedUrl = URL.createObjectURL(blob);
+        } catch (e) {
+          console.error("Gagal mengonversi Base64 ke Blob PDF:", e);
+        }
+      } 
+      else if (formattedUrl.includes('drive.google.com')) {
+        const driveIdMatch = formattedUrl.match(/\/d\/([a-zA-Z0-9_-]+)/) || formattedUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+        if (driveIdMatch && driveIdMatch[1]) {
+          formattedUrl = `https://drive.google.com/file/d/${driveIdMatch[1]}/preview`;
+        }
+      }
+
+      activePdfViewerUrl = formattedUrl;
+
       let modal = document.getElementById('pdfViewerModal');
       if (!modal) {
         modal = document.createElement('div');
         modal.id = 'pdfViewerModal';
         modal.className = 'fixed inset-0 z-50 bg-slate-950/70 modal-blur flex items-center justify-center p-3 sm:p-4 animate-fade-in';
         modal.innerHTML = `
-          <div class="bg-white rounded-3xl max-w-3xl w-full p-5 sm:p-6 shadow-2xl relative space-y-4 my-auto h-[80vh] flex flex-col">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 id="pdfModalTitle" class="text-sm sm:text-base font-black text-slate-900">Pratinjau Berkas PDF</h3>
-              <button onclick="closePdfModal()" class="text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark"></i></button>
+          <div class="bg-white rounded-3xl max-w-4xl w-full p-5 sm:p-6 shadow-2xl relative space-y-4 my-auto h-[85vh] flex flex-col">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3 flex-wrap gap-2">
+              <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-xs"><i class="fa-solid fa-file-pdf"></i></div>
+                <div>
+                  <h3 id="pdfModalTitle" class="text-sm sm:text-base font-black text-slate-900">Pratinjau Berkas PDF</h3>
+                  <p class="text-[10px] text-slate-400">Tampilan langsung tanpa minta akses / login</p>
+                </div>
+              </div>
+              <div class="flex items-center space-x-2 flex-wrap">
+                <button onclick="printPdfModalFile()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition flex items-center cursor-pointer border border-slate-200">
+                  <i class="fa-solid fa-print mr-1.5 text-xs text-blue-600"></i> Cetak PDF
+                </button>
+                <a id="pdfDownloadLink" href="#" download="Berkas-Peminjaman.pdf" target="_blank" class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold rounded-xl transition flex items-center cursor-pointer">
+                  <i class="fa-solid fa-download mr-1.5 text-xs"></i> Unduh PDF
+                </a>
+                <a id="pdfExternalLink" href="#" target="_blank" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition flex items-center border border-slate-200">
+                  <i class="fa-solid fa-up-right-from-square mr-1.5 text-[10px]"></i> Tab Baru
+                </a>
+                <button onclick="closePdfModal()" class="text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark"></i></button>
+              </div>
             </div>
-            <div class="flex-grow bg-slate-100 rounded-2xl overflow-hidden relative">
-              <iframe id="pdfIframe" src="" class="w-full h-full border-0"></iframe>
+            <div class="flex-grow bg-slate-100 rounded-2xl overflow-hidden relative shadow-inner">
+              <iframe id="pdfIframe" src="" class="w-full h-full border-0" allow="autoplay"></iframe>
             </div>
           </div>`;
         document.body.appendChild(modal);
       }
       document.getElementById('pdfModalTitle').innerText = `Pratinjau Berkas PDF (${bookingId})`;
-      document.getElementById('pdfIframe').src = url;
+      document.getElementById('pdfIframe').src = formattedUrl;
+      const extBtn = document.getElementById('pdfExternalLink');
+      if (extBtn) extBtn.href = formattedUrl;
+      const dlBtn = document.getElementById('pdfDownloadLink');
+      if (dlBtn) {
+        dlBtn.href = formattedUrl;
+        dlBtn.download = `Berkas-Peminjaman-${bookingId}.pdf`;
+      }
       modal.classList.remove('hidden');
+    }
+
+    function printPdfModalFile() {
+      if (!activePdfViewerUrl) return;
+      const iframe = document.getElementById('pdfIframe');
+      try {
+        if (iframe && iframe.contentWindow) {
+          iframe.contentWindow.focus();
+          iframe.contentWindow.print();
+          return;
+        }
+      } catch (e) {
+        console.warn("Cross-origin print fallback:", e);
+      }
+      const printWindow = window.open(activePdfViewerUrl, '_blank');
+      if (printWindow) {
+        printWindow.focus();
+        printWindow.print();
+      }
     }
 
     function closePdfModal() {
@@ -1884,7 +2001,11 @@
           const file = berkasInput.files[0];
           const reader = new FileReader();
           reader.onload = async function(uploadEvent) {
-            const base64String = uploadEvent.target.result.split(',')[1];
+            const dataUrl = uploadEvent.target.result;
+            newBooking.berkasUrl = dataUrl;
+            renderAdminPendingTable();
+
+            const base64String = dataUrl.split(',')[1];
             serverResult = await apiService.sendRequest('addBooking', {
               ...newBooking,
               fileBase64: base64String,
@@ -2298,6 +2419,7 @@
       }
 
       await syncDataFromDatabase();
+      checkAutoCancellation();
       setInterval(syncDataFromDatabase, 4000);
 
       renderRoomCards();
