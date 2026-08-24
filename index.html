@@ -1743,7 +1743,6 @@
 
     function closeBookingModal() {
       document.getElementById('bookingModal').classList.add('hidden');
-      document.getElementById('bookingForm').reset();
       const conflictBanner = document.getElementById('bookingConflictBanner');
       if (conflictBanner) conflictBanner.classList.add('hidden');
     }
@@ -2326,19 +2325,36 @@
     async function handleBookingSubmit(e) {
       e.preventDefault();
 
-      const pemohon = document.getElementById('inputPemohon').value.trim();
-      const email = document.getElementById('inputEmail').value.trim();
-      const unit = document.getElementById('inputUnit').value.trim();
-      const kategori = document.getElementById('inputKategori').value;
-      const kegiatan = document.getElementById('inputKegiatan').value.trim();
-      const ruangan = document.getElementById('inputRuangan').value.trim();
-      const tanggal = document.getElementById('inputTanggal').value;
-      const jamMulai = document.getElementById('inputJamMulai').value;
-      const jamSelesai = document.getElementById('inputJamSelesai').value;
-      const jam = `${jamMulai} - ${jamSelesai} WIB`;
-      const peserta = parseInt(document.getElementById('inputPeserta').value) || 0;
-      const catatan = document.getElementById('inputCatatan').value.trim();
+      const pemohonInput = document.getElementById('inputPemohon');
+      const emailInput = document.getElementById('inputEmail');
+      const unitInput = document.getElementById('inputUnit');
+      const kategoriSelect = document.getElementById('inputKategori');
+      const kegiatanInput = document.getElementById('inputKegiatan');
+      const ruanganSelect = document.getElementById('inputRuangan');
+      const tanggalInput = document.getElementById('inputTanggal');
+      const jamMulaiInput = document.getElementById('inputJamMulai');
+      const jamSelesaiInput = document.getElementById('inputJamSelesai');
+      const pesertaInput = document.getElementById('inputPeserta');
+      const catatanInput = document.getElementById('inputCatatan');
       const berkasInput = document.getElementById('inputBerkas');
+
+      if (!pemohonInput || !emailInput || !ruanganSelect || !tanggalInput || !jamMulaiInput || !jamSelesaiInput) {
+        showToast('Formulir tidak lengkap atau elemen tidak ditemukan.', 'error');
+        return;
+      }
+
+      const pemohon = pemohonInput.value.trim();
+      const email = emailInput.value.trim();
+      const unit = unitInput ? unitInput.value.trim() : 'Bagian Umum';
+      const kategori = kategoriSelect ? kategoriSelect.value : 'Rapat Dinas';
+      const kegiatan = kegiatanInput ? kegiatanInput.value.trim() : 'Rapat Koordinasi';
+      const ruangan = ruanganSelect.value.trim();
+      const tanggal = tanggalInput.value;
+      const jamMulai = jamMulaiInput.value;
+      const jamSelesai = jamSelesaiInput.value;
+      const jam = `${jamMulai} - ${jamSelesai} WIB`;
+      const peserta = parseInt(pesertaInput ? pesertaInput.value : '25') || 1;
+      const catatan = catatanInput ? catatanInput.value.trim() : '';
 
       // Local time validation
       const now = new Date();
@@ -2391,8 +2407,8 @@
       showToast(`Peminjaman berhasil dikirim (ID: ${newBooking.id})! Email konfirmasi terkirim ke ${email}.`, 'success');
       openBookingSuccessModal(newBooking);
 
-      // Async background server sync
-      (async () => {
+      // Async background server sync with error handling
+      try {
         let serverResult = { status: 'success' };
         if (berkasInput && berkasInput.files && berkasInput.files[0]) {
           const file = berkasInput.files[0];
@@ -2416,7 +2432,9 @@
           serverResult = await apiService.sendRequest('addBooking', newBooking);
           handleServerBookingResult(serverResult, newBooking);
         }
-      })();
+      } catch (err) {
+        console.error("Gagal menyinkronkan pengajuan ke database:", err);
+      }
     }
 
     function handleServerBookingResult(serverResult, newBooking) {
