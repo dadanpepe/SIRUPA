@@ -80,7 +80,7 @@
       <i class="fa-solid fa-bullhorn mr-1"></i> PENGUMUMAN
     </div>
     <marquee id="announcementMarqueeText" scrollamount="5" class="font-medium text-slate-300">
-      SIRUPA Aktif: Sistem Informasi Ruangan dan Peminjaman dengan Keamanan Terintegrasi.
+      Selamat Datang di SIRUPA - Sistem Informasi Ruangan dan Peminjaman
     </marquee>
   </div>
 
@@ -137,7 +137,6 @@
     </div>
   </header>
 
-  <!-- Mobile Bottom Nav -->
   <div class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-6 py-2.5 flex justify-around items-center shadow-2xl">
     <button onclick="switchView('dashboard')" id="mobNavDashboard" class="flex flex-col items-center text-blue-600 space-y-0.5 cursor-pointer transform active:scale-90 transition">
       <i class="fa-solid fa-gauge-high text-lg"></i>
@@ -155,7 +154,6 @@
 
   <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6 sm:space-y-8 animate-fade-in">
 
-    <!-- Dashboard View -->
     <section id="viewDashboard" class="space-y-6 sm:space-y-8">
       <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 p-6 sm:p-10 text-white shadow-xl shadow-blue-500/10 animate-shimmer">
         <div class="absolute -right-10 -bottom-10 opacity-10 text-white text-9xl font-black pointer-events-none animate-float">
@@ -261,7 +259,6 @@
       </div>
     </section>
 
-    <!-- Check Room View -->
     <section id="viewCheckRoom" class="space-y-6 sm:space-y-8 hidden">
       <div class="bg-sky-50 border border-sky-200 text-sky-800 p-4 rounded-2xl text-xs font-medium flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs animate-fade-in">
         <div class="flex items-start sm:items-center">
@@ -317,7 +314,6 @@
       </div>
     </section>
 
-    <!-- Admin View -->
     <section id="viewAdmin" class="space-y-6 hidden">
       <div id="adminLoginContainer" class="flex items-center justify-center py-6 sm:py-12 animate-fade-in">
         <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 p-6 sm:p-8 relative transition-all duration-300">
@@ -445,14 +441,13 @@
           </div>
         </div>
 
-        <!-- Super Admin Section: Account Management embedded directly -->
-        <div id="superAdminSectionWrapper" class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs space-y-6">
-          <div class="border-b border-slate-100 pb-3 flex items-center justify-between flex-wrap gap-2">
-            <div>
-              <span class="text-[10px] font-black text-purple-600 uppercase tracking-wider">Super Admin Kontrol</span>
-              <h3 class="text-base sm:text-lg font-black text-slate-900 tracking-tight">Manajemen Akun Admin Dinas & Bidang</h3>
-            </div>
+        <!-- EMBEDDED SUPER ADMIN ACCOUNT MANAGEMENT FORM -->
+        <div id="superAdminEmbeddedSection" class="hidden bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs space-y-6 animate-fade-in">
+          <div class="border-b border-slate-100 pb-3">
+            <h3 class="text-xs sm:text-sm font-bold text-slate-900 flex items-center"><i class="fa-solid fa-users-gear mr-2 text-purple-600"></i> Manajemen Akun Admin Dinas & Bidang</h3>
+            <p class="text-[11px] text-slate-400">Tambah, edit, dan kelola akun admin serta kunci TOTP langsung dari panel.</p>
           </div>
+
           <form onsubmit="handleCreateAdminSubmit(event)" class="bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200 space-y-4 text-xs">
             <input type="hidden" id="editAdminUsernameKey">
             <h4 id="adminFormTitle" class="font-bold text-slate-900 flex items-center"><i class="fa-solid fa-user-plus mr-2 text-purple-600"></i> Tambah Akun Admin Baru</h4>
@@ -479,8 +474,9 @@
               <button type="submit" id="submitAdminBtn" class="w-full sm:w-auto px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-md transition transform active:scale-95 cursor-pointer flex items-center justify-center"><i class="fa-solid fa-floppy-disk mr-2"></i> Simpan Akun Admin</button>
             </div>
           </form>
+
           <div class="space-y-3">
-            <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Daftar Akun Admin Aktif</h4>
+            <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Daftar Akun Admin Aktif (Tersinkronisasi)</h4>
             <div class="overflow-x-auto border border-slate-200 rounded-2xl bg-white shadow-xs">
               <table class="w-full text-left border-collapse min-w-[550px]">
                 <thead>
@@ -2010,9 +2006,13 @@
       }
       appState.adminAccounts = appState.adminAccounts.filter(a => a.username !== username);
       renderAdminAccountsList();
-      showToast('Menghapus akun admin dari spreadsheet...', 'info');
-      await sendDataToDatabase('deleteAdmin', { username });
-      showToast('Akun admin berhasil dihapus.', 'info');
+      showToast('Menghapus akun admin dari database...', 'info');
+      const res = await sendDataToDatabase('deleteAdmin', { username });
+      if (res && res.admins && Array.isArray(res.admins)) {
+        appState.adminAccounts = res.admins;
+        renderAdminAccountsList();
+      }
+      showToast('Akun admin berhasil dihapus dan disinkronkan.', 'info');
     }
 
     function openAddRoomModal() {
@@ -2197,12 +2197,15 @@
       }
 
       showToast('Menyimpan akun admin & kunci TOTP ke database...', 'info');
-      await sendDataToDatabase('saveAdmin', { admin: adminObj });
+      const res = await sendDataToDatabase('saveAdmin', { admin: adminObj });
+      if (res && res.admins && Array.isArray(res.admins)) {
+        appState.adminAccounts = res.admins;
+      }
 
       resetAdminForm();
       renderAdminAccountsList();
       e.target.reset();
-      showToast(`Akun admin ${username} berhasil disimpan dengan QR Authenticator unik!`, 'success');
+      showToast(`Akun admin ${username} berhasil disinkronkan & disimpan!`, 'success');
     }
 
     function toggleUnitDropdown() {
@@ -2639,18 +2642,19 @@
 
         showToast('Autentikasi Google Authenticator Berhasil! Sesi Enkripsi Terverifikasi.', 'success');
         
-        const superSection = document.getElementById('superAdminSectionWrapper');
+        const superEmbedded = document.getElementById('superAdminEmbeddedSection');
         const superClearBtn = document.getElementById('superAdminClearAnnounceBtn');
         const badge = document.getElementById('adminRoleBadge');
         const welcome = document.getElementById('adminWelcomeTitle');
 
         if (appState.currentAdmin && appState.currentAdmin.isSuper) {
-          if (superSection) superSection.classList.remove('hidden');
+          if (superEmbedded) superEmbedded.classList.remove('hidden');
           if (superClearBtn) superClearBtn.classList.remove('hidden');
           if (badge) badge.innerHTML = `<span class="w-1.5 h-1.5 bg-purple-500 rounded-full mr-1.5 live-pulse"></span> Super Administrator`;
           if (welcome) welcome.innerText = `Panel Kendali & Manajemen Ruangan (${appState.currentAdmin.name})`;
+          renderAdminAccountsList();
         } else {
-          if (superSection) superSection.classList.add('hidden');
+          if (superEmbedded) superEmbedded.classList.add('hidden');
           if (superClearBtn) superClearBtn.classList.add('hidden');
           if (badge) badge.innerHTML = `<span class="w-1.5 h-1.5 bg-blue-500 rounded-full mr-1.5 live-pulse"></span> Admin Dinas (${appState.currentAdmin ? appState.currentAdmin.unit : 'Bidang'})`;
           if (welcome) welcome.innerText = `Panel Kendali Ruangan (${appState.currentAdmin ? appState.currentAdmin.name : 'Admin'})`;
@@ -2676,6 +2680,8 @@
       document.getElementById('adminUsername').value = '';
       document.getElementById('adminPassword').value = '';
       document.getElementById('otpInput').value = '';
+      const superEmbedded = document.getElementById('superAdminEmbeddedSection');
+      if (superEmbedded) superEmbedded.classList.add('hidden');
       const superClearBtn = document.getElementById('superAdminClearAnnounceBtn');
       if (superClearBtn) superClearBtn.classList.add('hidden');
       backToStep1();
