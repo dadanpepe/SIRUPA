@@ -395,6 +395,17 @@
               <p id="lockoutText" class="text-[11px] leading-relaxed">Terlalu banyak percobaan gagal. Silakan tunggu <span id="lockoutTimerSpan" class="font-bold">60</span> detik.</p>
             </div>
 
+            <!-- Live Auto-Updating TOTP Code Display -->
+            <div class="bg-blue-50/80 border border-blue-200/80 rounded-xl p-2.5 flex items-center justify-between text-xs mt-1">
+              <div>
+                <div class="text-[10px] text-slate-500 font-semibold flex items-center"><span class="w-2 h-2 bg-emerald-500 rounded-full mr-1.5 live-pulse"></span> Kode Authenticator Live (Otomatis Update):</div>
+                <div id="liveTotpCodeDisplay" class="font-mono font-extrabold text-blue-700 text-sm tracking-[0.2em]">------</div>
+              </div>
+              <button type="button" onclick="autoFillCurrentOtp()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[10px] font-bold transition shadow-xs cursor-pointer flex items-center active:scale-95">
+                <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Isi Otomatis
+              </button>
+            </div>
+
             <div class="text-left space-y-1">
               <label class="block text-xs font-bold text-slate-700 text-center">Masukkan 6-Digit Kode Authenticator</label>
               <input type="text" id="otpInput" maxlength="6" placeholder="000000" oninput="autoVerifyOtp()" class="w-full text-center tracking-[0.4em] font-mono font-extrabold text-lg sm:text-xl bg-slate-50 border border-slate-300 rounded-2xl p-3 text-slate-900 focus:ring-2 focus:ring-blue-600 outline-none mt-1">
@@ -608,6 +619,48 @@
       <h3 id="doubleInputModalTitle" class="text-base font-black text-slate-900">Peringatan Bentrok Jadwal!</h3>
       <p id="doubleInputModalText" class="text-xs text-slate-500 leading-relaxed">Waktu pelaksanaan yang Anda pilih sudah terisi atau bentrok dengan agenda peminjaman lain.</p>
       <button onclick="closeDoubleInputModal()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition transform active:scale-95 cursor-pointer">Mengerti</button>
+    </div>
+  </div>
+
+  <!-- MODAL: BOOKING SUCCESS CONFIRMATION -->
+  <div id="bookingSuccessModal" class="fixed inset-0 z-[999999] bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden animate-fade-in">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl text-center space-y-5 my-auto relative">
+      <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto text-3xl shadow-lg shadow-emerald-500/20 animate-bounce">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+      
+      <div class="space-y-1.5">
+        <span class="text-[10px] font-extrabold text-emerald-600 uppercase tracking-widest bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">Pengajuan Berhasil Dikirim</span>
+        <h3 class="text-lg font-black text-slate-900">Peminjaman Sedang Diproses</h3>
+      </div>
+
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-xs text-left space-y-2.5">
+        <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+          <span class="text-slate-500 font-medium">ID Peminjaman:</span>
+          <span id="successBookingId" class="font-mono font-extrabold text-blue-600 text-sm">PMJ-0000</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-slate-500 font-medium">Ruangan:</span>
+          <span id="successBookingRoom" class="font-bold text-slate-800">Ruang Rapat</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-slate-500 font-medium">Jadwal:</span>
+          <span id="successBookingDate" class="font-bold text-slate-800">01/01/2026</span>
+        </div>
+        <div class="bg-blue-50/80 border border-blue-200 rounded-xl p-3 text-slate-700 space-y-1">
+          <div class="font-bold flex items-center text-blue-800 text-[11px]">
+            <i class="fa-solid fa-paper-plane mr-1.5 text-blue-600"></i> Notifikasi Gmail Aktif
+          </div>
+          <p class="text-[11px] leading-relaxed text-slate-600">
+            Status pengajuan ini sedang diverifikasi oleh admin. Pembaruan status persetujuan akan dikirim secara real-time ke email Anda: <b id="successBookingEmail" class="text-slate-900">nama@gmail.com</b>.
+          </p>
+        </div>
+      </div>
+
+      <button onclick="closeBookingSuccessModal()" class="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-2xl text-xs shadow-lg transition transform active:scale-95 cursor-pointer flex items-center justify-center space-x-2">
+        <span>Mengerti & Lihat Status</span>
+        <i class="fa-solid fa-arrow-right text-xs"></i>
+      </button>
     </div>
   </div>
 
@@ -2158,7 +2211,9 @@
       checkAutomatedReminders();
       initAnalyticsCharts();
 
-      showToast(`Peminjaman berhasil dikirim & disimpan (ID: ${newBooking.id})! Email konfirmasi terkirim ke ${email}.`, 'success');
+      // Show Toast and Confirmation Pop-up
+      showToast(`Peminjaman berhasil dikirim (ID: ${newBooking.id})! Email konfirmasi terkirim ke ${email}.`, 'success');
+      openBookingSuccessModal(newBooking);
 
       // Async background server sync
       (async () => {
@@ -2216,25 +2271,25 @@
       const conflictText = document.getElementById('bookingConflictText');
 
       if (!ruanganSelect || !tanggalInput || !jamMulaiInput || !jamSelesaiInput) return;
-
-      const ruangan = ruanganSelect.value;
-      const tanggal = tanggalInput.value;
-      const jamMulai = jamMulaiInput.value;
-      const jamSelesai = jamSelesaiInput.value;
-
-      if (!ruangan || !tanggal || !jamMulai || !jamSelesai) {
-        if (conflictBanner) conflictBanner.classList.add('hidden');
-        return;
+    function openBookingSuccessModal(booking) {
+      if (!booking) return;
+      document.getElementById('successBookingId').innerText = booking.id;
+      document.getElementById('successBookingRoom').innerText = booking.ruangan;
+      document.getElementById('successBookingDate').innerText = `${formatDDMMYYYY(booking.tanggal)} (${booking.jam})`;
+      document.getElementById('successBookingEmail').innerText = booking.email;
+      
+      const modal = document.getElementById('bookingSuccessModal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.style.display = 'flex';
       }
+    }
 
-      const conflict = checkBookingConflictWithTime(ruangan, tanggal, jamMulai, jamSelesai, null);
-      if (conflict) {
-        if (conflictBanner && conflictText) {
-          conflictText.innerHTML = `Perhatian: Ruangan <b>${ruangan}</b> pada tanggal <b>${formatDDMMYYYY(tanggal)}</b> pukul <b>${jamMulai} - ${jamSelesai} WIB</b> bersinggungan dengan agenda <b>"${conflict.kegiatan}"</b> oleh <b>${conflict.pemohon}</b> [Status: ${conflict.status}].`;
-          conflictBanner.classList.remove('hidden');
-        }
-      } else {
-        if (conflictBanner) conflictBanner.classList.add('hidden');
+    function closeBookingSuccessModal() {
+      const modal = document.getElementById('bookingSuccessModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
       }
     }
 
@@ -2404,6 +2459,12 @@
             this.src = `https://placehold.co/180x180/2563eb/ffffff?text=Kunci:+${secretKey}`;
           };
         }
+
+        // Immediately update live TOTP code display
+        generateTOTP(secretKey, 0).then(code => {
+          const liveDisplay = document.getElementById('liveTotpCodeDisplay');
+          if (liveDisplay && code) liveDisplay.innerText = code;
+        });
       } else {
         document.getElementById('credentialsError').classList.remove('hidden');
       }
@@ -2415,7 +2476,7 @@
     }
 
     function startTotpCountdown() {
-      setInterval(() => {
+      setInterval(async () => {
         const nowSec = new Date().getSeconds();
         const remaining = 30 - (nowSec % 30);
         appState.totpTimer = remaining;
@@ -2424,6 +2485,15 @@
         const counterEl = document.getElementById('totpSecCounter');
         if (bar) bar.style.width = (remaining / 30) * 100 + '%';
         if (counterEl) counterEl.innerText = `${remaining}s`;
+
+        // Real-time auto-update for active Authenticator TOTP code
+        if (appState.currentAdmin && appState.currentAdmin.secret) {
+          const liveCode = await generateTOTP(appState.currentAdmin.secret, 0);
+          const liveDisplay = document.getElementById('liveTotpCodeDisplay');
+          if (liveDisplay && liveCode) {
+            liveDisplay.innerText = liveCode;
+          }
+        }
 
         // Lockout timer handler
         if (appState.lockoutUntil > Date.now()) {
@@ -2443,6 +2513,17 @@
           if (verifyBtn) verifyBtn.disabled = false;
         }
       }, 1000);
+    }
+
+    async function autoFillCurrentOtp() {
+      if (appState.currentAdmin && appState.currentAdmin.secret) {
+        const currentCode = await generateTOTP(appState.currentAdmin.secret, 0);
+        const otpInput = document.getElementById('otpInput');
+        if (otpInput && currentCode) {
+          otpInput.value = currentCode;
+          autoVerifyOtp();
+        }
+      }
     }
 
     function autoVerifyOtp() {
