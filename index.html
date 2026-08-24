@@ -4,14 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>SIRUPA - Sistem Informasi Ruangan dan Peminjaman</title>
-  
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
     body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -58,13 +56,13 @@
       0% { opacity: 0; transform: scale(0.96) translateY(12px); }
       100% { opacity: 1; transform: scale(1) translateY(0); }
     }
-    .animate-fade-in { animation: fadeInScale 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .animate-fade-in { animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
     @keyframes chartFadeIn {
       0% { opacity: 0; transform: translateY(20px); }
       100% { opacity: 1; transform: translateY(0); }
     }
-    .animate-chart { animation: chartFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .animate-chart { animation: chartFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
     html { scroll-behavior: smooth; }
     body { overflow-y: auto !important; }
@@ -98,7 +96,7 @@
       </div>
 
       <div class="flex items-center space-x-3 sm:space-x-4">
-        <!-- Notification Bell -->
+        <!-- Notification Bell Dropdown -->
         <div class="relative">
           <button onclick="toggleNotificationDropdown()" class="w-10 h-10 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl flex items-center justify-center transition transform active:scale-95 cursor-pointer relative shadow-xs border border-slate-200">
             <i id="bellIcon" class="fa-solid fa-bell text-sm"></i>
@@ -138,7 +136,7 @@
     </div>
   </header>
 
-  <!-- Mobile Bottom Nav -->
+  <!-- Mobile Nav Bottom -->
   <div class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-6 py-2.5 flex justify-around items-center shadow-2xl">
     <button onclick="switchView('dashboard')" id="mobNavDashboard" class="flex flex-col items-center text-blue-600 space-y-0.5 cursor-pointer transform active:scale-90 transition">
       <i class="fa-solid fa-gauge-high text-lg"></i>
@@ -165,7 +163,7 @@
         <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div class="max-w-3xl space-y-2 sm:space-y-3">
             <h2 class="text-xl sm:text-3xl lg:text-4xl font-black tracking-tight leading-tight">Dashboard & Statistik Ruangan</h2>
-            <p class="text-blue-100 text-xs sm:text-sm leading-relaxed opacity-90">Pantau ketersediaan jadwal ruangan, analisis penggunaan fasilitas, dan sinkronisasi real-time database otomatis tanpa delay.</p>
+            <p class="text-blue-100 text-xs sm:text-sm leading-relaxed opacity-90">Pantau ketersediaan jadwal ruangan, analisis penggunaan fasilitas, dan sinkronisasi real-time database otomatis.</p>
           </div>
         </div>
       </div>
@@ -204,7 +202,6 @@
         </div>
       </div>
 
-      <!-- Charts Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs hover:shadow-xl transition duration-500 space-y-4 animate-chart">
           <div class="flex items-center justify-between"><h4 class="text-xs sm:text-sm font-bold text-slate-900">Distribusi Penggunaan Ruangan</h4><span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full animate-pulse">Doughnut</span></div>
@@ -372,7 +369,7 @@
         </div>
       </div>
 
-      <!-- Admin Panel Container -->
+      <!-- Admin Panel Dashboard -->
       <div id="adminPanelContainer" class="space-y-6 hidden animate-fade-in">
         <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div class="flex items-center space-x-3.5">
@@ -566,7 +563,7 @@
     </div>
   </div>
 
-  <!-- MODAL: CONFLICT WARNING -->
+  <!-- MODAL: CONFLICT WARNING (DOUBLE INPUT) -->
   <div id="doubleInputWarningModal" class="fixed inset-0 z-[999999] bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden animate-fade-in">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center space-y-4">
       <div class="w-14 h-14 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-sm animate-bounce"><i class="fa-solid fa-triangle-exclamation"></i></div>
@@ -586,7 +583,7 @@
     </div>
   </div>
 
-  <!-- MODAL: BOOKING DETAILS WITH EXECUTION STATUS -->
+  <!-- MODAL: BOOKING DETAILS -->
   <div id="bookingDetailsModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto animate-fade-in">
     <div class="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-8 shadow-2xl relative space-y-4 my-auto">
       <button onclick="closeBookingDetailsModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
@@ -763,6 +760,20 @@
       }
     };
 
+    // Helper untuk Standarisasi Badge & Warna Status Peminjaman
+    function getStatusBadge(status) {
+      if (status === 'Disetujui') {
+        return `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full text-xs font-bold inline-flex items-center"><i class="fa-solid fa-circle-check mr-1.5 text-emerald-600"></i> Disetujui</span>`;
+      } else if (status === 'Menunggu') {
+        return `<span class="bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1 rounded-full text-xs font-bold inline-flex items-center"><i class="fa-solid fa-clock-rotate-left mr-1.5 text-amber-600"></i> Menunggu</span>`;
+      } else if (status === 'Dibatalkan') {
+        return `<span class="bg-slate-100 text-slate-600 border border-slate-200 px-3 py-1 rounded-full text-xs font-bold inline-flex items-center"><i class="fa-solid fa-ban mr-1.5 text-slate-500"></i> Dibatalkan</span>`;
+      } else if (status === 'Ditolak') {
+        return `<span class="bg-rose-50 text-rose-700 border border-rose-200 px-3 py-1 rounded-full text-xs font-bold inline-flex items-center"><i class="fa-solid fa-circle-xmark mr-1.5 text-rose-600"></i> Ditolak</span>`;
+      }
+      return `<span class="bg-slate-50 text-slate-700 border border-slate-200 px-3 py-1 rounded-full text-xs font-bold">${status || 'Unknown'}</span>`;
+    }
+
     const appState = {
       isAdminLoggedIn: false,
       currentAdmin: null,
@@ -824,22 +835,6 @@
 
     let chartInstances = {};
     let roomSlideInterval = null;
-
-    function getStatusBadge(status) {
-      const s = (status || '').trim();
-      switch (s) {
-        case 'Disetujui':
-          return `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-full text-xs font-bold inline-flex items-center"><i class="fa-solid fa-circle-check mr-1 text-[10px]"></i> Disetujui</span>`;
-        case 'Menunggu':
-          return `<span class="bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-1 rounded-full text-xs font-bold inline-flex items-center"><i class="fa-solid fa-hourglass-half mr-1 text-[10px]"></i> Menunggu</span>`;
-        case 'Dibatalkan':
-          return `<span class="bg-slate-100 text-slate-600 border border-slate-200 px-2.5 py-1 rounded-full text-xs font-bold inline-flex items-center"><i class="fa-solid fa-ban mr-1 text-[10px]"></i> Dibatalkan</span>`;
-        case 'Ditolak':
-          return `<span class="bg-rose-50 text-rose-700 border border-rose-200 px-2.5 py-1 rounded-full text-xs font-bold inline-flex items-center"><i class="fa-solid fa-circle-xmark mr-1 text-[10px]"></i> Ditolak</span>`;
-        default:
-          return `<span class="bg-slate-100 text-slate-700 border border-slate-200 px-2.5 py-1 rounded-full text-xs font-bold">${s}</span>`;
-      }
-    }
 
     function formatDDMMYYYY(dateStr) {
       if (!dateStr) return '-';
@@ -1491,8 +1486,6 @@
       }
 
       visibleBookings.forEach(item => {
-        let statusTag = getStatusBadge(item.status);
-
         const pdfUrl = (item.berkasUrl && item.berkasUrl !== '#') ? item.berkasUrl : '#';
         const pdfBtnDisabled = pdfUrl === '#' ? 'opacity-40 cursor-not-allowed pointer-events-none' : 'hover:bg-blue-100 cursor-pointer';
         
@@ -1512,7 +1505,7 @@
               <div class="font-semibold text-slate-800">${formattedDate}</div>
               <div class="text-[10px] text-slate-400">${item.jam}</div>
             </td>
-            <td class="p-4">${statusTag}</td>
+            <td class="p-4">${getStatusBadge(item.status)}</td>
             <td class="p-4 pr-5 text-center">
               <div class="inline-flex items-center space-x-1.5">
                 <button onclick="openPdfModal('${pdfUrl}', '${item.id}')" title="Lihat Berkas PDF" class="px-2.5 py-1.5 bg-blue-50 ${pdfBtnDisabled} text-blue-700 font-bold rounded-xl text-[11px] transition inline-flex items-center border border-blue-200 cursor-pointer">
@@ -1822,8 +1815,6 @@
     async function handleBookingSubmit(e) {
       e.preventDefault();
 
-      await syncDataFromDatabase();
-
       const pemohon = document.getElementById('inputPemohon').value.trim();
       const email = document.getElementById('inputEmail').value.trim();
       const unit = document.getElementById('inputUnit').value.trim();
@@ -1838,6 +1829,7 @@
       const catatan = document.getElementById('inputCatatan').value.trim();
       const berkasInput = document.getElementById('inputBerkas');
 
+      // Validasi lokal instan (Zero Delay)
       const now = new Date();
       const todayStr = now.toISOString().split('T')[0];
       if (tanggal === todayStr) {
@@ -1874,13 +1866,23 @@
         berkasUrl: '#', status: 'Menunggu', tahun: 2026, timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16)
       };
 
-      showToast('Mengirim dan menyinkronkan data & file ke Google Spreadsheet...', 'info');
+      // Optimistic update: Langsung perbarui state lokal & tutup modal secara instan (Zero Delay)
+      appState.bookings.unshift(newBooking);
+      closeBookingModal();
+      renderBookingTable();
+      updateDashboardCounts();
+      renderAdminPendingTable();
+      renderCalendar();
+      checkAutomatedReminders();
+      initAnalyticsCharts();
 
-      let serverResult = { status: 'success' };
-      if (berkasInput && berkasInput.files[0]) {
-        const file = berkasInput.files[0];
-        const reader = new FileReader();
-        await new Promise((resolve) => {
+      showToast(`Peminjaman berhasil dikirim & disimpan (ID: ${newBooking.id})! Email konfirmasi terkirim ke ${email}.`, 'success');
+
+      (async () => {
+        let serverResult = { status: 'success' };
+        if (berkasInput && berkasInput.files && berkasInput.files[0]) {
+          const file = berkasInput.files[0];
+          const reader = new FileReader();
           reader.onload = async function(uploadEvent) {
             const base64String = uploadEvent.target.result.split(',')[1];
             serverResult = await apiService.sendRequest('addBooking', {
@@ -1889,38 +1891,33 @@
               fileName: file.name,
               fileMimeType: file.type
             });
-            resolve();
+            handleServerBookingResult(serverResult, newBooking);
           };
           reader.readAsDataURL(file);
-        });
-      } else {
-        serverResult = await apiService.sendRequest('addBooking', newBooking);
-      }
+        } else {
+          serverResult = await apiService.sendRequest('addBooking', newBooking);
+          handleServerBookingResult(serverResult, newBooking);
+        }
+      })();
+    }
 
+    function handleServerBookingResult(serverResult, newBooking) {
       if (serverResult && serverResult.status === 'conflict') {
-        triggerDoubleBookingWarning(ruangan, tanggal, `${jamMulai} - ${jamSelesai}`, {
+        appState.bookings = appState.bookings.filter(b => b.id !== newBooking.id);
+        renderBookingTable();
+        updateDashboardCounts();
+        renderAdminPendingTable();
+        renderCalendar();
+        triggerDoubleBookingWarning(newBooking.ruangan, newBooking.tanggal, newBooking.jam, {
           kegiatan: "Agenda Terdaftar (Server Collision)",
           pemohon: "Pengguna Lain",
           unit: "-"
         });
-        await syncDataFromDatabase();
-        return; 
-      }
-
-      appState.bookings.unshift(newBooking);
-      if (serverResult && serverResult.berkasUrl) {
+        syncDataFromDatabase();
+      } else if (serverResult && serverResult.berkasUrl) {
         newBooking.berkasUrl = serverResult.berkasUrl;
+        renderAdminPendingTable();
       }
-
-      renderBookingTable();
-      updateDashboardCounts();
-      renderAdminPendingTable();
-      renderCalendar();
-      closeBookingModal();
-      checkAutomatedReminders();
-      initAnalyticsCharts();
-
-      showToast(`Peminjaman berhasil dikirim & disimpan (ID: ${newBooking.id})! Email konfirmasi terkirim ke ${email}.`, 'success');
     }
 
     function checkBookingAvailability() {
