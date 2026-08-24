@@ -397,8 +397,8 @@
               <p id="lockoutText" class="text-[11px] leading-relaxed">Terlalu banyak percobaan gagal. Silakan tunggu <span id="lockoutTimerSpan" class="font-bold">60</span> detik.</p>
             </div>
 
-            <!-- Live Auto-Updating TOTP Code Display -->
-            <div class="bg-blue-50/80 border border-blue-200/80 rounded-xl p-2.5 flex items-center justify-between text-xs mt-1">
+            <!-- Live Auto-Updating TOTP Code Display (Appears after QR code is displayed/scanned) -->
+            <div id="autoFillSection" class="hidden bg-blue-50/80 border border-blue-200/80 rounded-xl p-2.5 flex items-center justify-between text-xs mt-1 animate-fade-in">
               <div>
                 <div class="text-[10px] text-slate-500 font-semibold flex items-center"><span class="w-2 h-2 bg-emerald-500 rounded-full mr-1.5 live-pulse"></span> Kode Authenticator Live (Otomatis Update):</div>
                 <div id="liveTotpCodeDisplay" class="font-mono font-extrabold text-blue-700 text-sm tracking-[0.2em]">------</div>
@@ -507,7 +507,7 @@
   </main>
 
   <footer class="bg-white border-t border-slate-200 py-6 mt-12 text-center text-xs text-slate-400">
-    © 2026 SIRUPA - Sistem Informasi Ruangan dan Peminjaman. | Bye DANPE
+    © 2026 SIRUPA - Sistem Informasi Ruangan dan Peminjaman.
   </footer>
 
   <div id="bookingModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto animate-fade-in">
@@ -728,7 +728,7 @@
 
   <!-- MODAL: SUPER ADMIN & EDIT ADMIN -->
   <div id="superAdminModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto animate-fade-in">
-    <div class="bg-white rounded-3xl max-w-2xl w-full p-5 sm:p-8 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto space-y-6">
+    <div class="bg-white rounded-3xl max-w-4xl w-full p-5 sm:p-8 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto space-y-6">
       <button onclick="closeSuperAdminModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
       <div class="space-y-1">
         <span class="text-[10px] font-black text-purple-600 uppercase tracking-wider">Super Admin Kontrol</span>
@@ -761,8 +761,20 @@
         </div>
       </form>
       <div class="space-y-3">
-        <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Daftar Admin Aktif</h4>
-        <div id="adminAccountsList" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
+        <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Daftar Akun Admin Aktif</h4>
+        <div class="overflow-x-auto border border-slate-200 rounded-2xl bg-white shadow-xs">
+          <table class="w-full text-left border-collapse min-w-[550px]">
+            <thead>
+              <tr class="bg-slate-50/70 border-b border-slate-100 text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
+                <th class="p-3 pl-4">Admin / Username</th>
+                <th class="p-3">Level Akses</th>
+                <th class="p-3">Unit / Dinas</th>
+                <th class="p-3 pr-4 text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="adminAccountsTableBody" class="divide-y divide-slate-100 text-xs text-slate-700"></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -1006,12 +1018,15 @@
 
     function toggleQrScanView() {
       const container = document.getElementById('qrScanContainer');
+      const autoFillSection = document.getElementById('autoFillSection');
       const textSpan = document.getElementById('toggleQrBtnText');
       if (container.classList.contains('hidden')) {
         container.classList.remove('hidden');
+        if (autoFillSection) autoFillSection.classList.remove('hidden');
         if (textSpan) textSpan.innerText = 'Sembunyikan QR';
       } else {
         container.classList.add('hidden');
+        if (autoFillSection) autoFillSection.classList.add('hidden');
         if (textSpan) textSpan.innerText = 'Tampilkan QR';
       }
     }
@@ -1900,22 +1915,33 @@
     function closeSuperAdminModal() { document.getElementById('superAdminModal').classList.add('hidden'); }
 
     function renderAdminAccountsList() {
-      const container = document.getElementById('adminAccountsList');
-      if (!container) return;
-      container.innerHTML = '';
+      const tbody = document.getElementById('adminAccountsTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
       appState.adminAccounts.forEach(acc => {
-        const isSuperBadge = acc.isSuper ? '<span class="text-[9px] bg-purple-100 text-purple-700 font-bold px-2 py-0.5 rounded">Super</span>' : '';
-        container.innerHTML += `
-          <div class="bg-white p-3 rounded-xl border border-slate-200 flex items-center justify-between text-xs">
-            <div class="space-y-0.5">
-              <div class="font-bold text-slate-900 flex items-center space-x-2"><span>${acc.name} (${acc.username})</span> ${isSuperBadge}</div>
-              <div class="text-[10px] text-slate-500">Unit: ${acc.unit}</div>
-            </div>
-            <div class="flex items-center space-x-1.5">
-              <button onclick="openEditAdminModal('${acc.username}')" class="w-7 h-7 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center hover:bg-blue-100 transition"><i class="fa-solid fa-pen text-[10px]"></i></button>
-              <button onclick="deleteAdminAccount('${acc.username}')" class="w-7 h-7 bg-rose-50 text-rose-600 rounded-lg flex items-center justify-center hover:bg-rose-100 transition"><i class="fa-solid fa-trash text-[10px]"></i></button>
-            </div>
-          </div>`;
+        const isSuperBadge = acc.isSuper 
+          ? '<span class="bg-purple-50 text-purple-700 border border-purple-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center"><i class="fa-solid fa-shield-halved mr-1 text-purple-600"></i> Super Admin</span>' 
+          : '<span class="bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center"><i class="fa-solid fa-user-shield mr-1 text-blue-600"></i> Admin Dinas</span>';
+
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="p-3 pl-4">
+              <div class="font-bold text-slate-900">${acc.name}</div>
+              <div class="text-[11px] font-mono text-blue-600">@${acc.username}</div>
+            </td>
+            <td class="p-3">${isSuperBadge}</td>
+            <td class="p-3 text-slate-600 font-medium">${acc.unit}</td>
+            <td class="p-3 pr-4 text-center">
+              <div class="inline-flex items-center space-x-1.5">
+                <button onclick="openEditAdminModal('${acc.username}')" title="Edit Akun" class="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold rounded-xl text-[11px] transition inline-flex items-center border border-blue-200 cursor-pointer">
+                  <i class="fa-solid fa-pen-to-square mr-1"></i> Edit
+                </button>
+                <button onclick="deleteAdminAccount('${acc.username}')" title="Hapus Akun" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl text-[11px] transition inline-flex items-center border border-rose-200 cursor-pointer">
+                  <i class="fa-solid fa-trash-can mr-1"></i> Hapus
+                </button>
+              </div>
+            </td>
+          </tr>`;
       });
     }
 
@@ -2475,6 +2501,12 @@
         document.getElementById('activeAuthEmail').innerText = `${foundAcc.username}@instansi.go.id`;
         document.getElementById('activeAuthAvatar').innerText = foundAcc.name.charAt(0).toUpperCase();
         document.getElementById('credentialsError').classList.add('hidden');
+
+        // Reset QR display & Auto-fill section state on new login step
+        document.getElementById('qrScanContainer').classList.add('hidden');
+        document.getElementById('autoFillSection').classList.add('hidden');
+        const toggleBtnText = document.getElementById('toggleQrBtnText');
+        if (toggleBtnText) toggleBtnText.innerText = 'Tampilkan QR';
 
         const secretKey = foundAcc.secret;
         document.getElementById('secretKeyText').innerText = secretKey;
