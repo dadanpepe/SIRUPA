@@ -278,7 +278,7 @@
       <div class="bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-900 text-sky-800 dark:text-sky-200 p-4 rounded-2xl text-xs font-medium flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs animate-fade-in">
         <div class="flex items-start sm:items-center">
           <i class="fa-solid fa-circle-info text-sky-600 dark:text-sky-400 mr-2.5 text-base mt-0.5 sm:mt-0 shrink-0"></i>
-          <span>Note : Tanggal ditandai merah menandakan adanya agenda peminjaman disetujui (Klik / tap untuk detail)</span>
+          <span>Note : Tanggal ditandai merah (agenda akan dilaksanakan) dan abu-abu (agenda sudah dilaksanakan/terlewat) menandakan adanya agenda peminjaman disetujui (Klik / tap untuk detail)</span>
         </div>
         <button onclick="openCancelModal()" class="w-full sm:w-auto px-4 py-2 bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-300 font-bold rounded-xl text-xs transition border border-rose-200 dark:border-rose-800 cursor-pointer shrink-0 flex items-center justify-center transform active:scale-95">
           <i class="fa-solid fa-ban mr-1.5"></i> Batal Pinjam
@@ -541,47 +541,69 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div class="lg:col-span-5 bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
-            <div class="border-b border-slate-100 dark:border-slate-800 pb-3 flex justify-between items-center">
-              <div>
-                <h3 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">Ruangan Berdasarkan Dinas/Bidang</h3>
-                <p id="adminRoomPermissionNote" class="text-[11px] text-slate-400">Daftar ruangan instansi.</p>
+          <div class="lg:col-span-5 bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4 flex flex-col justify-between">
+            <div class="space-y-4">
+              <div class="border-b border-slate-100 dark:border-slate-800 pb-3 flex justify-between items-center">
+                <div>
+                  <h3 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">Ruangan Berdasarkan Dinas/Bidang</h3>
+                  <p id="adminRoomPermissionNote" class="text-[11px] text-slate-400">Daftar ruangan instansi (5 per halaman).</p>
+                </div>
               </div>
-            </div>
-            <div class="relative">
-              <input type="text" id="adminSearchRoomInput" onkeyup="renderAdminRoomList()" oninput="renderAdminRoomList()" placeholder="Cari nama ruangan / dinas..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-200 rounded-xl py-2.5 pl-9 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
-              <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
-            </div>
-            <div id="adminRoomList" class="space-y-3 max-h-[440px] overflow-y-auto pr-1"></div>
-          </div>
-
-          <div class="lg:col-span-7 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden flex flex-col">
-            <div class="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Daftar Masuk Permintaan Peminjaman</h3>
-                <p id="adminTableSubtext" class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Setujui atau tolak pengajuan secara real-time.</p>
-              </div>
-            </div>
-            <div class="p-4 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
-              <div class="relative w-full">
-                <input type="text" id="adminSearchPendingInput" onkeyup="renderAdminPendingTable()" oninput="renderAdminPendingTable()" placeholder="Cari nama pemohon, kegiatan, atau ruangan..." class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-200 rounded-xl py-2.5 pl-9 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+              <div class="relative">
+                <input type="text" id="adminSearchRoomInput" onkeyup="renderAdminRoomList()" oninput="renderAdminRoomList()" placeholder="Cari nama ruangan / dinas..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-200 rounded-xl py-2.5 pl-9 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
               </div>
+              <div id="adminRoomList" class="space-y-3 min-h-[300px]"></div>
             </div>
-            <div class="overflow-x-auto flex-grow">
-              <table class="w-full text-left border-collapse min-w-[600px]">
-                <thead>
-                  <tr class="bg-slate-50/70 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
-                    <th class="p-3 sm:p-4 pl-5">ID / Pemohon</th>
-                    <th class="p-3 sm:p-4">Kegiatan</th>
-                    <th class="p-3 sm:p-4">Ruangan</th>
-                    <th class="p-3 sm:p-4">Jadwal</th>
-                    <th class="p-3 sm:p-4">Status</th>
-                    <th class="p-3 sm:p-4 pr-5 text-center">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody id="adminPendingTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-xs text-slate-700 dark:text-slate-300"></tbody>
-              </table>
+            <!-- Admin Rooms Pagination Controls (5 items per page) -->
+            <div class="p-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 bg-slate-50/50 dark:bg-slate-800/30 rounded-2xl mt-4">
+              <span id="adminRoomsPaginationInfo">Menampilkan 0-0 dari 0 data</span>
+              <div class="flex items-center space-x-2">
+                <button onclick="changeAdminRoomsPage(-1)" id="adminRoomsPrevBtn" class="px-3 py-1 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg font-bold transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed text-[11px]">Sebelumnya</button>
+                <span id="adminRoomsPageIndicator" class="font-bold text-slate-700 dark:text-slate-300 px-2">1 / 1</span>
+                <button onclick="changeAdminRoomsPage(1)" id="adminRoomsNextBtn" class="px-3 py-1 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg font-bold transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed text-[11px]">Berikutnya</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-7 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden flex flex-col justify-between">
+            <div class="space-y-0">
+              <div class="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Daftar Masuk Permintaan Peminjaman</h3>
+                  <p id="adminTableSubtext" class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Setujui atau tolak pengajuan secara real-time (5 per halaman).</p>
+                </div>
+              </div>
+              <div class="p-4 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
+                <div class="relative w-full">
+                  <input type="text" id="adminSearchPendingInput" onkeyup="renderAdminPendingTable()" oninput="renderAdminPendingTable()" placeholder="Cari nama pemohon, kegiatan, atau ruangan..." class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-200 rounded-xl py-2.5 pl-9 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                  <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                </div>
+              </div>
+              <div class="overflow-x-auto min-h-[320px]">
+                <table class="w-full text-left border-collapse min-w-[600px]">
+                  <thead>
+                    <tr class="bg-slate-50/70 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
+                      <th class="p-3 sm:p-4 pl-5">ID / Pemohon</th>
+                      <th class="p-3 sm:p-4">Kegiatan</th>
+                      <th class="p-3 sm:p-4">Ruangan</th>
+                      <th class="p-3 sm:p-4">Jadwal</th>
+                      <th class="p-3 sm:p-4">Status</th>
+                      <th class="p-3 sm:p-4 pr-5 text-center">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminPendingTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-xs text-slate-700 dark:text-slate-300"></tbody>
+                </table>
+              </div>
+            </div>
+            <!-- Admin Pending Bookings Pagination Controls (5 items per page) -->
+            <div class="p-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 bg-slate-50/50 dark:bg-slate-800/30">
+              <span id="adminPendingPaginationInfo">Menampilkan 0-0 dari 0 data</span>
+              <div class="flex items-center space-x-2">
+                <button onclick="changeAdminPendingPage(-1)" id="adminPendingPrevBtn" class="px-3 py-1 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg font-bold transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed text-[11px]">Sebelumnya</button>
+                <span id="adminPendingPageIndicator" class="font-bold text-slate-700 dark:text-slate-300 px-2">1 / 1</span>
+                <button onclick="changeAdminPendingPage(1)" id="adminPendingNextBtn" class="px-3 py-1 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg font-bold transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed text-[11px]">Berikutnya</button>
+              </div>
             </div>
           </div>
         </div>
@@ -952,6 +974,10 @@
       itemsPerPage: 5,
       currentAdminTablePage: 1,
       adminItemsPerPage: 5,
+      currentAdminRoomsPage: 1,
+      adminRoomsPerPage: 5,
+      currentAdminPendingPage: 1,
+      adminPendingPerPage: 5,
       announcementsList: [
         "Sistem Informasi Ruangan dan Peminjaman (SIRUPA) aktif. Proteksi anti double-input, validasi jam lampau, & pop-up bentrok ketat real-time."
       ],
@@ -1454,6 +1480,7 @@
           renderCalendar();
           renderAdminPendingTable();
           renderAdminAccountsList();
+          renderAdminRoomList();
           renderRoomCards();
           checkAutomatedReminders();
           initAnalyticsCharts();
@@ -1608,6 +1635,7 @@
 
       calendarBody.innerHTML = '';
       let dateCounter = 1, nextMonthCounter = 1, rowHtml = '';
+      const now = new Date();
 
       for (let i = 0; i < 6; i++) {
         rowHtml += '<tr class="h-20 sm:h-24">';
@@ -1636,15 +1664,64 @@
           let cellBgClass = 'bg-white dark:bg-slate-900', textColor = isCurrentMonth ? 'text-slate-800 dark:text-slate-200' : 'text-slate-300 dark:text-slate-700', clickAttr = '';
 
           if (hasBookings) {
-            cellBgClass = 'bg-rose-100/75 dark:bg-rose-950/60 cursor-pointer hover:bg-rose-200/80 dark:hover:bg-rose-900/60';
-            textColor = 'text-slate-900 dark:text-white font-bold';
+            let allPassed = true;
+            bookingsOnThisDay.forEach(b => {
+              let endH = 23, endM = 59;
+              const jamString = String(b.jam || '');
+              const parts = jamString.split(' - ');
+              if (parts.length >= 2) {
+                const endHM = parts[1].replace(/WIB/gi, '').trim().split(':');
+                endH = parseInt(endHM[0], 10) || 23;
+                endM = parseInt(endHM[1], 10) || 59;
+              }
+              const bookingEndDateTime = new Date(dateStr + 'T' + String(endH).padStart(2, '0') + ':' + String(endM).padStart(2, '0') + ':00');
+              if (now <= bookingEndDateTime) {
+                allPassed = false;
+              }
+            });
+
+            if (allPassed) {
+              cellBgClass = 'bg-slate-200 dark:bg-slate-800/80 cursor-pointer hover:bg-slate-300 dark:hover:bg-slate-800';
+              textColor = 'text-slate-700 dark:text-slate-300 font-bold';
+            } else {
+              cellBgClass = 'bg-rose-100/75 dark:bg-rose-950/60 cursor-pointer hover:bg-rose-200/80 dark:hover:bg-rose-900/60';
+              textColor = 'text-slate-900 dark:text-white font-bold';
+            }
+
             const bInfo = encodeURIComponent(JSON.stringify(bookingsOnThisDay));
             clickAttr = `onclick="showBookingDetails('${bInfo}')"`;
           } else {
             clickAttr = `onclick="showEmptyAgendaModal('${dateStr}')"`;
           }
 
-          rowHtml += `<td ${clickAttr} class="align-top border-r border-slate-200 dark:border-slate-800 p-1.5 sm:p-2 relative ${cellBgClass} transition cursor-pointer"><span class="${textColor} text-xs">${dayNum}</span>${hasBookings ? '<span class="absolute bottom-1.5 right-1.5 w-2 h-2 bg-rose-600 rounded-full live-pulse"></span>' : ''}</td>`;
+          let agendaLabel = '';
+          if (hasBookings) {
+            const count = bookingsOnThisDay.length;
+            const labelText = count === 1 ? '1 agenda' : `${count} agenda`;
+            let badgeColorClass = 'bg-rose-600 text-white';
+            
+            let allPassedCheck = true;
+            bookingsOnThisDay.forEach(b => {
+              let endH = 23, endM = 59;
+              const jamString = String(b.jam || '');
+              const parts = jamString.split(' - ');
+              if (parts.length >= 2) {
+                const endHM = parts[1].replace(/WIB/gi, '').trim().split(':');
+                endH = parseInt(endHM[0], 10) || 23;
+                endM = parseInt(endHM[1], 10) || 59;
+              }
+              const bookingEndDateTime = new Date(dateStr + 'T' + String(endH).padStart(2, '0') + ':' + String(endM).padStart(2, '0') + ':00');
+              if (now <= bookingEndDateTime) allPassedCheck = false;
+            });
+
+            if (allPassedCheck) {
+              badgeColorClass = 'bg-slate-500 text-white';
+            }
+
+            agendaLabel = `<div class="absolute bottom-1.5 left-1 right-1 text-[9px] font-extrabold px-1 py-0.5 rounded ${badgeColorClass} text-center shadow-2xs truncate">${labelText}</div>`;
+          }
+
+          rowHtml += `<td ${clickAttr} class="align-top border-r border-slate-200 dark:border-slate-800 p-1.5 sm:p-2 relative ${cellBgClass} transition cursor-pointer"><span class="${textColor} text-xs">${dayNum}</span>${agendaLabel}</td>`;
         }
         rowHtml += '</tr>';
         if (dateCounter > totalDays && i >= 4) break;
@@ -1776,12 +1853,24 @@
         });
       }
 
-      if (filteredRooms.length === 0) {
+      const totalItems = filteredRooms.length;
+      const totalPages = Math.ceil(totalItems / appState.adminRoomsPerPage) || 1;
+      if (appState.currentAdminRoomsPage > totalPages) appState.currentAdminRoomsPage = totalPages;
+      if (appState.currentAdminRoomsPage < 1) appState.currentAdminRoomsPage = 1;
+
+      const startIndex = (appState.currentAdminRoomsPage - 1) * appState.adminRoomsPerPage;
+      const paginatedList = filteredRooms.slice(startIndex, startIndex + appState.adminRoomsPerPage);
+
+      if (totalItems === 0) {
         container.innerHTML = `<div class="p-4 text-center text-slate-400 text-xs">Tidak ada ruangan ditemukan.</div>`;
+        document.getElementById('adminRoomsPaginationInfo').innerText = `Menampilkan 0 dari 0 data`;
+        document.getElementById('adminRoomsPageIndicator').innerText = `1 / 1`;
+        document.getElementById('adminRoomsPrevBtn').disabled = true;
+        document.getElementById('adminRoomsNextBtn').disabled = true;
         return;
       }
 
-      filteredRooms.forEach(room => {
+      paginatedList.forEach(room => {
         container.innerHTML += `
           <div class="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-3.5 sm:p-4 space-y-3">
             <div class="flex items-center justify-between">
@@ -1795,6 +1884,17 @@
             </div>
           </div>`;
       });
+
+      const endDisplayIndex = Math.min(startIndex + appState.adminRoomsPerPage, totalItems);
+      document.getElementById('adminRoomsPaginationInfo').innerText = `Menampilkan ${startIndex + 1}-${endDisplayIndex} dari ${totalItems} data`;
+      document.getElementById('adminRoomsPageIndicator').innerText = `${appState.currentAdminRoomsPage} / ${totalPages}`;
+      document.getElementById('adminRoomsPrevBtn').disabled = appState.currentAdminRoomsPage <= 1;
+      document.getElementById('adminRoomsNextBtn').disabled = appState.currentAdminRoomsPage >= totalPages;
+    }
+
+    function changeAdminRoomsPage(direction) {
+      appState.currentAdminRoomsPage += direction;
+      renderAdminRoomList();
     }
 
     function renderAdminPendingTable() {
@@ -1803,11 +1903,6 @@
       const tbody = document.getElementById('adminPendingTableBody');
       if (!tbody) return;
       tbody.innerHTML = '';
-
-      if (appState.bookings.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400 font-medium">Tidak ada pengajuan masuk.</td></tr>`;
-        return;
-      }
 
       let visibleBookings = appState.bookings;
       if (appState.currentAdmin && !appState.currentAdmin.isSuper) {
@@ -1832,14 +1927,26 @@
         });
       }
 
-      if (visibleBookings.length === 0) {
+      const totalItems = visibleBookings.length;
+      const totalPages = Math.ceil(totalItems / appState.adminPendingPerPage) || 1;
+      if (appState.currentAdminPendingPage > totalPages) appState.currentAdminPendingPage = totalPages;
+      if (appState.currentAdminPendingPage < 1) appState.currentAdminPendingPage = 1;
+
+      const startIndex = (appState.currentAdminPendingPage - 1) * appState.adminPendingPerPage;
+      const paginatedList = visibleBookings.slice(startIndex, startIndex + appState.adminPendingPerPage);
+
+      if (totalItems === 0) {
         tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 text-xs">Tidak ada permintaan peminjaman ditemukan.</td></tr>`;
+        document.getElementById('adminPendingPaginationInfo').innerText = `Menampilkan 0 dari 0 data`;
+        document.getElementById('adminPendingPageIndicator').innerText = `1 / 1`;
+        document.getElementById('adminPendingPrevBtn').disabled = true;
+        document.getElementById('adminPendingNextBtn').disabled = true;
         return;
       }
 
       const now = new Date();
 
-      visibleBookings.forEach(item => {
+      paginatedList.forEach(item => {
         const pdfUrl = (item.berkasUrl && item.berkasUrl !== '#') ? item.berkasUrl : '#';
         const pdfBtnDisabled = pdfUrl === '#' ? 'opacity-40 cursor-not-allowed pointer-events-none' : 'hover:bg-blue-100 cursor-pointer';
         
@@ -1896,6 +2003,17 @@
           </tr>
         `;
       });
+
+      const endDisplayIndex = Math.min(startIndex + appState.adminPendingPerPage, totalItems);
+      document.getElementById('adminPendingPaginationInfo').innerText = `Menampilkan ${startIndex + 1}-${endDisplayIndex} dari ${totalItems} data`;
+      document.getElementById('adminPendingPageIndicator').innerText = `${appState.currentAdminPendingPage} / ${totalPages}`;
+      document.getElementById('adminPendingPrevBtn').disabled = appState.currentAdminPendingPage <= 1;
+      document.getElementById('adminPendingNextBtn').disabled = appState.currentAdminPendingPage >= totalPages;
+    }
+
+    function changeAdminPendingPage(direction) {
+      appState.currentAdminPendingPage += direction;
+      renderAdminPendingTable();
     }
 
     let activePdfViewerUrl = '';
