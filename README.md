@@ -1,1 +1,1 @@
-# dashboard.peminjaman
+# SIRUPA - Sistem Informasi Ruangan dan Peminjaman
