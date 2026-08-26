@@ -286,7 +286,7 @@
       <div class="bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-900 text-sky-800 dark:text-sky-200 p-4 rounded-2xl text-xs font-medium flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs animate-fade-in">
         <div class="flex items-start sm:items-center">
           <i class="fa-solid fa-circle-info text-sky-600 dark:text-sky-400 mr-2.5 text-base mt-0.5 sm:mt-0 shrink-0"></i>
-          <span>Note : Kalender interaktif dapat bisa melihat status ruangan secara realtime (<b>Sedang Berlangsung</b>, <b>Segera</b>, dan <b>Selesai</b>). Klik untuk detail.</span>
+          <span>Note : Kalender interaktif dengan warna-warni dinamis & efek animasi pencahayaan menandakan status (<b>Sedang Berlangsung</b>, <b>Segera</b>, dan <b>Selesai</b>). Klik untuk detail.</span>
         </div>
         <button onclick="openCancelModal()" class="w-full sm:w-auto px-4 py-2 bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-300 font-bold rounded-xl text-xs transition border border-rose-200 dark:border-rose-800 cursor-pointer shrink-0 flex items-center justify-center transform active:scale-95">
           <i class="fa-solid fa-ban mr-1.5"></i> Batal Pinjam
@@ -356,7 +356,7 @@
             <form onsubmit="handleCredentialsSubmit(event)" class="space-y-4 text-xs">
               <div>
                 <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Username Admin</label>
-                <input type="text" id="adminUsername" required placeholder="username admin" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-slate-800 dark:text-slate-200 font-medium focus:ring-2 focus:ring-slate-900 outline-none">
+                <input type="text" id="adminUsername" required placeholder="superadmin / admin_umum" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-slate-800 dark:text-slate-200 font-medium focus:ring-2 focus:ring-slate-900 outline-none">
               </div>
               <div>
                 <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Password</label>
@@ -627,7 +627,7 @@
       <form id="bookingForm" onsubmit="handleBookingSubmit(event)" class="space-y-4 text-xs">
         <div>
           <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Pilih Ruangan</label>
-          <select id="inputRuangan" onchange="checkBookingAvailability(); checkCapacityLimit();" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none font-medium cursor-pointer">
+          <select id="inputRuangan" required onchange="checkBookingAvailability(); checkCapacityLimit();" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none font-medium cursor-pointer">
           </select>
         </div>
 
@@ -650,7 +650,8 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Kategori Kegiatan</label>
-            <select id="inputKategori" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none cursor-pointer">
+            <select id="inputKategori" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none cursor-pointer">
+              <option value="" disabled selected>Pilih Kategori</option>
               <option value="Rapat Dinas">Rapat Dinas</option>
               <option value="Seminar / Sosialisasi">Seminar / Sosialisasi</option>
               <option value="Workshop">Workshop</option>
@@ -659,7 +660,7 @@
           </div>
           <div>
             <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Jumlah Peserta</label>
-            <input type="number" id="inputPeserta" required value="25" min="1" oninput="checkCapacityLimit()" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none">
+            <input type="number" id="inputPeserta" required value="" placeholder="Contoh: 25" min="1" oninput="checkCapacityLimit()" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none">
           </div>
         </div>
 
@@ -676,26 +677,26 @@
           <div>
             <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Waktu / Jam Pelaksanaan <span class="text-slate-400 font-normal">(HH:MM - HH:MM WIB)</span></label>
             <div class="grid grid-cols-2 gap-2">
-              <input type="time" id="inputJamMulai" required value="08:00" onchange="checkBookingAvailability()" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 text-center outline-none">
-              <input type="time" id="inputJamSelesai" required value="17:00" onchange="checkBookingAvailability()" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 text-center outline-none">
+              <input type="time" id="inputJamMulai" required value="" onchange="checkBookingAvailability()" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 text-center outline-none">
+              <input type="time" id="inputJamSelesai" required value="" onchange="checkBookingAvailability()" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 text-center outline-none">
             </div>
           </div>
         </div>
 
         <div>
-          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Upload Berkas / Surat Izin <span class="text-rose-600">(PDF)</span></label>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Upload Berkas / Surat Izin <span class="text-rose-600">(PDF - Wajib)</span></label>
           <div class="flex items-center space-x-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-2">
             <label class="px-3 py-1.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold rounded-lg cursor-pointer text-[11px] transition">
               Pilih Berkas
-              <input type="file" id="inputBerkas" accept=".pdf" class="hidden" onchange="document.getElementById('fileNameSpan').innerText = this.files[0] ? this.files[0].name : 'Tidak ada berkas dipilih'">
+              <input type="file" id="inputBerkas" accept=".pdf" required class="hidden" onchange="document.getElementById('fileNameSpan').innerText = this.files[0] ? this.files[0].name : 'Tidak ada berkas dipilih'">
             </label>
-            <span id="fileNameSpan" class="text-slate-400 text-[11px] truncate">Tidak ada berkas dipilih</span>
+            <span id="fileNameSpan" class="text-slate-400 text-[11px] truncate">Tidak ada berkas dipilih (Wajib PDF)</span>
           </div>
         </div>
 
         <div>
-          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Catatan Tambahan <span class="text-slate-400 font-normal">(Opsional)</span></label>
-          <textarea id="inputCatatan" rows="2" placeholder="Catatan khusus fasilitas..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none resize-none"></textarea>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Catatan Tambahan</label>
+          <textarea id="inputCatatan" rows="2" required placeholder="Catatan khusus fasilitas..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none resize-none"></textarea>
         </div>
 
         <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100 dark:border-slate-800">
