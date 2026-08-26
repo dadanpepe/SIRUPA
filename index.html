@@ -74,11 +74,11 @@
     .animate-shake { animation: shakeAnim 0.4s ease-in-out; }
 
     @keyframes glowPulseEffect {
-      0%, 100% { box-shadow: inset 0 0 15px rgba(255,255,255,0.6), 0 0 12px currentColor; }
-      50% { box-shadow: inset 0 0 25px rgba(255,255,255,0.9), 0 0 22px currentColor; }
+      0%, 100% { box-shadow: inset 0 0 15px rgba(255,255,255,0.6), 0 0 14px currentColor; transform: scale(1); }
+      50% { box-shadow: inset 0 0 25px rgba(255,255,255,0.9), 0 0 24px currentColor; transform: scale(1.02); }
     }
     .calendar-glow-ongoing {
-      animation: glowPulseEffect 2.5s infinite ease-in-out;
+      animation: glowPulseEffect 2.2s infinite ease-in-out;
     }
 
     html { scroll-behavior: smooth; }
@@ -286,7 +286,7 @@
       <div class="bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-900 text-sky-800 dark:text-sky-200 p-4 rounded-2xl text-xs font-medium flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs animate-fade-in">
         <div class="flex items-start sm:items-center">
           <i class="fa-solid fa-circle-info text-sky-600 dark:text-sky-400 mr-2.5 text-base mt-0.5 sm:mt-0 shrink-0"></i>
-          <span>Note : Kalender interaktif dengan warna-warni dinamis & efek animasi pencahayaan menandakan status (<b>Sedang Berlangsung</b>, <b>Segera</b>, dan <b>Selesai</b>). Klik untuk detail.</span>
+          <span>Note : Kalender interaktif penuh warna dengan efek pencahayaan animasi dinamis (<b>Sedang Berlangsung</b>, <b>Segera</b>, dan <b>Selesai</b>). Klik tanggal untuk melihat detail agenda.</span>
         </div>
         <button onclick="openCancelModal()" class="w-full sm:w-auto px-4 py-2 bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-300 font-bold rounded-xl text-xs transition border border-rose-200 dark:border-rose-800 cursor-pointer shrink-0 flex items-center justify-center transform active:scale-95">
           <i class="fa-solid fa-ban mr-1.5"></i> Batal Pinjam
@@ -838,8 +838,8 @@
           </div>
           <div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Kapasitas</label><input type="text" id="inputRoomCapacity" required placeholder="Contoh: 40 Orang" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none"></div>
         </div>
-        <div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Dinas / Bidang Pengelola <span class="text-slate-400 font-normal">(Ketik Manual)</span></label><input type="text" id="inputRoomUnit" required placeholder="Contoh: Bagian Umum" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 outline-none text-slate-800 dark:text-slate-200"></div>
-        <div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Fasilitas <span class="text-slate-400 font-normal">(pisahkan dengan koma)</span></label><input type="text" id="inputRoomFeatures" required placeholder="Contoh: Proyektor, AC" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 outline-none text-slate-800 dark:text-slate-200"></div>
+        <div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Dinas / Bidang Pengelola <span class="text-slate-400 font-normal">(Ketik Manual)</span></label><input type="text" id="inputRoomUnit" required placeholder="Contoh: Bagian Umum" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none"></div>
+        <div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Fasilitas <span class="text-slate-400 font-normal">(pisahkan dengan koma)</span></label><input type="text" id="inputRoomFeatures" required placeholder="Contoh: Proyektor, AC" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none"></div>
         <div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Deskripsi</label><textarea id="inputRoomDesc" rows="2" required placeholder="Deskripsi..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none resize-none"></textarea></div>
         
         <div>
@@ -966,7 +966,7 @@
       currentAdminTablePage: 1,
       adminItemsPerPage: 5,
       announcementsList: [
-        "Sistem Informasi Ruangan dan Peminjaman (SIRUPA) aktif dengan kalender warna-warni interaktif."
+        "Sistem Informasi Ruangan dan Peminjaman (SIRUPA) aktif dengan kalender interaktif warna-warni & efek pencahayaan dinamis."
       ],
       adminAccounts: [
         { username: 'superadmin', name: 'Super Administrator', pass: 'admin123', unit: 'Semua Dinas', isSuper: true, secret: 'JBSWY3DPEHPK3PXP' },
@@ -1669,7 +1669,6 @@
 
           let badgeColorBg = 'bg-blue-600';
           let badgeTextStatus = 'Aktif';
-          let glowClass = '';
 
           if (hasBookings) {
             let hasOngoing = false;
@@ -1711,19 +1710,19 @@
             });
 
             if (hasOngoing) {
-              cellBgClass = 'bg-gradient-to-br from-blue-400 via-indigo-400 to-cyan-400 text-slate-950 dark:text-white font-black calendar-glow-ongoing border-2 border-blue-200';
+              cellBgClass = 'bg-gradient-to-br from-blue-500 via-indigo-500 to-cyan-500 text-white font-black calendar-glow-ongoing border-2 border-blue-200';
               textColor = 'text-white font-black';
-              badgeColorBg = 'bg-blue-600';
+              badgeColorBg = 'bg-blue-700 text-white';
               badgeTextStatus = 'Sedang Berlangsung';
             } else if (hasUpcomingToday || !allFinished) {
-              cellBgClass = 'bg-gradient-to-br from-amber-300 via-orange-300 to-yellow-300 text-slate-950 dark:text-white font-black calendar-glow-ongoing border-2 border-amber-200';
+              cellBgClass = 'bg-gradient-to-br from-amber-400 via-orange-400 to-yellow-400 text-slate-950 dark:text-white font-black calendar-glow-ongoing border-2 border-amber-200';
               textColor = 'text-slate-950 font-black';
-              badgeColorBg = 'bg-amber-600';
+              badgeColorBg = 'bg-amber-700 text-white';
               badgeTextStatus = 'Segera';
             } else {
-              cellBgClass = 'bg-gradient-to-br from-emerald-200 to-teal-200 dark:from-emerald-950 dark:to-teal-900 shadow-inner border border-emerald-300 dark:border-emerald-800';
-              textColor = 'text-emerald-950 dark:text-emerald-100 font-extrabold';
-              badgeColorBg = 'bg-emerald-600';
+              cellBgClass = 'bg-gradient-to-br from-emerald-300 via-teal-300 to-emerald-400 text-emerald-950 font-extrabold calendar-glow-ongoing border-2 border-emerald-200';
+              textColor = 'text-emerald-950 font-black';
+              badgeColorBg = 'bg-emerald-700 text-white';
               badgeTextStatus = 'Selesai';
             }
 
@@ -1737,8 +1736,8 @@
           if (hasBookings) {
             innerBadge = `
               <div class="mt-2 flex items-center justify-between">
-                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${badgeColorBg} text-white shadow-xs">${badgeTextStatus}</span>
-                <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center font-bold text-[10px] shadow-md border-2 border-white dark:border-slate-800">
+                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${badgeColorBg} shadow-xs">${badgeTextStatus}</span>
+                <div class="w-7 h-7 rounded-full bg-slate-900/80 text-white flex items-center justify-center font-bold text-[10px] shadow-md border-2 border-white dark:border-slate-800">
                   <i class="fa-solid fa-user-tie"></i>
                 </div>
               </div>
@@ -1795,9 +1794,9 @@
           const bookingEndDateTime = new Date(displayDateDetail + 'T' + String(endH).padStart(2, '0') + ':' + String(endM).padStart(2, '0') + ':00');
 
           if (now > bookingEndDateTime) {
-            executionBadge = `<span class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-700 px-2.5 py-0.5 rounded-full text-[10px] font-bold"><i class="fa-solid fa-check-double mr-1"></i> Telah Dilaksanakan</span>`;
+            executionBadge = `<span class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-700 px-2.5 py-0.5 rounded-full text-[10px] font-bold"><i class="fa-solid fa-check-double mr-1"></i> Selesai (Telah Dilaksanakan)</span>`;
           } else {
-            executionBadge = `<span class="bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900 px-2.5 py-0.5 rounded-full text-[10px] font-bold"><i class="fa-solid fa-clock mr-1"></i> Akan Dilaksanakan</span>`;
+            executionBadge = `<span class="bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900 px-2.5 py-0.5 rounded-full text-[10px] font-bold"><i class="fa-solid fa-clock mr-1"></i> Segera / Sedang Berlangsung</span>`;
           }
 
           html += `
