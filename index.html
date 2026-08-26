@@ -914,6 +914,7 @@
             return { status: 'success' };
           }
         } catch (err) {
+          console.error("Database POST sync error:", err);
           return { status: 'error', message: err.toString() };
         }
       },
@@ -929,11 +930,14 @@
           });
           const textRes = await response.text();
           try {
-            return JSON.parse(textRes);
+            const parsed = JSON.parse(textRes);
+            return parsed;
           } catch(e) {
+            console.error("Database JSON parse error:", e);
             return { status: 'success', bookings: appState.bookings, rooms: appState.rooms, admins: appState.adminAccounts, announcements: appState.announcementsList };
           }
         } catch (err) {
+          console.warn("Database connection warning (using local fallback state):", err);
           return { status: 'success', bookings: appState.bookings, rooms: appState.rooms, admins: appState.adminAccounts, announcements: appState.announcementsList };
         }
       }
@@ -1472,7 +1476,7 @@
           initAnalyticsCharts();
         }
       } catch (err) {
-        console.warn("Background sync retry:", err);
+        console.warn("Background sync retry error:", err);
       }
     }
 
