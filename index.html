@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>SIRUPA - Sistem Informasi Ruangan dan Peminjaman</title>
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     if (typeof tailwind !== 'undefined') {
@@ -13,7 +12,6 @@
       }
     }
   </script>
-  <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -28,6 +26,14 @@
       50% { opacity: 0.6; transform: scale(0.98); }
     }
     .live-pulse { animation: pulseGlow 2s infinite ease-in-out; }
+
+    @keyframes redGlowPulse {
+      0%, 100% { box-shadow: inset 0 0 15px rgba(239, 68, 68, 0.6), 0 0 14px rgba(239, 68, 68, 0.8); }
+      50% { box-shadow: inset 0 0 25px rgba(239, 68, 68, 0.9), 0 0 24px rgba(239, 68, 68, 1); }
+    }
+    .calendar-glow-ongoing-red {
+      animation: redGlowPulse 2s infinite ease-in-out;
+    }
 
     @keyframes bellSwing {
       0% { transform: rotate(0deg); }
@@ -74,11 +80,11 @@
     .animate-shake { animation: shakeAnim 0.4s ease-in-out; }
 
     @keyframes glowPulseEffect {
-      0%, 100% { box-shadow: inset 0 0 15px rgba(255,255,255,0.6), 0 0 14px currentColor; transform: scale(1); }
-      50% { box-shadow: inset 0 0 25px rgba(255,255,255,0.9), 0 0 24px currentColor; transform: scale(1.02); }
+      0%, 100% { box-shadow: inset 0 0 15px rgba(255,255,255,0.6), 0 0 12px currentColor; }
+      50% { box-shadow: inset 0 0 25px rgba(255,255,255,0.9), 0 0 22px currentColor; }
     }
     .calendar-glow-ongoing {
-      animation: glowPulseEffect 2.2s infinite ease-in-out;
+      animation: glowPulseEffect 2.5s infinite ease-in-out;
     }
 
     html { scroll-behavior: smooth; }
@@ -184,7 +190,7 @@
         <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div class="max-w-3xl space-y-2 sm:space-y-3">
             <h2 class="text-xl sm:text-3xl lg:text-4xl font-black tracking-tight leading-tight">Dashboard & Statistik Ruangan</h2>
-            <p class="text-blue-100 text-xs sm:text-sm leading-relaxed opacity-90">SIRUPA — Satu Sistem, Semua Ruangan.</p>
+            <p class="text-blue-100 text-xs sm:text-sm leading-relaxed opacity-90">SIRUPA — Satu Sistem, Semua Ruangan. Kalender mendeteksi status otomatis (Sedang Berlangsung & Telah Dilaksanakan).</p>
           </div>
         </div>
       </div>
@@ -250,9 +256,11 @@
             <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Daftar & Riwayat Peminjaman Ruangan</h3>
             <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Menampilkan 5 data terbaru per halaman</p>
           </div>
-          <div class="relative w-full sm:w-72">
-            <input type="text" id="searchTableInput" onkeyup="filterBookingTable()" oninput="filterBookingTable()" placeholder="Cari pemohon / kegiatan..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-200 rounded-full py-2.5 pl-9 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800 transition">
-            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+          <div class="flex items-center space-x-3 w-full sm:w-auto">
+            <div class="relative w-full sm:w-72">
+              <input type="text" id="searchTableInput" onkeyup="filterBookingTable()" oninput="filterBookingTable()" placeholder="Cari pemohon / kegiatan..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-200 rounded-full py-2.5 pl-9 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-800 transition">
+              <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+            </div>
           </div>
         </div>
         <div class="overflow-x-auto">
@@ -263,7 +271,7 @@
                 <th class="p-3 sm:p-4">Kegiatan</th>
                 <th class="p-3 sm:p-4">Ruangan</th>
                 <th class="p-3 sm:p-4">Waktu Pelaksanaan</th>
-                <th class="p-3 sm:p-4 pr-5 sm:pr-6">Status</th>
+                <th class="p-3 sm:p-4 pr-5 sm:pr-6">Status Pelaksanaan</th>
               </tr>
             </thead>
             <tbody id="bookingTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-xs text-slate-700 dark:text-slate-300"></tbody>
@@ -286,7 +294,7 @@
       <div class="bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-900 text-sky-800 dark:text-sky-200 p-4 rounded-2xl text-xs font-medium flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs animate-fade-in">
         <div class="flex items-start sm:items-center">
           <i class="fa-solid fa-circle-info text-sky-600 dark:text-sky-400 mr-2.5 text-base mt-0.5 sm:mt-0 shrink-0"></i>
-          <span>Note : Kalender interaktif penuh warna dengan efek pencahayaan animasi dinamis (<b>Sedang Berlangsung</b>, <b>Segera</b>, dan <b>Selesai</b>). Klik tanggal untuk melihat detail agenda.</span>
+          <span>Note : Silahkan Klik pada salah satu tanggal yang berisi kegiatan untuk melihat lebih detail agenda.</span>
         </div>
         <button onclick="openCancelModal()" class="w-full sm:w-auto px-4 py-2 bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-300 font-bold rounded-xl text-xs transition border border-rose-200 dark:border-rose-800 cursor-pointer shrink-0 flex items-center justify-center transform active:scale-95">
           <i class="fa-solid fa-ban mr-1.5"></i> Batal Pinjam
@@ -298,7 +306,7 @@
           <div class="flex items-center space-x-2 flex-wrap gap-y-1">
             <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500 text-white shadow-xs"><span class="w-1.5 h-1.5 rounded-full bg-white mr-1 live-pulse"></span> Sedang Berlangsung</span>
             <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500 text-white shadow-xs"><span class="w-1.5 h-1.5 rounded-full bg-white mr-1 live-pulse"></span> Segera (Hari Ini)</span>
-            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white shadow-xs">Selesai</span>
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-600 text-white shadow-xs">Telah Dilaksanakan</span>
           </div>
           <span class="text-xs sm:text-sm font-black text-slate-900 dark:text-white tracking-wider text-center" id="calendarMonthTitle">AGUSTUS 2026</span>
           <div class="flex items-center justify-end space-x-2">
@@ -356,7 +364,7 @@
             <form onsubmit="handleCredentialsSubmit(event)" class="space-y-4 text-xs">
               <div>
                 <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Username Admin</label>
-                <input type="text" id="adminUsername" required placeholder="superadmin / admin_umum" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-slate-800 dark:text-slate-200 font-medium focus:ring-2 focus:ring-slate-900 outline-none">
+                <input type="text" id="adminUsername" required placeholder="username" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-slate-800 dark:text-slate-200 font-medium focus:ring-2 focus:ring-slate-900 outline-none">
               </div>
               <div>
                 <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Password</label>
@@ -602,7 +610,7 @@
   </main>
 
   <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 mt-12 text-center text-xs text-slate-400">
-    © 2026 SIRUPA - Sistem Informasi Ruangan dan Peminjaman.| @ DANPE
+    © 2026 SIRUPA - Sistem Informasi Ruangan dan Peminjaman.
   </footer>
 
   <div id="bookingModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto animate-fade-in">
@@ -637,7 +645,7 @@
             <input type="text" id="inputPemohon" required placeholder="Contoh: Ahmad Fauzi" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none">
           </div>
           <div>
-            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Email Pemohon (Untuk Pengingat H-1 & H-3 Jam)</label>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Email Pemohon (Notifikasi & Info Status)</label>
             <input type="email" id="inputEmail" required placeholder="nama@email.com" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none">
           </div>
         </div>
@@ -675,10 +683,10 @@
             <input type="date" id="inputTanggal" required onchange="checkBookingAvailability()" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none font-medium">
           </div>
           <div>
-            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Waktu / Jam Pelaksanaan <span class="text-slate-400 font-normal">(HH:MM - HH:MM WIB)</span></label>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Waktu / Jam Pelaksanaan <span class="text-slate-400 font-normal">(Selesai wajib > Mulai)</span></label>
             <div class="grid grid-cols-2 gap-2">
-              <input type="time" id="inputJamMulai" required value="" onchange="checkBookingAvailability()" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 text-center outline-none">
-              <input type="time" id="inputJamSelesai" required value="" onchange="checkBookingAvailability()" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 text-center outline-none">
+              <input type="time" id="inputJamMulai" required value="" onchange="validateTimeRange(); checkBookingAvailability();" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 text-center outline-none">
+              <input type="time" id="inputJamSelesai" required value="" onchange="validateTimeRange(); checkBookingAvailability();" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 text-center outline-none">
             </div>
           </div>
         </div>
@@ -747,10 +755,10 @@
         </div>
         <div class="bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-900 rounded-xl p-3 text-slate-700 dark:text-slate-300 space-y-1">
           <div class="font-bold flex items-center text-blue-800 dark:text-blue-300 text-[11px]">
-            <i class="fa-solid fa-paper-plane mr-1.5 text-blue-600"></i> Notifikasi Gmail Aktif
+            <i class="fa-solid fa-paper-plane mr-1.5 text-blue-600"></i> MailApp Apps Script Aktif
           </div>
           <p class="text-[11px] leading-relaxed text-slate-600 dark:text-slate-400">
-            Status pengajuan ini sedang diverifikasi oleh admin. Pembaruan status persetujuan akan dikirim secara real-time ke email Anda: <b id="successBookingEmail" class="text-slate-900 dark:text-white">nama@gmail.com</b>.
+            Status pengajuan diverifikasi admin. Email resmi akan dikirimkan ke email Anda: <b id="successBookingEmail" class="text-slate-900 dark:text-white">nama@gmail.com</b>.
           </p>
         </div>
       </div>
@@ -838,8 +846,8 @@
           </div>
           <div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Kapasitas</label><input type="text" id="inputRoomCapacity" required placeholder="Contoh: 40 Orang" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none"></div>
         </div>
-        <div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Dinas / Bidang Pengelola <span class="text-slate-400 font-normal">(Ketik Manual)</span></label><input type="text" id="inputRoomUnit" required placeholder="Contoh: Bagian Umum" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none"></div>
-        <div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Fasilitas <span class="text-slate-400 font-normal">(pisahkan dengan koma)</span></label><input type="text" id="inputRoomFeatures" required placeholder="Contoh: Proyektor, AC" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none"></div>
+        <div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Dinas / Bidang Pengelola <span class="text-slate-400 font-normal">(Ketik Manual)</span></label><input type="text" id="inputRoomUnit" required placeholder="Contoh: Bagian Umum" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 outline-none text-slate-800 dark:text-slate-200"></div>
+        <div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Fasilitas <span class="text-slate-400 font-normal">(pisahkan dengan koma)</span></label><input type="text" id="inputRoomFeatures" required placeholder="Contoh: Proyektor, AC" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 outline-none text-slate-800 dark:text-slate-200"></div>
         <div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Deskripsi</label><textarea id="inputRoomDesc" rows="2" required placeholder="Deskripsi..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none resize-none"></textarea></div>
         
         <div>
@@ -914,7 +922,6 @@
             return { status: 'success' };
           }
         } catch (err) {
-          console.error("Database POST sync error:", err);
           return { status: 'error', message: err.toString() };
         }
       },
@@ -930,30 +937,91 @@
           });
           const textRes = await response.text();
           try {
-            const parsed = JSON.parse(textRes);
-            return parsed;
+            return JSON.parse(textRes);
           } catch(e) {
-            console.error("Database JSON parse error:", e);
             return { status: 'success', bookings: appState.bookings, rooms: appState.rooms, admins: appState.adminAccounts, announcements: appState.announcementsList };
           }
         } catch (err) {
-          console.warn("Database connection warning (using local fallback state):", err);
           return { status: 'success', bookings: appState.bookings, rooms: appState.rooms, admins: appState.adminAccounts, announcements: appState.announcementsList };
         }
       }
     };
 
-    function getStatusBadge(status) {
-      if (status === 'Disetujui') {
-        return `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full text-xs font-bold inline-flex items-center"><i class="fa-solid fa-circle-check mr-1.5 text-emerald-600"></i> Disetujui</span>`;
-      } else if (status === 'Menunggu') {
+    function saveLocalCache() {
+      try {
+        localStorage.setItem('sirupa_cache_bookings', JSON.stringify(appState.bookings));
+        localStorage.setItem('sirupa_cache_rooms', JSON.stringify(appState.rooms));
+        localStorage.setItem('sirupa_cache_announcements', JSON.stringify(appState.announcementsList));
+      } catch (e) {
+        console.warn("LocalStorage fallback warning:", e);
+      }
+    }
+
+    function loadLocalCache() {
+      try {
+        const cachedBookings = localStorage.getItem('sirupa_cache_bookings');
+        const cachedRooms = localStorage.getItem('sirupa_cache_rooms');
+        const cachedAnnounce = localStorage.getItem('sirupa_cache_announcements');
+
+        if (cachedBookings) appState.bookings = JSON.parse(cachedBookings);
+        if (cachedRooms) appState.rooms = JSON.parse(cachedRooms);
+        if (cachedAnnounce) appState.announcementsList = JSON.parse(cachedAnnounce);
+      } catch (e) {
+        console.warn("Failed loading local cache:", e);
+      }
+    }
+
+    function getBookingExecutionStatus(booking) {
+      if (booking.status !== 'Disetujui') {
+        return { label: booking.status, class: 'bg-slate-100 text-slate-700 border-slate-300' };
+      }
+
+      const now = new Date();
+      let displayDateDetail = (String(booking.tanggal || '')).split('T')[0];
+      const todayStr = now.toISOString().split('T')[0];
+
+      let startH = 8, startM = 0, endH = 17, endM = 0;
+      const jamString = String(booking.jam || '');
+      const parts = jamString.split(' - ');
+      if (parts.length >= 2) {
+        const startHM = parts[0].trim().split(':');
+        startH = parseInt(startHM[0], 10) || 8;
+        startM = parseInt(startHM[1], 10) || 0;
+
+        const endHM = parts[1].replace(/WIB/gi, '').trim().split(':');
+        endH = parseInt(endHM[0], 10) || 17;
+        endM = parseInt(endHM[1], 10) || 59;
+      }
+
+      const startDateTime = new Date(displayDateDetail + 'T' + String(startH).padStart(2, '0') + ':' + String(startM).padStart(2, '0') + ':00');
+      const endDateTime = new Date(displayDateDetail + 'T' + String(endH).padStart(2, '0') + ':' + String(endM).padStart(2, '0') + ':00');
+
+      if (now > endDateTime) {
+        return { label: 'Telah Dilaksanakan', class: 'bg-slate-100 text-slate-700 border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700' };
+      } else if (now >= startDateTime && now <= endDateTime) {
+        return { label: 'Sedang Berlangsung', class: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-900' };
+      } else {
+        return { label: 'Disetujui (Akan Datang)', class: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800' };
+      }
+    }
+
+    function getStatusBadge(booking) {
+      const exec = getBookingExecutionStatus(booking);
+      if (booking.status === 'Disetujui') {
+        if (exec.label === 'Sedang Berlangsung') {
+          return `<span class="${exec.class} px-3 py-1 rounded-full text-xs font-bold inline-flex items-center"><i class="fa-solid fa-spinner fa-spin mr-1.5 text-blue-600"></i> Sedang Berlangsung</span>`;
+        } else if (exec.label === 'Telah Dilaksanakan') {
+          return `<span class="${exec.class} px-3 py-1 rounded-full text-xs font-bold inline-flex items-center"><i class="fa-solid fa-check-double mr-1.5 text-slate-600"></i> Telah Dilaksanakan</span>`;
+        }
+        return `<span class="${exec.class} px-3 py-1 rounded-full text-xs font-bold inline-flex items-center"><i class="fa-solid fa-circle-check mr-1.5 text-emerald-600"></i> Disetujui</span>`;
+      } else if (booking.status === 'Menunggu') {
         return `<span class="bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1 rounded-full text-xs font-bold inline-flex items-center"><i class="fa-solid fa-clock-rotate-left mr-1.5 text-amber-600"></i> Menunggu</span>`;
-      } else if (status === 'Dibatalkan') {
+      } else if (booking.status === 'Dibatalkan') {
         return `<span class="bg-slate-100 text-slate-600 border border-slate-200 px-3 py-1 rounded-full text-xs font-bold inline-flex items-center"><i class="fa-solid fa-ban mr-1.5 text-slate-500"></i> Dibatalkan</span>`;
-      } else if (status === 'Ditolak') {
+      } else if (booking.status === 'Ditolak') {
         return `<span class="bg-rose-50 text-rose-700 border border-rose-200 px-3 py-1 rounded-full text-xs font-bold inline-flex items-center"><i class="fa-solid fa-circle-xmark mr-1.5 text-rose-600"></i> Ditolak</span>`;
       }
-      return `<span class="bg-slate-50 text-slate-700 border border-slate-200 px-3 py-1 rounded-full text-xs font-bold">${status || 'Unknown'}</span>`;
+      return `<span class="bg-slate-50 text-slate-700 border border-slate-200 px-3 py-1 rounded-full text-xs font-bold">${booking.status || 'Unknown'}</span>`;
     }
 
     const appState = {
@@ -970,7 +1038,7 @@
       currentAdminTablePage: 1,
       adminItemsPerPage: 5,
       announcementsList: [
-        "Sistem Informasi Ruangan dan Peminjaman (SIRUPA) aktif dengan kalender interaktif warna-warni & efek pencahayaan dinamis."
+        "Selamat Dengan Di SIRUPA - Sistem Informasi Ruangan dan Peminjaman"
       ],
       adminAccounts: [
         { username: 'superadmin', name: 'Super Administrator', pass: 'admin123', unit: 'Semua Dinas', isSuper: true, secret: 'JBSWY3DPEHPK3PXP' },
@@ -1218,6 +1286,7 @@
         renderCalendar();
         checkAutomatedReminders();
         initAnalyticsCharts();
+        saveLocalCache();
       }
     }
 
@@ -1357,7 +1426,7 @@
             <td class="p-3 sm:p-4 font-bold text-slate-800 dark:text-slate-200">${item.kegiatan}</td>
             <td class="p-3 sm:p-4 text-slate-600 dark:text-slate-400 font-medium">${item.ruangan}</td>
             <td class="p-3 sm:p-4"><div class="font-medium text-slate-700 dark:text-slate-300">${formattedDate}</div><div class="text-[11px] text-slate-400">${item.jam}</div></td>
-            <td class="p-3 sm:p-4 pr-5 sm:pr-6">${getStatusBadge(item.status)}</td>
+            <td class="p-3 sm:p-4 pr-5 sm:pr-6">${getStatusBadge(item)}</td>
           </tr>`;
       });
 
@@ -1465,6 +1534,7 @@
             updateAnnouncementDisplay();
           }
           
+          saveLocalCache();
           checkAutoCancellation();
           renderBookingTable();
           updateDashboardCounts();
@@ -1476,7 +1546,7 @@
           initAnalyticsCharts();
         }
       } catch (err) {
-        console.warn("Background sync retry error:", err);
+        console.warn("Background sync retry:", err);
       }
     }
 
@@ -1501,6 +1571,7 @@
       appState.announcementsList.push(newMsg);
       updateAnnouncementDisplay();
       input.value = '';
+      saveLocalCache();
       showToast('Menambahkan dan mempublikasikan pengumuman baru secara real-time...', 'info');
       await sendDataToDatabase('saveAnnouncement', { announcements: appState.announcementsList });
       showToast('Pengumuman baru berhasil ditambahkan ke papan publikasi!', 'success');
@@ -1513,6 +1584,7 @@
       }
       appState.announcementsList = ["Sistem Informasi Ruangan dan Peminjaman (SIRUPA) aktif."];
       updateAnnouncementDisplay();
+      saveLocalCache();
       showToast('Menghapus dan mereset seluruh pengumuman di database...', 'info');
       await sendDataToDatabase('saveAnnouncement', { announcements: appState.announcementsList });
       showToast('Semua papan pengumuman berhasil dikosongkan.', 'success');
@@ -1527,6 +1599,11 @@
         if (document.getElementById('liveDate')) document.getElementById('liveDate').innerText = dateStr;
         
         checkAutoCancellation();
+        // Periodically re-render calendar and booking table to reflect ongoing/completed live status transitions
+        if (appState.activeView === 'checkRoom') {
+          renderCalendar();
+        }
+        renderBookingTable();
       }, 1000);
     }
 
@@ -1675,7 +1752,7 @@
           let badgeTextStatus = 'Aktif';
 
           if (hasBookings) {
-            let hasOngoing = false;
+            let ongoingCount = 0;
             let hasUpcomingToday = false;
             let allFinished = true;
 
@@ -1699,7 +1776,7 @@
 
               if (displayDateDetail === todayDateStr) {
                 if (currentMinutesTotal >= startMinTotal && currentMinutesTotal <= endMinTotal) {
-                  hasOngoing = true;
+                  ongoingCount++;
                 } else if (currentMinutesTotal < startMinTotal) {
                   hasUpcomingToday = true;
                 }
@@ -1713,21 +1790,21 @@
               }
             });
 
-            if (hasOngoing) {
-              cellBgClass = 'bg-gradient-to-br from-blue-500 via-indigo-500 to-cyan-500 text-white font-black calendar-glow-ongoing border-2 border-blue-200';
+            if (ongoingCount > 0) {
+              cellBgClass = 'bg-gradient-to-br from-blue-400 via-indigo-400 to-cyan-400 text-slate-950 dark:text-white font-black calendar-glow-ongoing border-2 border-blue-200';
               textColor = 'text-white font-black';
-              badgeColorBg = 'bg-blue-700 text-white';
+              badgeColorBg = 'bg-blue-600';
               badgeTextStatus = 'Sedang Berlangsung';
             } else if (hasUpcomingToday || !allFinished) {
-              cellBgClass = 'bg-gradient-to-br from-amber-400 via-orange-400 to-yellow-400 text-slate-950 dark:text-white font-black calendar-glow-ongoing border-2 border-amber-200';
+              cellBgClass = 'bg-gradient-to-br from-amber-300 via-orange-300 to-yellow-300 text-slate-950 dark:text-white font-black calendar-glow-ongoing border-2 border-amber-200';
               textColor = 'text-slate-950 font-black';
-              badgeColorBg = 'bg-amber-700 text-white';
+              badgeColorBg = 'bg-amber-600';
               badgeTextStatus = 'Segera';
             } else {
-              cellBgClass = 'bg-gradient-to-br from-emerald-300 via-teal-300 to-emerald-400 text-emerald-950 font-extrabold calendar-glow-ongoing border-2 border-emerald-200';
-              textColor = 'text-emerald-950 font-black';
-              badgeColorBg = 'bg-emerald-700 text-white';
-              badgeTextStatus = 'Selesai';
+              cellBgClass = 'bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-900 shadow-inner border border-slate-300 dark:border-slate-700';
+              textColor = 'text-slate-700 dark:text-slate-300 font-extrabold';
+              badgeColorBg = 'bg-slate-600';
+              badgeTextStatus = 'Telah Dilaksanakan';
             }
 
             const bInfo = encodeURIComponent(JSON.stringify(bookingsOnThisDay));
@@ -1738,10 +1815,39 @@
 
           let innerBadge = '';
           if (hasBookings) {
+            // Check if there are >1 agendas with different times and at least one is ongoing -> glowing red circle indicator
+            let ongoingAgendasOnThisDay = bookingsOnThisDay.filter(b => {
+              let displayDateDetail = (String(b.tanggal || '')).split('T')[0];
+              let startH = 8, startM = 0, endH = 17, endM = 0;
+              const parts = String(b.jam || '').split(' - ');
+              if (parts.length >= 2) {
+                const startHM = parts[0].trim().split(':');
+                startH = parseInt(startHM[0], 10) || 8;
+                startM = parseInt(startHM[1], 10) || 0;
+                const endHM = parts[1].replace(/WIB/gi, '').trim().split(':');
+                endH = parseInt(endHM[0], 10) || 17;
+                endM = parseInt(endHM[1], 10) || 59;
+              }
+              const startMin = startH * 60 + startM;
+              const endMin = endH * 60 + endM;
+              return displayDateDetail === todayDateStr && currentMinutesTotal >= startMin && currentMinutesTotal <= endMin;
+            });
+
+            let redGlowIndicator = '';
+            if (bookingsOnThisDay.length > 1 && ongoingAgendasOnThisDay.length > 0) {
+              redGlowIndicator = `
+                <div class="absolute top-2 right-2 flex items-center space-x-1 bg-red-950/80 px-2 py-0.5 rounded-full border border-red-500 shadow-lg z-20">
+                  <span class="w-2 h-2 rounded-full bg-red-500 calendar-glow-ongoing-red live-pulse"></span>
+                  <span class="text-[9px] font-black text-red-400 tracking-wider">SIARAN LANGSUNG</span>
+                </div>
+              `;
+            }
+
             innerBadge = `
+              ${redGlowIndicator}
               <div class="mt-2 flex items-center justify-between">
-                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${badgeColorBg} shadow-xs">${badgeTextStatus}</span>
-                <div class="w-7 h-7 rounded-full bg-slate-900/80 text-white flex items-center justify-center font-bold text-[10px] shadow-md border-2 border-white dark:border-slate-800">
+                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${badgeColorBg} text-white shadow-xs">${badgeTextStatus}</span>
+                <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center font-bold text-[10px] shadow-md border-2 border-white dark:border-slate-800">
                   <i class="fa-solid fa-user-tie"></i>
                 </div>
               </div>
@@ -1798,9 +1904,9 @@
           const bookingEndDateTime = new Date(displayDateDetail + 'T' + String(endH).padStart(2, '0') + ':' + String(endM).padStart(2, '0') + ':00');
 
           if (now > bookingEndDateTime) {
-            executionBadge = `<span class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-700 px-2.5 py-0.5 rounded-full text-[10px] font-bold"><i class="fa-solid fa-check-double mr-1"></i> Selesai (Telah Dilaksanakan)</span>`;
+            executionBadge = `<span class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-700 px-2.5 py-0.5 rounded-full text-[10px] font-bold"><i class="fa-solid fa-check-double mr-1"></i> Telah Dilaksanakan</span>`;
           } else {
-            executionBadge = `<span class="bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900 px-2.5 py-0.5 rounded-full text-[10px] font-bold"><i class="fa-solid fa-clock mr-1"></i> Segera / Sedang Berlangsung</span>`;
+            executionBadge = `<span class="bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900 px-2.5 py-0.5 rounded-full text-[10px] font-bold"><i class="fa-solid fa-clock mr-1"></i> Akan Dilaksanakan</span>`;
           }
 
           html += `
@@ -1809,7 +1915,7 @@
                 <span class="font-mono font-bold text-blue-600 dark:text-blue-400 text-xs">${b.id}</span>
                 <div class="flex items-center space-x-1">
                   ${executionBadge}
-                  ${getStatusBadge(b.status)}
+                  ${getStatusBadge(b)}
                 </div>
               </div>
               <div class="text-xs font-extrabold text-slate-900 dark:text-white">${b.kegiatan}</div>
@@ -1994,7 +2100,7 @@
               <div class="font-semibold text-slate-800 dark:text-slate-200">${formattedDate}</div>
               <div class="text-[10px] text-slate-400">${item.jam}</div>
             </td>
-            <td class="p-4">${getStatusBadge(item.status)}</td>
+            <td class="p-4">${getStatusBadge(item)}</td>
             <td class="p-4 pr-5 text-center">
               <div class="inline-flex items-center space-x-1.5">
                 <button onclick="openPdfModal('${pdfUrl}', '${item.id}')" title="Lihat Berkas PDF" class="px-2.5 py-1.5 bg-blue-50 dark:bg-blue-950/50 ${pdfBtnDisabled} text-blue-700 dark:text-blue-300 font-bold rounded-xl text-[11px] transition inline-flex items-center border border-blue-200 dark:border-blue-800 cursor-pointer">
@@ -2237,6 +2343,7 @@
       }
       appState.adminAccounts = appState.adminAccounts.filter(a => a.username !== username);
       renderAdminAccountsList();
+      saveLocalCache();
       showToast('Menghapus akun admin dari database...', 'info');
       const res = await sendDataToDatabase('deleteAdmin', { username });
       if (res && res.admins && Array.isArray(res.admins)) {
@@ -2294,6 +2401,7 @@
         room.icon = room.statusText === 'Tersedia' ? 'fa-circle-check' : 'fa-triangle-exclamation';
         renderAdminRoomList();
         renderRoomCards();
+        saveLocalCache();
         showToast('Menyinkronkan status ruangan ke database...', 'info');
         await sendDataToDatabase('saveRoom', { room });
         showToast(`Status ${room.name} diubah menjadi: ${room.statusText}`, 'info');
@@ -2348,6 +2456,7 @@
           appState.rooms.push(targetRoom);
         }
 
+        saveLocalCache();
         showToast('Menyimpan ruangan ke Google Spreadsheet & Folder Drive Instansi...', 'info');
         await sendDataToDatabase('saveRoom', { room: targetRoom });
 
@@ -2391,6 +2500,7 @@
       populateUnitFilterOptions();
       updateDashboardCounts();
       initAnalyticsCharts();
+      saveLocalCache();
       showToast('Menghapus ruangan dari database...', 'info');
       await sendDataToDatabase('deleteRoom', { id: roomId });
       showToast('Ruangan berhasil dihapus.', 'info');
@@ -2427,6 +2537,7 @@
         appState.adminAccounts.push(adminObj);
       }
 
+      saveLocalCache();
       showToast('Menyimpan akun admin & kunci TOTP ke database...', 'info');
       const res = await sendDataToDatabase('saveAdmin', { admin: adminObj });
       if (res && res.admins && Array.isArray(res.admins)) {
@@ -2444,6 +2555,17 @@
       const group = document.getElementById('unitSelectionGroup');
       if (level === 'super') group.classList.add('hidden');
       else group.classList.remove('hidden');
+    }
+
+    function validateTimeRange() {
+      const mulai = document.getElementById('inputJamMulai').value;
+      const selesai = document.getElementById('inputJamSelesai').value;
+      if (mulai && selesai) {
+        if (timeToMinutes(selesai) <= timeToMinutes(mulai)) {
+          showToast('Jam selesai wajib lebih besar daripada jam mulai!', 'warning');
+          document.getElementById('inputJamSelesai').value = '';
+        }
+      }
     }
 
     async function handleBookingSubmit(e) {
@@ -2476,6 +2598,12 @@
       const tanggal = tanggalInput.value;
       const jamMulai = jamMulaiInput.value;
       const jamSelesai = jamSelesaiInput.value;
+
+      if (timeToMinutes(jamSelesai) <= timeToMinutes(jamMulai)) {
+        showToast('Jam selesai wajib lebih besar daripada jam mulai!', 'warning');
+        return;
+      }
+
       const jam = `${jamMulai} - ${jamSelesai} WIB`;
       const peserta = parseInt(pesertaInput ? pesertaInput.value : '25') || 1;
       const catatan = catatanInput ? catatanInput.value.trim() : '';
@@ -2517,6 +2645,7 @@
       };
 
       appState.bookings.unshift(newBooking);
+      saveLocalCache();
       closeBookingModal();
       renderBookingTable();
       updateDashboardCounts();
@@ -2537,6 +2666,7 @@
             const dataUrl = uploadEvent.target.result;
             newBooking.berkasUrl = dataUrl;
             renderAdminPendingTable();
+            saveLocalCache();
 
             const base64String = dataUrl.split(',')[1];
             serverResult = await apiService.sendRequest('addBooking', {
@@ -2560,6 +2690,7 @@
     function handleServerBookingResult(serverResult, newBooking) {
       if (serverResult && serverResult.status === 'conflict') {
         appState.bookings = appState.bookings.filter(b => b.id !== newBooking.id);
+        saveLocalCache();
         renderBookingTable();
         updateDashboardCounts();
         renderAdminPendingTable();
@@ -2572,6 +2703,7 @@
         syncDataFromDatabase();
       } else if (serverResult && serverResult.berkasUrl) {
         newBooking.berkasUrl = serverResult.berkasUrl;
+        saveLocalCache();
         renderAdminPendingTable();
       }
     }
@@ -2716,6 +2848,7 @@
           return;
         }
         item.status = 'Dibatalkan';
+        saveLocalCache();
         closeCancelModal();
         renderBookingTable();
         updateDashboardCounts();
@@ -2750,6 +2883,7 @@
         }
 
         item.status = newStatus;
+        saveLocalCache();
         renderAdminPendingTable();
         renderBookingTable();
         updateDashboardCounts();
@@ -2947,19 +3081,16 @@
       const ctx1 = document.getElementById('chartPenggunaanRuangan');
       if (ctx1) {
         if (chartInstances.penggunaan) {
-          chartInstances.penggunaan.data.labels = Object.keys(roomCounts);
-          chartInstances.penggunaan.data.datasets[0].data = Object.values(roomCounts);
-          chartInstances.penggunaan.update('none');
-        } else {
-          chartInstances.penggunaan = new Chart(ctx1, {
-            type: 'doughnut',
-            data: {
-              labels: Object.keys(roomCounts),
-              datasets: [{ data: Object.values(roomCounts), backgroundColor: ['#2563eb', '#38bdf8', '#6366f1', '#f59e0b', '#10b981', '#ec4899', '#8b5cf6'] }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, animation: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } }
-          });
+          chartInstances.penggunaan.destroy();
         }
+        chartInstances.penggunaan = new Chart(ctx1, {
+          type: 'doughnut',
+          data: {
+            labels: Object.keys(roomCounts),
+            datasets: [{ data: Object.values(roomCounts), backgroundColor: ['#2563eb', '#38bdf8', '#6366f1', '#f59e0b', '#10b981', '#ec4899', '#8b5cf6'] }]
+          },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } }
+        });
       }
 
       const yearlyCounts = { 2026: 0, 2027: 0, 2028: 0, 2029: 0 };
@@ -2982,16 +3113,13 @@
       const ctx2 = document.getElementById('chartPemakaianTahun');
       if (ctx2) {
         if (chartInstances.tahunan) {
-          chartInstances.tahunan.data.labels = yearsArr;
-          chartInstances.tahunan.data.datasets[0].data = countsArr;
-          chartInstances.tahunan.update('none');
-        } else {
-          chartInstances.tahunan = new Chart(ctx2, {
-            type: 'line',
-            data: { labels: yearsArr, datasets: [{ label: 'Jumlah Kegiatan', data: countsArr, borderColor: '#6366f1', backgroundColor: 'rgba(99, 102, 241, 0.1)', fill: true, tension: 0.35 }] },
-            options: { responsive: true, maintainAspectRatio: false, animation: false, scales: { y: { beginAtZero: true } } }
-          });
+          chartInstances.tahunan.destroy();
         }
+        chartInstances.tahunan = new Chart(ctx2, {
+          type: 'line',
+          data: { labels: yearsArr, datasets: [{ label: 'Jumlah Kegiatan', data: countsArr, borderColor: '#6366f1', backgroundColor: 'rgba(99, 102, 241, 0.1)', fill: true, tension: 0.35 }] },
+          options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+        });
       }
 
       const catCounts = { 'Rapat Dinas': 0, 'Seminar / Sosialisasi': 0, 'Workshop': 0, 'Diklat / Pelatihan': 0 };
@@ -3004,16 +3132,13 @@
       const ctx3 = document.getElementById('chartPesertaKategori');
       if (ctx3) {
         if (chartInstances.peserta) {
-          chartInstances.peserta.data.labels = Object.keys(catCounts);
-          chartInstances.peserta.data.datasets[0].data = Object.values(catCounts);
-          chartInstances.peserta.update('none');
-        } else {
-          chartInstances.peserta = new Chart(ctx3, {
-            type: 'bar',
-            data: { labels: Object.keys(catCounts), datasets: [{ data: Object.values(catCounts), backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#ec4899'], borderRadius: 8 }] },
-            options: { responsive: true, maintainAspectRatio: false, animation: false, plugins: { legend: { display: false } } }
-          });
+          chartInstances.peserta.destroy();
         }
+        chartInstances.peserta = new Chart(ctx3, {
+          type: 'bar',
+          data: { labels: Object.keys(catCounts), datasets: [{ data: Object.values(catCounts), backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#ec4899'], borderRadius: 8 }] },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
       }
 
       const unitCounts = {};
@@ -3029,16 +3154,13 @@
       const ctx4 = document.getElementById('chartUnit');
       if (ctx4) {
         if (chartInstances.unit) {
-          chartInstances.unit.data.labels = Object.keys(unitCounts);
-          chartInstances.unit.data.datasets[0].data = Object.values(unitCounts);
-          chartInstances.unit.update('none');
-        } else {
-          chartInstances.unit = new Chart(ctx4, {
-            type: 'polarArea',
-            data: { labels: Object.keys(unitCounts), datasets: [{ data: Object.values(unitCounts), backgroundColor: ['rgba(37, 99, 235, 0.7)', 'rgba(16, 185, 129, 0.7)', 'rgba(245, 158, 11, 0.7)', 'rgba(236, 72, 153, 0.7)', 'rgba(99, 102, 241, 0.7)'] }] },
-            options: { responsive: true, maintainAspectRatio: false, animation: false, plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } } } }
-          });
+          chartInstances.unit.destroy();
         }
+        chartInstances.unit = new Chart(ctx4, {
+          type: 'polarArea',
+          data: { labels: Object.keys(unitCounts), datasets: [{ data: Object.values(unitCounts), backgroundColor: ['rgba(37, 99, 235, 0.7)', 'rgba(16, 185, 129, 0.7)', 'rgba(245, 158, 11, 0.7)', 'rgba(236, 72, 153, 0.7)', 'rgba(99, 102, 241, 0.7)'] }] },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } } } }
+        });
       }
     }
 
@@ -3088,6 +3210,7 @@
 
     window.onload = async function() {
       initTheme();
+      loadLocalCache();
       initClock();
       populateRoomOptions();
       populateUnitFilterOptions();
