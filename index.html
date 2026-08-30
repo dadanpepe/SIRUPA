@@ -105,6 +105,34 @@
     </marquee>
   </div>
 
+  <!-- KIOSK DISPLAY TV MODE BANNER (HIDDEN BY DEFAULT) -->
+  <div id="kioskModeBanner" class="hidden fixed inset-0 z-[99999999] bg-slate-950 text-white p-6 sm:p-10 flex flex-col justify-between animate-fade-in overflow-y-auto">
+    <div class="flex items-center justify-between border-b border-slate-800 pb-5">
+      <div class="flex items-center space-x-4">
+        <div class="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center text-3xl shadow-lg"><i class="fa-solid fa-building-user"></i></div>
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-black tracking-tight">SIRUPA DIGITAL SIGNAGE</h1>
+          <p class="text-xs text-blue-400 font-semibold">Jadwal Penggunaan Ruangan Rapat Hari Ini (Lobi Resepsionis)</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-6">
+        <div class="text-right">
+          <div id="kioskClock" class="text-2xl sm:text-3xl font-mono font-black text-emerald-400">00:00:00 WIB</div>
+          <div id="kioskDate" class="text-xs text-slate-400">Kamis, 30 Agustus 2026</div>
+        </div>
+        <button onclick="toggleKioskMode(false)" class="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-2xl text-xs transition cursor-pointer shadow-lg">
+          <i class="fa-solid fa-xmark mr-1.5"></i> Keluar Kiosk
+        </button>
+      </div>
+    </div>
+    <div class="my-auto space-y-6 py-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="kioskRoomsContainer"></div>
+    </div>
+    <div class="border-t border-slate-800 pt-4 text-center text-xs text-slate-500">
+      © 2026 SIRUPA - Sistem Informasi Ruangan dan Peminjaman | Digital Signage Display Mode
+    </div>
+  </div>
+
   <header class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200 dark:border-slate-800 shadow-xs transition-all duration-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
       <div class="flex items-center space-x-3 cursor-pointer group" onclick="switchView('dashboard')">
@@ -118,6 +146,11 @@
       </div>
 
       <div class="flex items-center space-x-3 sm:space-x-4">
+        <!-- Kiosk Display TV Mode Button -->
+        <button onclick="toggleKioskMode(true)" class="hidden sm:flex items-center px-3 py-2 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 rounded-xl text-xs font-bold transition border border-emerald-200 dark:border-emerald-800 cursor-pointer shadow-2xs">
+          <i class="fa-solid fa-tv mr-1.5 text-emerald-600"></i> Mode Kiosk TV
+        </button>
+
         <!-- Theme Toggle -->
         <button onclick="toggleDarkMode()" class="w-10 h-10 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-2xl flex items-center justify-center transition transform active:scale-95 cursor-pointer relative shadow-xs border border-slate-200 dark:border-slate-700" title="Ganti Tema Siang/Malam">
           <i id="themeIcon" class="fa-solid fa-moon text-sm"></i>
@@ -133,7 +166,7 @@
           <div id="notifDropdown" class="hidden absolute right-0 mt-3 w-80 sm:w-96 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 p-4 z-50 space-y-3 transform transition-all animate-fade-in">
             <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
               <h4 class="font-black text-slate-900 dark:text-slate-100 text-xs uppercase tracking-wider flex items-center">
-                <i class="fa-solid fa-bell mr-1.5 text-blue-600 animate-bounce"></i> Notifikasi dan Pengingat
+                <i class="fa-solid fa-bell mr-1.5 text-blue-600 animate-bounce"></i> Notifikasi & Reminder Gmail (H-1 & 3 Jam)
               </h4>
               <button onclick="toggleNotificationDropdown()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
@@ -190,7 +223,15 @@
         <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div class="max-w-3xl space-y-2 sm:space-y-3">
             <h2 class="text-xl sm:text-3xl lg:text-4xl font-black tracking-tight leading-tight">Dashboard & Statistik Ruangan</h2>
-            <p class="text-blue-100 text-xs sm:text-sm leading-relaxed opacity-90">SIRUPA — Satu Sistem, Semua Ruangan. Kalender mendeteksi status otomatis (Sedang Berlangsung & Telah Dilaksanakan).</p>
+            <p class="text-blue-100 text-xs sm:text-sm leading-relaxed opacity-90">SIRUPA — Satu Sistem, Semua Ruangan. Kalender mendeteksi status otomatis & fitur Ulasan Fasilitas.</p>
+          </div>
+          <div class="flex items-center space-x-3 shrink-0 flex-wrap gap-y-2">
+            <button onclick="exportReportsCsv()" class="px-4 py-2.5 bg-white/10 hover:bg-white/25 text-white font-bold rounded-2xl text-xs backdrop-blur-md transition flex items-center cursor-pointer border border-white/20">
+              <i class="fa-solid fa-file-excel mr-2 text-emerald-300"></i> Ekspor Laporan (CSV/Excel)
+            </button>
+            <button onclick="toggleKioskMode(true)" class="sm:hidden px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl text-xs transition flex items-center cursor-pointer shadow-lg">
+              <i class="fa-solid fa-tv mr-2"></i> Mode Kiosk TV
+            </button>
           </div>
         </div>
       </div>
@@ -254,7 +295,7 @@
         <div class="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Daftar & Riwayat Peminjaman Ruangan</h3>
-            <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Menampilkan 5 data terbaru per halaman</p>
+            <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">Menampilkan 5 data terbaru per halaman. Klik ulasan untuk memberikan rating fasilitas.</p>
           </div>
           <div class="flex items-center space-x-3 w-full sm:w-auto">
             <div class="relative w-full sm:w-72">
@@ -264,14 +305,15 @@
           </div>
         </div>
         <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse min-w-[600px]">
+          <table class="w-full text-left border-collapse min-w-[700px]">
             <thead>
               <tr class="bg-slate-50/70 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
                 <th class="p-3 sm:p-4 pl-5 sm:pl-6">ID / Pemohon</th>
                 <th class="p-3 sm:p-4">Kegiatan</th>
                 <th class="p-3 sm:p-4">Ruangan</th>
                 <th class="p-3 sm:p-4">Waktu Pelaksanaan</th>
-                <th class="p-3 sm:p-4 pr-5 sm:pr-6">Status Pelaksanaan</th>
+                <th class="p-3 sm:p-4">Status Pelaksanaan</th>
+                <th class="p-3 sm:p-4 pr-5 sm:pr-6 text-center">Ulasan Fasilitas</th>
               </tr>
             </thead>
             <tbody id="bookingTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-xs text-slate-700 dark:text-slate-300"></tbody>
@@ -294,7 +336,7 @@
       <div class="bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-900 text-sky-800 dark:text-sky-200 p-4 rounded-2xl text-xs font-medium flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs animate-fade-in">
         <div class="flex items-start sm:items-center">
           <i class="fa-solid fa-circle-info text-sky-600 dark:text-sky-400 mr-2.5 text-base mt-0.5 sm:mt-0 shrink-0"></i>
-          <span>Note : Kalender interaktif mendeteksi status otomatis (<b>Sedang Berlangsung</b>, <b>Segera</b>, dan <b>Telah Dilaksanakan</b>). Jika ada >1 agenda dengan jam berbeda, muncul tanda lingkaran kecil merah bercahaya (siaran langsung).</span>
+          <span>Note : Kalender interaktif mendeteksi status otomatis (<b>Sedang Berlangsung</b>, <b>Segera</b>, dan <b>Telah Dilaksanakan</b>). Jika ada >1 agenda, muncul indikator siaran langsung merah berdenyut.</span>
         </div>
         <button onclick="openCancelModal()" class="w-full sm:w-auto px-4 py-2 bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-300 font-bold rounded-xl text-xs transition border border-rose-200 dark:border-rose-800 cursor-pointer shrink-0 flex items-center justify-center transform active:scale-95">
           <i class="fa-solid fa-ban mr-1.5"></i> Batal Pinjam
@@ -470,6 +512,7 @@
             </div>
           </div>
           <div class="flex items-center space-x-2.5 flex-wrap gap-y-2">
+            <button onclick="exportReportsCsv()" class="inline-flex items-center px-3.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition shadow-sm cursor-pointer transform active:scale-95"><i class="fa-solid fa-file-excel mr-1.5"></i> Ekspor Laporan</button>
             <button onclick="openAddRoomModal()" class="inline-flex items-center px-3.5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition shadow-sm cursor-pointer transform active:scale-95"><i class="fa-solid fa-plus mr-1.5"></i> Tambah Ruangan</button>
             <button onclick="adminLogout()" class="inline-flex items-center px-3.5 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 dark:text-rose-300 font-bold rounded-xl text-xs transition border border-rose-200 dark:border-rose-800 cursor-pointer transform active:scale-95"><i class="fa-solid fa-right-from-bracket mr-1.5"></i> Keluar</button>
           </div>
@@ -645,7 +688,7 @@
             <input type="text" id="inputPemohon" required placeholder="Contoh: Ahmad Fauzi" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none">
           </div>
           <div>
-            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Email Pemohon (Notifikasi & Info Status)</label>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Email Pemohon (Notifikasi & Reminder Gmail)</label>
             <input type="email" id="inputEmail" required placeholder="nama@email.com" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl p-3 outline-none">
           </div>
         </div>
@@ -718,6 +761,43 @@
     </div>
   </div>
 
+  <!-- MODAL: REVIEW & RATING FASILITAS -->
+  <div id="reviewModal" class="fixed inset-0 z-50 bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto animate-fade-in">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative space-y-5 my-auto">
+      <button onclick="closeReviewModal()" class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark text-sm"></i></button>
+      <div class="space-y-1">
+        <span class="text-[10px] font-extrabold text-blue-600 uppercase tracking-wider block">ULASAN & RATING FASILITAS</span>
+        <h3 id="reviewModalTitle" class="text-base font-black text-slate-900 dark:text-white">Beri Penilaian Ruangan</h3>
+      </div>
+      <form onsubmit="handleReviewSubmit(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="reviewBookingId">
+        <div class="text-center space-y-2 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-700">
+          <label class="block font-bold text-slate-700 dark:text-slate-300">Pilih Bintang Rating</label>
+          <div class="flex justify-center space-x-2 text-2xl text-amber-400 cursor-pointer" id="starRatingContainer">
+            <i class="fa-solid fa-star hover:scale-125 transition" onclick="setStarRating(1)" id="star-1"></i>
+            <i class="fa-solid fa-star hover:scale-125 transition" onclick="setStarRating(2)" id="star-2"></i>
+            <i class="fa-solid fa-star hover:scale-125 transition" onclick="setStarRating(3)" id="star-3"></i>
+            <i class="fa-solid fa-star hover:scale-125 transition" onclick="setStarRating(4)" id="star-4"></i>
+            <i class="fa-solid fa-star hover:scale-125 transition" onclick="setStarRating(5)" id="star-5"></i>
+          </div>
+          <input type="hidden" id="inputStarValue" value="5">
+          <div id="starTextLabel" class="font-bold text-slate-600 dark:text-slate-300 text-[11px]">Sangat Baik (5/5)</div>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Komentar & Ulasan Fasilitas</label>
+          <textarea id="inputReviewComment" rows="3" required placeholder="Contoh: AC dingin, proyektor jernih, kebersihan sangat terjaga..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 outline-none resize-none text-slate-800 dark:text-slate-200"></textarea>
+        </div>
+        <div class="flex items-center justify-end space-x-3 pt-2">
+          <button type="button" onclick="closeReviewModal()" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold rounded-xl transition cursor-pointer">Batal</button>
+          <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition transform active:scale-95 cursor-pointer flex items-center space-x-2">
+            <i class="fa-solid fa-paper-plane text-xs"></i>
+            <span>Kirim Ulasan</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- MODAL: CONFLICT WARNING -->
   <div id="doubleInputWarningModal" class="fixed inset-0 z-[999999] bg-slate-950/60 modal-blur flex items-center justify-center p-3 sm:p-4 hidden animate-fade-in">
     <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center space-y-4">
@@ -755,10 +835,10 @@
         </div>
         <div class="bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-900 rounded-xl p-3 text-slate-700 dark:text-slate-300 space-y-1">
           <div class="font-bold flex items-center text-blue-800 dark:text-blue-300 text-[11px]">
-            <i class="fa-solid fa-paper-plane mr-1.5 text-blue-600"></i> MailApp Apps Script Aktif
+            <i class="fa-solid fa-paper-plane mr-1.5 text-blue-600"></i> Gmail Reminder Aktif (H-1 & 3 Jam)
           </div>
           <p class="text-[11px] leading-relaxed text-slate-600 dark:text-slate-400">
-            Status pengajuan diverifikasi admin. Email resmi akan dikirimkan ke email Anda: <b id="successBookingEmail" class="text-slate-900 dark:text-white">nama@gmail.com</b>.
+            Email pengingat resmi akan dikirimkan ke Gmail Anda: <b id="successBookingEmail" class="text-slate-900 dark:text-white">nama@gmail.com</b>.
           </p>
         </div>
       </div>
@@ -978,7 +1058,6 @@
 
       const now = new Date();
       let displayDateDetail = (String(booking.tanggal || '')).split('T')[0];
-      const todayStr = now.toISOString().split('T')[0];
 
       let startH = 8, startM = 0, endH = 17, endM = 0;
       const jamString = String(booking.jam || '');
@@ -999,7 +1078,7 @@
       if (now > endDateTime) {
         return { label: 'Telah Dilaksanakan', class: 'bg-slate-100 text-slate-700 border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700' };
       } else if (now >= startDateTime && now <= endDateTime) {
-        return { label: 'Sedang Berlangsung', class: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-900' };
+        return { label: 'Sedang Berlangsung', class: 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/50 dark:text-red-300 dark:border-red-900' };
       } else {
         return { label: 'Disetujui (Akan Datang)', class: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800' };
       }
@@ -1009,7 +1088,7 @@
       const exec = getBookingExecutionStatus(booking);
       if (booking.status === 'Disetujui') {
         if (exec.label === 'Sedang Berlangsung') {
-          return `<span class="${exec.class} px-3 py-1 rounded-full text-xs font-bold inline-flex items-center"><i class="fa-solid fa-spinner fa-spin mr-1.5 text-blue-600"></i> Sedang Berlangsung</span>`;
+          return `<span class="${exec.class} px-3 py-1 rounded-full text-xs font-bold inline-flex items-center"><span class="w-2 h-2 rounded-full bg-red-600 mr-1.5 live-pulse inline-block"></span> Sedang Berlangsung</span>`;
         } else if (exec.label === 'Telah Dilaksanakan') {
           return `<span class="${exec.class} px-3 py-1 rounded-full text-xs font-bold inline-flex items-center"><i class="fa-solid fa-check-double mr-1.5 text-slate-600"></i> Telah Dilaksanakan</span>`;
         }
@@ -1085,12 +1164,13 @@
         }
       ],
       bookings: [
-        { id: 'PMJ-1029', pemohon: 'Ahmad Fauzi', email: 'ahmad@example.com', unit: 'Bagian Umum', kategori: 'Rapat Dinas', kegiatan: 'Rapat Koordinasi Triwulan', ruangan: 'Ruang Aula Besar', tanggal: '2026-08-21', jam: '08:00 - 17:00 WIB', peserta: 45, catatan: 'Mic wireless', berkasUrl: '#', status: 'Disetujui', tahun: 2026, timestamp: '2026-08-10 09:30' }
+        { id: 'PMJ-1029', pemohon: 'Ahmad Fauzi', email: 'ahmad@example.com', unit: 'Bagian Umum', kategori: 'Rapat Dinas', kegiatan: 'Rapat Koordinasi Triwulan', ruangan: 'Ruang Aula Besar', tanggal: '2026-08-21', jam: '08:00 - 17:00 WIB', peserta: 45, catatan: 'Mic wireless', berkasUrl: '#', status: 'Disetujui', tahun: 2026, timestamp: '2026-08-10 09:30', rating: 5, review: 'Fasilitas sangat memadai dan AC dingin.' }
       ]
     };
 
     let chartInstances = {};
     let roomSlideInterval = null;
+    let notifRenderedOnce = false;
 
     function base32ToBuf(base32) {
       const base32chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
@@ -1405,7 +1485,7 @@
         const message = q !== '' 
           ? `Tidak ada data peminjaman yang cocok dengan kata kunci "${q}".`
           : `Tidak ada data peminjaman.`;
-        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 font-medium">${message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 font-medium">${message}</td></tr>`;
         document.getElementById('paginationInfo').innerText = `Menampilkan 0 dari 0 data`;
         document.getElementById('pageIndicator').innerText = `1 / 1`;
         document.getElementById('prevPageBtn').disabled = true;
@@ -1419,6 +1499,30 @@
           displayDate = displayDate.split('T')[0];
         }
         const formattedDate = formatDDMMYYYY(displayDate);
+        const exec = getBookingExecutionStatus(item);
+
+        let reviewBtnHtml = '';
+        if (exec.label === 'Telah Dilaksanakan') {
+          if (item.rating) {
+            let starsStr = '';
+            for (let s = 1; s <= 5; s++) {
+              starsStr += s <= item.rating ? '<i class="fa-solid fa-star text-amber-400 text-[10px]"></i>' : '<i class="fa-regular fa-star text-slate-300 text-[10px]"></i>';
+            }
+            reviewBtnHtml = `
+              <div class="flex flex-col items-center space-y-0.5">
+                <div class="flex space-x-0.5">${starsStr}</div>
+                <span class="text-[10px] text-slate-500 italic max-w-[140px] truncate" title="${item.review || ''}">"${item.review || 'Ulasan tersimpan'}"</span>
+                <button onclick="openReviewModal('${item.id}')" class="text-[10px] text-blue-600 hover:underline font-semibold cursor-pointer">Edit Ulasan</button>
+              </div>`;
+          } else {
+            reviewBtnHtml = `
+              <button onclick="openReviewModal('${item.id}')" class="px-3 py-1 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 rounded-xl font-bold text-[10px] transition cursor-pointer shadow-xs inline-flex items-center">
+                <i class="fa-solid fa-star mr-1 text-amber-500"></i> Beri Ulasan
+              </button>`;
+          }
+        } else {
+          reviewBtnHtml = `<span class="text-[10px] text-slate-400 italic">Tersedia setelah selesai</span>`;
+        }
 
         tbody.innerHTML += `
           <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/55 transition">
@@ -1426,7 +1530,8 @@
             <td class="p-3 sm:p-4 font-bold text-slate-800 dark:text-slate-200">${item.kegiatan}</td>
             <td class="p-3 sm:p-4 text-slate-600 dark:text-slate-400 font-medium">${item.ruangan}</td>
             <td class="p-3 sm:p-4"><div class="font-medium text-slate-700 dark:text-slate-300">${formattedDate}</div><div class="text-[11px] text-slate-400">${item.jam}</div></td>
-            <td class="p-3 sm:p-4 pr-5 sm:pr-6">${getStatusBadge(item)}</td>
+            <td class="p-3 sm:p-4">${getStatusBadge(item)}</td>
+            <td class="p-3 sm:p-4 pr-5 sm:pr-6 text-center">${reviewBtnHtml}</td>
           </tr>`;
       });
 
@@ -1447,6 +1552,166 @@
       renderBookingTable();
     }
 
+    function openReviewModal(bookingId) {
+      const item = appState.bookings.find(b => b.id === bookingId);
+      if (item) {
+        document.getElementById('reviewBookingId').value = item.id;
+        document.getElementById('reviewModalTitle').innerText = `Ulasan Fasilitas (${item.ruangan})`;
+        const currentRating = item.rating || 5;
+        setStarRating(currentRating);
+        document.getElementById('inputReviewComment').value = item.review || '';
+        document.getElementById('reviewModal').classList.remove('hidden');
+      }
+    }
+
+    function closeReviewModal() {
+      document.getElementById('reviewModal').classList.add('hidden');
+    }
+
+    function setStarRating(val) {
+      document.getElementById('inputStarValue').value = val;
+      const textLabels = ["Sangat Buruk (1/5)", "Kurang (2/5)", "Cukup (3/5)", "Baik (4/5)", "Sangat Baik (5/5)"];
+      document.getElementById('starTextLabel').innerText = textLabels[val - 1] || "Sangat Baik (5/5)";
+      
+      for (let i = 1; i <= 5; i++) {
+        const star = document.getElementById(`star-${i}`);
+        if (star) {
+          if (i <= val) {
+            star.className = "fa-solid fa-star hover:scale-125 transition text-amber-400";
+          } else {
+            star.className = "fa-solid fa-star hover:scale-125 transition text-slate-300 dark:text-slate-700";
+          }
+        }
+      }
+    }
+
+    async function handleReviewSubmit(e) {
+      e.preventDefault();
+      const bId = document.getElementById('reviewBookingId').value;
+      const rating = parseInt(document.getElementById('inputStarValue').value) || 5;
+      const review = document.getElementById('inputReviewComment').value.trim();
+
+      const item = appState.bookings.find(b => b.id === bId);
+      if (item) {
+        item.rating = rating;
+        item.review = review;
+        saveLocalCache();
+        closeReviewModal();
+        renderBookingTable();
+        showToast(`Ulasan fasilitas untuk kegiatan ${bId} berhasil disimpan!`, 'success');
+        await sendDataToDatabase('updateReview', { id: bId, rating, review });
+      }
+    }
+
+    function exportReportsCsv() {
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "ID,Pemohon,Email,Unit Kerja,Kategori,Kegiatan,Ruangan,Tanggal,Jam,Peserta,Status\r\n";
+
+      appState.bookings.forEach(b => {
+        let row = [b.id, `"${b.pemohon}"`, b.email, `"${b.unit}"`, `"${b.kategori}"`, `"${b.kegiatan}"`, `"${b.ruangan}"`, b.tanggal, `"${b.jam}"`, b.peserta, b.status];
+        csvContent += row.join(",") + "\r\n";
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `Laporan_Peminjaman_SIRUPA_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('Laporan peminjaman ruangan berhasil diekspor ke format CSV/Excel!', 'success');
+    }
+
+    function toggleKioskMode(activate) {
+      const banner = document.getElementById('kioskModeBanner');
+      if (!banner) return;
+      if (activate) {
+        banner.classList.remove('hidden');
+        renderKioskDisplay();
+      } else {
+        banner.classList.add('hidden');
+      }
+    }
+
+    function renderKioskDisplay() {
+      const container = document.getElementById('kioskRoomsContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const now = new Date();
+      const todayStr = now.toISOString().split('T')[0];
+      const currentMin = now.getHours() * 60 + now.getMinutes();
+
+      document.getElementById('kioskClock').innerText = now.toLocaleTimeString('id-ID', { hour12: false }) + ' WIB';
+      document.getElementById('kioskDate').innerText = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+      appState.rooms.forEach(room => {
+        const todayBookings = appState.bookings.filter(b => {
+          let bDate = (String(b.tanggal || '')).split('T')[0];
+          return (b.ruangan || '').trim().toLowerCase() === (room.name || '').trim().toLowerCase() && bDate === todayStr && b.status === 'Disetujui';
+        });
+
+        let agendaHtml = '';
+        if (todayBookings.length === 0) {
+          agendaHtml = `<div class="text-xs text-slate-400 italic py-4">Tidak ada jadwal rapat hari ini. Ruangan tersedia.</div>`;
+        } else {
+          todayBookings.forEach(b => {
+            let startH = 8, startM = 0, endH = 17, endM = 0;
+            const parts = String(b.jam || '').split(' - ');
+            if (parts.length >= 2) {
+              const startHM = parts[0].trim().split(':');
+              startH = parseInt(startHM[0], 10) || 8;
+              startM = parseInt(startHM[1], 10) || 0;
+              const endHM = parts[1].replace(/WIB/gi, '').trim().split(':');
+              endH = parseInt(endHM[0], 10) || 17;
+              endM = parseInt(endHM[1], 10) || 59;
+            }
+            const startMin = startH * 60 + startM;
+            const endMin = endH * 60 + endM;
+
+            let statusBadgeKiosk = '';
+            let cardBgKiosk = 'bg-slate-900 border-slate-800';
+
+            if (currentMin >= startMin && currentMin <= endMin) {
+              statusBadgeKiosk = `<span class="bg-red-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full live-pulse inline-flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-white mr-1.5 live-pulse"></span> Sedang Berlangsung</span>`;
+              cardBgKiosk = 'bg-gradient-to-br from-slate-900 via-slate-900 to-rose-950/40 border-rose-500/50 shadow-2xl calendar-glow-ongoing-red';
+            } else if (currentMin < startMin) {
+              statusBadgeKiosk = `<span class="bg-amber-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full">Akan Datang</span>`;
+              cardBgKiosk = 'bg-slate-900 border-amber-500/30';
+            } else {
+              statusBadgeKiosk = `<span class="bg-slate-700 text-slate-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full">Selesai</span>`;
+              cardBgKiosk = 'bg-slate-900/60 border-slate-800 opacity-70';
+            }
+
+            agendaHtml += `
+              <div class="${cardBgKiosk} border p-4 rounded-2xl space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="font-mono text-xs text-blue-400 font-bold">${b.jam}</span>
+                  ${statusBadgeKiosk}
+                </div>
+                <h4 class="font-bold text-sm text-white">${b.kegiatan}</h4>
+                <div class="text-[11px] text-slate-300">Pemohon: <b>${b.pemohon}</b> (${b.unit})</div>
+              </div>`;
+          });
+        }
+
+        container.innerHTML += `
+          <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-xl backdrop-blur-md flex flex-col justify-between">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-base font-black text-white">${room.name}</h3>
+                <span class="text-[10px] bg-blue-950 text-blue-300 font-bold px-2.5 py-1 rounded-full border border-blue-900">${room.capacity}</span>
+              </div>
+              <div class="space-y-2.5 max-h-64 overflow-y-auto pr-1">${agendaHtml}</div>
+            </div>
+            <div class="pt-3 border-t border-slate-800 text-[10px] text-slate-400 flex justify-between">
+              <span>Pengelola: ${room.unit || 'Umum'}</span>
+              <span class="text-emerald-400 font-bold">Kiosk Display Aktif</span>
+            </div>
+          </div>`;
+      });
+    }
+
     function updateDashboardCounts() {
       const disetujuiCount = appState.bookings.filter(b => b.status === 'Disetujui').length;
       const menungguCount = appState.bookings.filter(b => b.status === 'Menunggu').length;
@@ -1462,12 +1727,34 @@
       const tomorrow = new Date(now);
       tomorrow.setDate(now.getDate() + 1);
       const tomorrowStr = tomorrow.toISOString().split('T')[0];
+      const currentMinTotal = now.getHours() * 60 + now.getMinutes();
 
       const activeBookings = appState.bookings.filter(b => b.status === 'Disetujui');
 
-      const h1Bookings = activeBookings.filter(b => {
+      const relevantBookings = activeBookings.filter(b => {
         let bDate = (String(b.tanggal || '')).split('T')[0];
-        return bDate === tomorrowStr || bDate === todayStr;
+        if (bDate !== todayStr && bDate !== tomorrowStr) return false;
+
+        let startH = 8, startM = 0, endH = 17, endM = 59;
+        const jamString = String(b.jam || '');
+        const parts = jamString.split(' - ');
+        if (parts.length >= 2) {
+          const startHM = parts[0].trim().split(':');
+          startH = parseInt(startHM[0], 10) || 8;
+          startM = parseInt(startHM[1], 10) || 0;
+
+          const endHM = parts[1].replace(/WIB/gi, '').trim().split(':');
+          endH = parseInt(endHM[0], 10) || 17;
+          endM = parseInt(endHM[1], 10) || 59;
+        }
+
+        const startMinTotal = startH * 60 + startM;
+        const endMinTotal = endH * 60 + endM;
+
+        if (bDate === todayStr) {
+          return currentMinTotal <= endMinTotal;
+        }
+        return true;
       });
 
       const badge = document.getElementById('notifBadge');
@@ -1477,43 +1764,69 @@
       let reminderHTML = '';
       let reminderCount = 0;
 
-      if (h1Bookings.length > 0) {
-        reminderCount += h1Bookings.length;
-        h1Bookings.forEach(b => {
+      if (relevantBookings.length > 0) {
+        reminderCount += relevantBookings.length;
+        relevantBookings.forEach(b => {
           let dStr = (String(b.tanggal || '')).split('T')[0];
-          const isToday = dStr === todayStr;
-          const reminderTitle = isToday ? 'Pengingat Hari Ini' : 'Pengingat H-1 Penggunaan';
+          let startH = 8, startM = 0, endH = 17, endM = 0;
+          const parts = String(b.jam || '').split(' - ');
+          if (parts.length >= 2) {
+            const startHM = parts[0].trim().split(':');
+            startH = parseInt(startHM[0], 10) || 8;
+            startM = parseInt(startHM[1], 10) || 0;
+            const endHM = parts[1].replace(/WIB/gi, '').trim().split(':');
+            endH = parseInt(endHM[0], 10) || 17;
+            endM = parseInt(endHM[1], 10) || 59;
+          }
+          const startMinTotal = startH * 60 + startM;
+          const endMinTotal = endH * 60 + endM;
+
+          let statusBadgeClass = 'bg-amber-600 text-white';
+          let statusTextLabel = 'Pengingat H-1 (Gmail)';
+
+          if (dStr === todayStr) {
+            if (currentMinTotal >= startMinTotal && currentMinTotal <= endMinTotal) {
+              statusBadgeClass = 'bg-red-600 text-white live-pulse';
+              statusTextLabel = 'Sedang Berlangsung (Gmail)';
+            } else if (startMinTotal - currentMinTotal <= 180 && currentMinTotal < startMinTotal) {
+              statusBadgeClass = 'bg-orange-500 text-white live-pulse';
+              statusTextLabel = 'Pengingat 3 Jam Lagi (Gmail)';
+            }
+          }
           
           reminderHTML += `
             <div class="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 p-3 rounded-2xl space-y-1 animate-fade-in">
               <div class="flex items-center justify-between">
-                <span class="text-[10px] font-extrabold text-amber-800 dark:text-amber-300 uppercase tracking-wider"><i class="fa-solid fa-clock mr-1"></i> ${reminderTitle} (${formatDDMMYYYY(dStr)})</span>
+                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded ${statusBadgeClass} uppercase tracking-wider"><i class="fa-solid fa-envelope mr-1"></i> ${statusTextLabel}</span>
                 <span class="text-[10px] font-bold text-slate-500">${b.jam}</span>
               </div>
               <div class="font-bold text-slate-900 dark:text-white text-xs">${b.kegiatan}</div>
               <div class="text-[11px] text-slate-600 dark:text-slate-300">Ruangan: <b>${b.ruangan}</b></div>
-              <div class="text-[10px] text-slate-400">Pengingat terkirim ke: ${b.email}</div>
+              <div class="text-[10px] text-slate-400">Terkirim ke Gmail: ${b.email}</div>
             </div>`;
         });
       }
 
-      if (reminderCount > 0) {
-        if (badge) {
-          badge.innerText = reminderCount;
-          badge.classList.remove('hidden');
+      if (!notifRenderedOnce) {
+        if (reminderCount > 0) {
+          if (badge) {
+            badge.innerText = reminderCount;
+            badge.classList.remove('hidden');
+          }
+          if (bellIcon) {
+            bellIcon.classList.add('animate-bell-swing', 'text-amber-500');
+          }
+          if (container) {
+            container.innerHTML = reminderHTML;
+          }
+        } else {
+          if (badge) badge.classList.add('hidden');
+          if (bellIcon) {
+            bellIcon.classList.remove('animate-bell-swing', 'text-amber-500');
+          }
+          if (container) container.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs font-medium">Tidak ada pemberitahuan baru. Semua jadwal telah selesai.</div>`;
         }
-        if (bellIcon) {
-          bellIcon.classList.add('animate-bell-swing', 'text-amber-500');
-        }
-        if (container) {
-          container.innerHTML = reminderHTML;
-        }
-      } else {
-        if (badge) badge.classList.add('hidden');
-        if (bellIcon) {
-          bellIcon.classList.remove('animate-bell-swing', 'text-amber-500');
-        }
-        if (container) container.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs font-medium">Tidak ada pemberitahuan baru. Semua jadwal telah direfresh.</div>`;
+        notifRenderedOnce = true;
       }
     }
 
@@ -1603,6 +1916,10 @@
           renderCalendar();
         }
         renderBookingTable();
+        const kioskBanner = document.getElementById('kioskModeBanner');
+        if (kioskBanner && !kioskBanner.classList.contains('hidden')) {
+          renderKioskDisplay();
+        }
       }, 1000);
     }
 
@@ -1790,9 +2107,9 @@
             });
 
             if (ongoingCount > 0) {
-              cellBgClass = 'bg-gradient-to-br from-blue-400 via-indigo-400 to-cyan-400 text-slate-950 dark:text-white font-black calendar-glow-ongoing border-2 border-blue-200';
+              cellBgClass = 'bg-gradient-to-br from-red-400 via-rose-400 to-orange-400 text-slate-950 dark:text-white font-black calendar-glow-ongoing border-2 border-red-300';
               textColor = 'text-white font-black';
-              badgeColorBg = 'bg-blue-600';
+              badgeColorBg = 'bg-red-600';
               badgeTextStatus = 'Sedang Berlangsung';
             } else if (hasUpcomingToday || !allFinished) {
               cellBgClass = 'bg-gradient-to-br from-amber-300 via-orange-300 to-yellow-300 text-slate-950 dark:text-white font-black calendar-glow-ongoing border-2 border-amber-200';
@@ -1841,10 +2158,21 @@
               `;
             }
 
+            let badgeHtml = '';
+            if (badgeTextStatus === 'Sedang Berlangsung') {
+              badgeHtml = `
+                <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-red-600 text-white shadow-md inline-flex items-center">
+                  <span class="w-2 h-2 rounded-full bg-white mr-1.5 live-pulse inline-block"></span>
+                  Sedang Berlangsung
+                </span>`;
+            } else {
+              badgeHtml = `<span class="text-[9px] font-bold px-2 py-0.5 rounded ${badgeColorBg} text-white shadow-xs">${badgeTextStatus}</span>`;
+            }
+
             innerBadge = `
               ${redGlowIndicator}
               <div class="mt-2 flex items-center justify-between">
-                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${badgeColorBg} text-white shadow-xs">${badgeTextStatus}</span>
+                ${badgeHtml}
                 <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center font-bold text-[10px] shadow-md border-2 border-white dark:border-slate-800">
                   <i class="fa-solid fa-user-tie"></i>
                 </div>
@@ -1884,37 +2212,45 @@
         let html = '';
 
         const now = new Date();
+        const todayStr = now.toISOString().split('T')[0];
+        const currentMinutesTotal = now.getHours() * 60 + now.getMinutes();
 
         bookings.forEach(b => {
           let displayDateDetail = (String(b.tanggal || '')).split('T')[0];
           const formattedDDMMYYYY = formatDDMMYYYY(displayDateDetail);
 
-          let executionBadge = '';
+          let startH = 8, startM = 0, endH = 17, endM = 59;
           const jamString = String(b.jam || '');
           const parts = jamString.split(' - ');
-          let endH = 23, endM = 59;
           if (parts.length >= 2) {
+            const startHM = parts[0].trim().split(':');
+            startH = parseInt(startHM[0], 10) || 8;
+            startM = parseInt(startHM[1], 10) || 0;
+
             const endHM = parts[1].replace(/WIB/gi, '').trim().split(':');
-            endH = parseInt(endHM[0], 10) || 23;
+            endH = parseInt(endHM[0], 10) || 17;
             endM = parseInt(endHM[1], 10) || 59;
           }
-          
+
+          const startMinTotal = startH * 60 + startM;
+          const endMinTotal = endH * 60 + endM;
+
+          let singleStatusHtml = '';
           const bookingEndDateTime = new Date(displayDateDetail + 'T' + String(endH).padStart(2, '0') + ':' + String(endM).padStart(2, '0') + ':00');
 
           if (now > bookingEndDateTime) {
-            executionBadge = `<span class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-700 px-2.5 py-0.5 rounded-full text-[10px] font-bold"><i class="fa-solid fa-check-double mr-1"></i> Telah Dilaksanakan</span>`;
+            singleStatusHtml = `<span class="bg-slate-100 text-slate-700 border border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 px-3 py-1 rounded-full text-xs font-bold inline-flex items-center"><i class="fa-solid fa-check-double mr-1.5 text-slate-600"></i> Telah Dilaksanakan</span>`;
+          } else if (displayDateDetail === todayStr && currentMinutesTotal >= startMinTotal && currentMinutesTotal <= endMinTotal) {
+            singleStatusHtml = `<span class="bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/50 dark:text-red-300 dark:border-red-900 px-3 py-1 rounded-full text-xs font-bold inline-flex items-center"><span class="w-2 h-2 rounded-full bg-red-600 mr-1.5 live-pulse inline-block"></span> Sedang Berlangsung</span>`;
           } else {
-            executionBadge = `<span class="bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900 px-2.5 py-0.5 rounded-full text-[10px] font-bold"><i class="fa-solid fa-clock mr-1"></i> Akan Dilaksanakan</span>`;
+            singleStatusHtml = `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800 px-3 py-1 rounded-full text-xs font-bold inline-flex items-center"><i class="fa-solid fa-circle-check mr-1.5 text-emerald-600"></i> Disetujui</span>`;
           }
 
           html += `
             <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-2 mb-3 last:mb-0">
               <div class="flex justify-between items-center flex-wrap gap-1">
                 <span class="font-mono font-bold text-blue-600 dark:text-blue-400 text-xs">${b.id}</span>
-                <div class="flex items-center space-x-1">
-                  ${executionBadge}
-                  ${getStatusBadge(b)}
-                </div>
+                <div>${singleStatusHtml}</div>
               </div>
               <div class="text-xs font-extrabold text-slate-900 dark:text-white">${b.kegiatan}</div>
               <div class="text-xs text-slate-700 dark:text-slate-300"><strong>Ruangan:</strong> ${b.ruangan}</div>
@@ -2652,7 +2988,7 @@
       checkAutomatedReminders();
       initAnalyticsCharts();
 
-      showToast(`Peminjaman berhasil dikirim (ID: ${newBooking.id})! Email konfirmasi terkirim ke ${email}.`, 'success');
+      showToast(`Peminjaman berhasil dikirim (ID: ${newBooking.id})! Email konfirmasi & pengingat Gmail (H-1 & 3 Jam) dijadwalkan ke ${email}.`, 'success');
       openBookingSuccessModal(newBooking);
 
       try {
