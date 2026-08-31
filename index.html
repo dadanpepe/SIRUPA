@@ -214,7 +214,6 @@
 
   <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6 sm:space-y-8 animate-fade-in">
 
-    <!-- Dashboard View -->
     <section id="viewDashboard" class="space-y-6 sm:space-y-8">
       <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 p-6 sm:p-10 text-white shadow-xl shadow-blue-500/10 animate-shimmer">
         <div class="absolute -right-10 -bottom-10 opacity-10 text-white text-9xl font-black pointer-events-none animate-float">
@@ -331,7 +330,6 @@
       </div>
     </section>
 
-    <!-- Check Room View -->
     <section id="viewCheckRoom" class="space-y-6 sm:space-y-8 hidden">
       <div class="bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-900 text-sky-800 dark:text-sky-200 p-4 rounded-2xl text-xs font-medium flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs animate-fade-in">
         <div class="flex items-start sm:items-center">
@@ -391,7 +389,6 @@
       </div>
     </section>
 
-    <!-- Admin View -->
     <section id="viewAdmin" class="space-y-6 hidden">
       <div id="adminLoginContainer" class="flex items-center justify-center py-6 sm:py-12 animate-fade-in">
         <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 relative transition-all duration-300">
@@ -1768,7 +1765,7 @@
         reminderCount += relevantBookings.length;
         relevantBookings.forEach(b => {
           let dStr = (String(b.tanggal || '')).split('T')[0];
-          let startH = 8, startM = 0, endH = 17, endM = 0;
+          let startH = 8, startM = 0, endH = 17, endM = 59;
           const parts = String(b.jam || '').split(' - ');
           if (parts.length >= 2) {
             const startHM = parts[0].trim().split(':');
@@ -2131,33 +2128,6 @@
 
           let innerBadge = '';
           if (hasBookings) {
-            let ongoingAgendasOnThisDay = bookingsOnThisDay.filter(b => {
-              let displayDateDetail = (String(b.tanggal || '')).split('T')[0];
-              let startH = 8, startM = 0, endH = 17, endM = 0;
-              const parts = String(b.jam || '').split(' - ');
-              if (parts.length >= 2) {
-                const startHM = parts[0].trim().split(':');
-                startH = parseInt(startHM[0], 10) || 8;
-                startM = parseInt(startHM[1], 10) || 0;
-                const endHM = parts[1].replace(/WIB/gi, '').trim().split(':');
-                endH = parseInt(endHM[0], 10) || 17;
-                endM = parseInt(endHM[1], 10) || 59;
-              }
-              const startMin = startH * 60 + startM;
-              const endMin = endH * 60 + endM;
-              return displayDateDetail === todayDateStr && currentMinutesTotal >= startMin && currentMinutesTotal <= endMin;
-            });
-
-            let redGlowIndicator = '';
-            if (bookingsOnThisDay.length > 1 && ongoingAgendasOnThisDay.length > 0) {
-              redGlowIndicator = `
-                <div class="absolute top-2 right-2 flex items-center space-x-1 bg-red-950/80 px-2 py-0.5 rounded-full border border-red-500 shadow-lg z-20">
-                  <span class="w-2 h-2 rounded-full bg-red-500 calendar-glow-ongoing-red live-pulse"></span>
-                  <span class="text-[9px] font-black text-red-400 tracking-wider">SIARAN LANGSUNG</span>
-                </div>
-              `;
-            }
-
             let badgeHtml = '';
             if (badgeTextStatus === 'Sedang Berlangsung') {
               badgeHtml = `
@@ -2170,7 +2140,6 @@
             }
 
             innerBadge = `
-              ${redGlowIndicator}
               <div class="mt-2 flex items-center justify-between">
                 ${badgeHtml}
                 <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center font-bold text-[10px] shadow-md border-2 border-white dark:border-slate-800">
@@ -2944,11 +2913,16 @@
 
       const now = new Date();
       const todayStr = now.toISOString().split('T')[0];
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+      const startMinutes = timeToMinutes(jamMulai);
+
       if (tanggal === todayStr) {
-        const currentMinutes = now.getHours() * 60 + now.getMinutes();
-        const startMinutes = timeToMinutes(jamMulai);
         if (startMinutes <= currentMinutes) {
-          triggerPastTimeWarning(`Waktu mulai (${jamMulai} WIB) yang Anda pilih sudah terlewat atau sama dengan waktu saat ini (${now.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' })} WIB). Silakan pilih waktu mendatang.`);
+          triggerPastTimeWarning(`Waktu mulai (${jamMulai} WIB) yang Anda pilih sudah terlewat atau sama dengan waktu saat ini (${now.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' })} WIB). Pengajuan wajib dilakukan minimal 1 jam sebelum pelaksanaan dimulai.`);
+          return;
+        }
+        if (startMinutes - currentMinutes < 60) {
+          triggerPastTimeWarning(`Pengajuan peminjaman ruangan wajib dilakukan minimal 1 jam sebelum pelaksanaan dimulai (Waktu mulai ${jamMulai} WIB).`);
           return;
         }
       } else if (tanggal < todayStr) {
