@@ -107,25 +107,43 @@
 
   <!-- KIOSK DISPLAY TV MODE BANNER (HIDDEN BY DEFAULT) -->
   <div id="kioskModeBanner" class="hidden fixed inset-0 z-[99999999] bg-slate-950 text-white p-6 sm:p-10 flex flex-col justify-between animate-fade-in overflow-y-auto">
-    <div class="flex items-center justify-between border-b border-slate-800 pb-5">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between border-b border-slate-800 pb-5 gap-4">
       <div class="flex items-center space-x-4">
         <div class="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center text-3xl shadow-lg"><i class="fa-solid fa-building-user"></i></div>
         <div>
           <h1 class="text-2xl sm:text-3xl font-black tracking-tight">SIRUPA DIGITAL SIGNAGE</h1>
-          <p class="text-xs text-blue-400 font-semibold">Jadwal Penggunaan Ruangan Rapat Hari Ini (Lobi Resepsionis)</p>
+          <p class="text-xs text-blue-400 font-semibold">Jadwal Penggunaan Ruangan Rapat Hari Ini & Info Rating / YouTube</p>
         </div>
       </div>
-      <div class="flex items-center space-x-6">
+      <div class="flex items-center space-x-4 flex-wrap gap-y-2">
+        <!-- Filter Dinas Kiosk -->
+        <div class="flex items-center space-x-2 bg-slate-900 border border-slate-800 px-3 py-2 rounded-2xl">
+          <span class="text-[11px] font-bold text-slate-400"><i class="fa-solid fa-filter mr-1 text-blue-400"></i> Filter Dinas:</span>
+          <select id="kioskUnitFilter" onchange="renderKioskDisplay()" class="bg-slate-950 text-white text-xs font-bold rounded-xl px-2 py-1 outline-none border border-slate-700 cursor-pointer">
+            <option value="Semua">Semua Dinas / Bidang</option>
+          </select>
+        </div>
         <div class="text-right">
           <div id="kioskClock" class="text-2xl sm:text-3xl font-mono font-black text-emerald-400">00:00:00 WIB</div>
-          <div id="kioskDate" class="text-xs text-slate-400">Kamis, 30 Agustus 2026</div>
+          <div id="kioskDate" class="text-xs text-slate-400">Selasa, 8 September 2026</div>
         </div>
         <button onclick="toggleKioskMode(false)" class="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-2xl text-xs transition cursor-pointer shadow-lg">
           <i class="fa-solid fa-xmark mr-1.5"></i> Keluar Kiosk
         </button>
       </div>
     </div>
-    <div class="my-auto space-y-6 py-6">
+    
+    <!-- Berjalan / Ticker Rapat Berikutnya -->
+    <div class="bg-gradient-to-r from-blue-900/80 via-indigo-900/80 to-blue-950/80 border border-blue-800/60 rounded-2xl px-4 py-2 text-xs flex items-center shadow-lg my-3">
+      <div class="bg-blue-600 text-white font-black px-2 py-0.5 rounded text-[10px] mr-3 shrink-0 flex items-center shadow-xs animate-pulse">
+        <i class="fa-solid fa-business-time mr-1"></i> AGENDA BERIKUTNYA
+      </div>
+      <marquee id="kioskUpcomingTicker" scrollamount="6" class="font-bold text-blue-100">
+        Memuat informasi rapat berikutnya...
+      </marquee>
+    </div>
+
+    <div class="my-auto space-y-6 py-2">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="kioskRoomsContainer"></div>
     </div>
     <div class="border-t border-slate-800 pt-4 text-center text-xs text-slate-500">
@@ -398,12 +416,12 @@
             <div class="text-center space-y-2">
               <div class="w-12 h-12 sm:w-14 sm:h-14 bg-slate-900 dark:bg-slate-800 text-white rounded-2xl mx-auto flex items-center justify-center text-xl sm:text-2xl shadow-md animate-float"><i class="fa-solid fa-user-shield"></i></div>
               <h3 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">Login Administrator</h3>
-              <p class="text-xs text-slate-500 leading-relaxed max-w-xs mx-auto">Masuk sebagai Admin Dinas/Bidang.</p>
+              <p class="text-xs text-slate-500 leading-relaxed max-w-xs mx-auto">Masuk sebagai Super Admin atau Admin Dinas/Bidang.</p>
             </div>
             <form onsubmit="handleCredentialsSubmit(event)" class="space-y-4 text-xs">
               <div>
                 <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Username Admin</label>
-                <input type="text" id="adminUsername" required placeholder="admin" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-slate-800 dark:text-slate-200 font-medium focus:ring-2 focus:ring-slate-900 outline-none">
+                <input type="text" id="adminUsername" required placeholder="superadmin / admin_umum" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-slate-800 dark:text-slate-200 font-medium focus:ring-2 focus:ring-slate-900 outline-none">
               </div>
               <div>
                 <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Password</label>
@@ -519,7 +537,7 @@
         <div id="superAdminEmbeddedSection" class="hidden bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6 animate-fade-in">
           <div class="border-b border-slate-100 dark:border-slate-800 pb-3">
             <h3 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white flex items-center"><i class="fa-solid fa-users-gear mr-2 text-purple-600"></i> Manajemen Akun Admin Dinas & Bidang</h3>
-            <p class="text-[11px] text-slate-400">Tambah, edit, dan kelola akun admin serta kunci TOTP langsung dari panel.</p>
+            <p class="text-[11px] text-slate-400">Tambah, edit, dan kelola akun admin serta tautan YouTube live stream Kiosk TV per unit dinas.</p>
           </div>
 
           <form onsubmit="handleCreateAdminSubmit(event)" class="bg-slate-50 dark:bg-slate-800/50 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-4 text-xs">
@@ -542,6 +560,10 @@
             <div id="unitSelectionGroup">
               <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Nama Dinas / Instansi / Bidang <span class="text-slate-400 font-normal">(Ketik Manual)</span></label>
               <input type="text" id="newAdminUnit" placeholder="Contoh: Bagian Umum / Dinas Pendidikan" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-3 outline-none text-slate-800 dark:text-slate-200">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Tautan YouTube Live / Video (Kiosk TV Dinas) <span class="text-slate-400 font-normal">(URL / Embed YouTube)</span></label>
+              <input type="text" id="newAdminYoutube" placeholder="Contoh: https://www.youtube.com/embed/dQw4w9WgXcQ atau ID Video" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-3 outline-none text-slate-800 dark:text-slate-200">
             </div>
             <div class="flex items-center justify-end space-x-2 pt-1">
               <button type="button" id="cancelEditAdminBtn" onclick="resetAdminForm()" class="hidden px-4 py-2.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold rounded-xl transition cursor-pointer">Batal</button>
@@ -1125,9 +1147,9 @@
         "Sistem Informasi Ruangan dan Peminjaman (SIRUPA) aktif dengan kalender interaktif dan deteksi status otomatis."
       ],
       adminAccounts: [
-        { username: 'superadmin', name: 'Super Administrator', pass: 'admin123', unit: 'Semua Dinas', isSuper: true, secret: 'JBSWY3DPEHPK3PXP' },
-        { username: 'admin_umum', name: 'Budi Santoso', pass: 'admin123', unit: 'Bagian Umum', isSuper: false, secret: 'KVKFKRCPJ5BDC3C7' },
-        { username: 'admin_it', name: 'Siti Rahma', pass: 'admin123', unit: 'Bappeda & IT', isSuper: false, secret: 'MZXW6YTBOI=======' }
+        { username: 'superadmin', name: 'Super Administrator', pass: 'admin123', unit: 'Semua Dinas', isSuper: true, secret: 'JBSWY3DPEHPK3PXP', youtubeUrl: 'https://www.youtube.com/embed/jfKfPfyJRdk' },
+        { username: 'admin_umum', name: 'Budi Santoso', pass: 'admin123', unit: 'Bagian Umum', isSuper: false, secret: 'KVKFKRCPJ5BDC3C7', youtubeUrl: 'https://www.youtube.com/embed/5qap5aO4i9A' },
+        { username: 'admin_it', name: 'Siti Rahma', pass: 'admin123', unit: 'Bappeda & IT', isSuper: false, secret: 'MZXW6YTBOI=======', youtubeUrl: 'https://www.youtube.com/embed/jfKfPfyJRdk' }
       ],
       rooms: [
         { 
@@ -1633,16 +1655,36 @@
       if (!banner) return;
       if (activate) {
         banner.classList.remove('hidden');
+        populateKioskUnitFilter();
         renderKioskDisplay();
       } else {
         banner.classList.add('hidden');
       }
     }
 
+    function populateKioskUnitFilter() {
+      const select = document.getElementById('kioskUnitFilter');
+      if (!select) return;
+      const units = [...new Set(appState.rooms.map(r => r.unit || 'Umum'))];
+      select.innerHTML = '<option value="Semua">Semua Dinas / Bidang</option>';
+      units.forEach(u => {
+        select.innerHTML += `<option value="${u}">${u}</option>`;
+      });
+    }
+
     function renderKioskDisplay() {
       const container = document.getElementById('kioskRoomsContainer');
+      const tickerEl = document.getElementById('kioskUpcomingTicker');
       if (!container) return;
       container.innerHTML = '';
+
+      const filterSelect = document.getElementById('kioskUnitFilter');
+      const selectedUnit = filterSelect ? filterSelect.value : 'Semua';
+
+      let roomsToDisplay = appState.rooms;
+      if (selectedUnit && selectedUnit !== 'Semua') {
+        roomsToDisplay = appState.rooms.filter(r => (r.unit || 'Umum').toLowerCase() === selectedUnit.toLowerCase());
+      }
 
       const now = new Date();
       const todayStr = now.toISOString().split('T')[0];
@@ -1651,15 +1693,59 @@
       document.getElementById('kioskClock').innerText = now.toLocaleTimeString('id-ID', { hour12: false }) + ' WIB';
       document.getElementById('kioskDate').innerText = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-      appState.rooms.forEach(room => {
+      let upcomingAgendasText = [];
+      const isSingleRoom = roomsToDisplay.length === 1;
+
+      if (isSingleRoom) {
+        container.className = "grid grid-cols-1 gap-6 max-w-5xl mx-auto w-full";
+      } else {
+        container.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6";
+      }
+
+      roomsToDisplay.forEach(room => {
         const todayBookings = appState.bookings.filter(b => {
           let bDate = (String(b.tanggal || '')).split('T')[0];
           return (b.ruangan || '').trim().toLowerCase() === (room.name || '').trim().toLowerCase() && bDate === todayStr && b.status === 'Disetujui';
         });
 
+        const roomBookingsWithRating = appState.bookings.filter(b => (b.ruangan || '').trim().toLowerCase() === (room.name || '').trim().toLowerCase() && b.rating);
+        let avgRating = 0;
+        if (roomBookingsWithRating.length > 0) {
+          const totalStar = roomBookingsWithRating.reduce((acc, curr) => acc + (curr.rating || 0), 0);
+          avgRating = (totalStar / roomBookingsWithRating.length).toFixed(1);
+        }
+
+        let ratingHtml = '';
+        if (roomBookingsWithRating.length > 0) {
+          let starsHtml = '';
+          const fullStars = Math.floor(avgRating);
+          for (let s = 1; s <= 5; s++) {
+            starsHtml += s <= fullStars ? '<i class="fa-solid fa-star text-amber-400 text-[10px]"></i>' : '<i class="fa-regular fa-star text-slate-500 text-[10px]"></i>';
+          }
+          ratingHtml = `
+            <div class="bg-slate-950/80 border border-slate-800 p-3 rounded-2xl flex items-center justify-between text-xs">
+              <div class="flex items-center space-x-2">
+                <span class="text-amber-400 font-black text-base">${avgRating}</span>
+                <div class="flex space-x-0.5">${starsHtml}</div>
+              </div>
+              <span class="text-xs text-slate-400 font-semibold">(${roomBookingsWithRating.length} Ulasan Fasilitas)</span>
+            </div>`;
+        } else {
+          ratingHtml = `
+            <div class="bg-slate-950/80 border border-slate-800 p-3 rounded-2xl flex items-center justify-between text-xs text-slate-400">
+              <span><i class="fa-regular fa-star mr-1.5 text-slate-500"></i> Belum ada ulasan fasilitas</span>
+              <span class="text-xs">-</span>
+            </div>`;
+        }
+
         let agendaHtml = '';
         if (todayBookings.length === 0) {
-          agendaHtml = `<div class="text-xs text-slate-400 italic py-4">Tidak ada jadwal rapat hari ini. Ruangan tersedia.</div>`;
+          agendaHtml = `
+            <div class="text-center py-8 bg-slate-950/60 rounded-2xl border border-slate-800 space-y-2">
+              <div class="w-12 h-12 bg-emerald-950/50 text-emerald-400 rounded-2xl mx-auto flex items-center justify-center text-xl"><i class="fa-solid fa-circle-check"></i></div>
+              <h4 class="font-bold text-sm text-emerald-300">Ruangan Kosong & Tersedia Sepanjang Hari Ini</h4>
+              <p class="text-xs text-slate-400">Tidak ada jadwal rapat yang terdaftar untuk tanggal ini.</p>
+            </div>`;
         } else {
           todayBookings.forEach(b => {
             let startH = 8, startM = 0, endH = 17, endM = 0;
@@ -1679,139 +1765,208 @@
             let cardBgKiosk = 'bg-slate-900 border-slate-800';
 
             if (currentMin >= startMin && currentMin <= endMin) {
-              statusBadgeKiosk = `<span class="bg-red-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full live-pulse inline-flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-white mr-1.5 live-pulse"></span> Sedang Berlangsung</span>`;
-              cardBgKiosk = 'bg-gradient-to-br from-slate-900 via-slate-900 to-rose-950/40 border-rose-500/50 shadow-2xl calendar-glow-ongoing-red';
+              statusBadgeKiosk = `<span class="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full live-pulse inline-flex items-center"><span class="w-2 h-2 rounded-full bg-white mr-1.5 live-pulse"></span> Berlangsung</span>`;
+              cardBgKiosk = 'bg-gradient-to-br from-slate-900 via-slate-900 to-rose-950/60 border-rose-500/60 shadow-xl calendar-glow-ongoing-red';
             } else if (currentMin < startMin) {
-              statusBadgeKiosk = `<span class="bg-amber-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full">Akan Datang</span>`;
-              cardBgKiosk = 'bg-slate-900 border-amber-500/30';
+              statusBadgeKiosk = `<span class="bg-amber-600 text-white text-xs font-bold px-3 py-1 rounded-full live-pulse inline-flex items-center"><span class="w-2 h-2 rounded-full bg-white mr-1.5 live-pulse"></span> Segera</span>`;
+              cardBgKiosk = 'bg-gradient-to-br from-slate-900 via-slate-900 to-amber-950/60 border-amber-500/60 shadow-xl calendar-glow-ongoing';
             } else {
-              statusBadgeKiosk = `<span class="bg-slate-700 text-slate-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full">Selesai</span>`;
-              cardBgKiosk = 'bg-slate-900/60 border-slate-800 opacity-70';
+              statusBadgeKiosk = `<span class="bg-slate-700 text-slate-300 text-xs font-semibold px-3 py-1 rounded-full">Selesai</span>`;
             }
 
+            upcomingAgendasText.push(`${room.name}: ${b.kegiatan} (${b.jam})`);
+
             agendaHtml += `
-              <div class="${cardBgKiosk} border p-4 rounded-2xl space-y-2">
+              <div class="${cardBgKiosk} border rounded-2xl p-4 space-y-2 transition-all">
                 <div class="flex items-center justify-between">
-                  <span class="font-mono text-xs text-blue-400 font-bold">${b.jam}</span>
+                  <span class="text-xs font-mono font-bold text-blue-400"><i class="fa-solid fa-clock mr-1"></i> ${b.jam}</span>
                   ${statusBadgeKiosk}
                 </div>
-                <h4 class="font-bold text-sm text-white">${b.kegiatan}</h4>
-                <div class="text-[11px] text-slate-300">Pemohon: <b>${b.pemohon}</b> (${b.unit})</div>
+                <div class="font-bold text-white text-sm">${b.kegiatan}</div>
+                <div class="text-xs text-slate-300 flex items-center justify-between">
+                  <span><i class="fa-solid fa-user-tie text-slate-400 mr-1"></i> ${b.pemohon} (${b.unit})</span>
+                  <span class="text-xs text-slate-400"><i class="fa-solid fa-users mr-1"></i> ${b.peserta} Orang</span>
+                </div>
               </div>`;
           });
         }
 
-        container.innerHTML += `
-          <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-xl backdrop-blur-md flex flex-col justify-between">
-            <div class="space-y-3">
-              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <h3 class="text-base font-black text-white">${room.name}</h3>
-                <span class="text-[10px] bg-blue-950 text-blue-300 font-bold px-2.5 py-1 rounded-full border border-blue-900">${room.capacity}</span>
+        let ytEmbedUrl = '';
+        const matchedAdmin = appState.adminAccounts.find(a => (a.unit || '').trim().toLowerCase() === (room.unit || '').trim().toLowerCase() && a.youtubeUrl);
+        if (matchedAdmin && matchedAdmin.youtubeUrl) {
+          ytEmbedUrl = matchedAdmin.youtubeUrl;
+        } else {
+          const superAdminAcc = appState.adminAccounts.find(a => a.isSuper && a.youtubeUrl);
+          if (superAdminAcc) ytEmbedUrl = superAdminAcc.youtubeUrl;
+        }
+
+        if (ytEmbedUrl && ytEmbedUrl.includes('watch?v=')) {
+          const vId = ytEmbedUrl.split('watch?v=')[1].split('&')[0];
+          ytEmbedUrl = `https://www.youtube.com/embed/${vId}`;
+        }
+
+        let mediaStreamContentHtml = '';
+        if (ytEmbedUrl && ytEmbedUrl.trim() !== '') {
+          mediaStreamContentHtml = `
+            <div class="rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 h-56 sm:h-64 relative shadow-inner">
+              <iframe src="${ytEmbedUrl}" class="w-full h-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>`;
+        } else {
+          mediaStreamContentHtml = `
+            <div class="rounded-2xl border border-slate-800 bg-slate-950/80 h-56 sm:h-64 flex flex-col items-center justify-center p-6 text-center space-y-2 shadow-inner">
+              <div class="w-12 h-12 bg-slate-900 text-slate-400 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-video-slash"></i></div>
+              <h4 class="font-bold text-xs text-slate-300">Siaran Langsung Tidak Tersedia</h4>
+              <p class="text-[11px] text-slate-500 max-w-xs">Belum ada tautan YouTube live stream yang ditautkan untuk unit/dinas ini.</p>
+            </div>`;
+        }
+
+        let mediaStreamContentHtmlSmall = '';
+        if (ytEmbedUrl && ytEmbedUrl.trim() !== '') {
+          mediaStreamContentHtmlSmall = `
+            <div class="rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 h-36 relative shadow-inner">
+              <iframe src="${ytEmbedUrl}" class="w-full h-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>`;
+        } else {
+          mediaStreamContentHtmlSmall = `
+            <div class="rounded-2xl border border-slate-800 bg-slate-950/80 h-36 flex flex-col items-center justify-center p-3 text-center space-y-1 shadow-inner">
+              <div class="w-9 h-9 bg-slate-900 text-slate-400 rounded-xl flex items-center justify-center text-sm"><i class="fa-solid fa-video-slash"></i></div>
+              <p class="text-[10px] text-slate-400 font-medium">Siaran Langsung Tidak Tersedia</p>
+            </div>`;
+        }
+
+        if (isSingleRoom) {
+          const firstPhoto = (room.images && room.images.length > 0) ? room.images[0] : 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80';
+          const featuresListHtml = (room.features || []).map(f => `<span class="bg-slate-950 border border-slate-800 text-slate-300 px-3 py-1 rounded-xl text-xs font-semibold inline-flex items-center"><i class="fa-solid fa-check text-emerald-400 mr-1.5"></i> ${f}</span>`).join('');
+
+          container.innerHTML += `
+            <div class="bg-slate-900/95 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl backdrop-blur-md">
+              <div class="flex flex-col md:flex-row items-start md:items-center justify-between border-b border-slate-800 pb-5 gap-4">
+                <div class="flex items-center space-x-4">
+                  <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-slate-800 shrink-0 border border-slate-700 shadow-md">
+                    <img src="${firstPhoto}" alt="${room.name}" class="w-full h-full object-cover">
+                  </div>
+                  <div>
+                    <span class="text-xs font-bold text-blue-400 uppercase tracking-widest">${room.unit || 'Umum'}</span>
+                    <h2 class="text-2xl sm:text-3xl font-black text-white">${room.name}</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">${room.description || 'Ruangan rapat utama instansi.'}</p>
+                  </div>
+                </div>
+                <div class="flex items-center space-x-3 shrink-0">
+                  <div class="bg-blue-950/80 border border-blue-900 px-4 py-2.5 rounded-2xl text-center">
+                    <span class="text-[10px] text-blue-300 font-bold block uppercase">Kapasitas Maksimal</span>
+                    <span class="text-lg font-black text-white"><i class="fa-solid fa-users mr-1 text-blue-400"></i> ${room.capacity}</span>
+                  </div>
+                </div>
               </div>
-              <div class="space-y-2.5 max-h-64 overflow-y-auto pr-1">${agendaHtml}</div>
-            </div>
-            <div class="pt-3 border-t border-slate-800 text-[10px] text-slate-400 flex justify-between">
-              <span>Pengelola: ${room.unit || 'Umum'}</span>
-              <span class="text-emerald-400 font-bold">Kiosk Display Aktif</span>
-            </div>
-          </div>`;
+
+              <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <div class="lg:col-span-7 space-y-4">
+                  <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider"><i class="fa-solid fa-calendar-day mr-2 text-blue-400"></i> Daftar Agenda / Rapat Hari Ini</h3>
+                    <span class="text-xs text-slate-400 font-medium">Total: ${todayBookings.length} Agenda</span>
+                  </div>
+                  <div class="space-y-3 max-h-[360px] overflow-y-auto pr-1">${agendaHtml}</div>
+                  ${ratingHtml}
+                </div>
+
+                <div class="lg:col-span-5 space-y-4">
+                  <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider"><i class="fa-solid fa-video mr-2 text-emerald-400"></i> Siaran Langsung / Live Stream Kiosk</h3>
+                  ${mediaStreamContentHtml}
+                  <div class="bg-slate-950/80 border border-slate-800 rounded-2xl p-3.5 space-y-2">
+                    <div class="text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1">Fasilitas Tersedia:</div>
+                    <div class="flex flex-wrap gap-1.5">${featuresListHtml}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="border-t border-slate-800 pt-4 flex items-center justify-between text-xs text-slate-400">
+                <span>Pengelola: <b class="text-white">${room.unit || 'Umum'}</b></span>
+                <span class="text-emerald-400 font-bold flex items-center"><span class="w-2 h-2 rounded-full bg-emerald-500 mr-1.5 live-pulse"></span> Mode Kiosk TV - Tampilan Layar Penuh</span>
+              </div>
+            </div>`;
+        } else {
+          container.innerHTML += `
+            <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-xl backdrop-blur-md flex flex-col justify-between">
+              <div class="space-y-3">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <h3 class="text-base font-black text-white">${room.name}</h3>
+                  <span class="text-xs bg-blue-950 text-blue-300 font-bold px-3 py-1 rounded-full border border-blue-900">${room.capacity}</span>
+                </div>
+                ${ratingHtml}
+                <div class="space-y-2 max-h-48 overflow-y-auto pr-1">${agendaHtml}</div>
+                ${mediaStreamContentHtmlSmall}
+              </div>
+              <div class="pt-3 border-t border-slate-800 text-xs text-slate-400 flex justify-between">
+                <span>Pengelola: ${room.unit || 'Umum'}</span>
+                <span class="text-emerald-400 font-bold">Kiosk TV Aktif</span>
+              </div>
+            </div>`;
+        }
       });
+
+      if (tickerEl) {
+        if (upcomingAgendasText.length > 0) {
+          tickerEl.innerText = upcomingAgendasText.join("  ✦  ");
+        } else {
+          tickerEl.innerText = "Tidak ada agenda rapat berikutnya yang dijadwalkan segera hari ini. Semua ruangan dalam kondisi siap pakai.";
+        }
+      }
     }
 
     function updateDashboardCounts() {
-      const disetujuiCount = appState.bookings.filter(b => b.status === 'Disetujui').length;
-      const menungguCount = appState.bookings.filter(b => b.status === 'Menunggu').length;
-      if (document.getElementById('kpiTotalRuangan')) document.getElementById('kpiTotalRuangan').innerText = appState.rooms.length;
-      if (document.getElementById('kpiDisetujuiCount')) document.getElementById('kpiDisetujuiCount').innerText = disetujuiCount;
-      if (document.getElementById('kpiMenungguCount')) document.getElementById('kpiMenungguCount').innerText = menungguCount;
+      const totalR = appState.rooms.length;
+      const disetujuiB = appState.bookings.filter(b => b.status === 'Disetujui').length;
+      const menungguB = appState.bookings.filter(b => b.status === 'Menunggu').length;
+
+      if (document.getElementById('kpiTotalRuangan')) document.getElementById('kpiTotalRuangan').innerText = totalR;
+      if (document.getElementById('kpiDisetujuiCount')) document.getElementById('kpiDisetujuiCount').innerText = disetujuiB;
+      if (document.getElementById('kpiMenungguCount')) document.getElementById('kpiMenungguCount').innerText = menungguB;
     }
 
     function checkAutomatedReminders() {
       const now = new Date();
-      const todayStr = now.toISOString().split('T')[0];
-      
-      const tomorrow = new Date(now);
-      tomorrow.setDate(now.getDate() + 1);
-      const tomorrowStr = tomorrow.toISOString().split('T')[0];
-      const currentMinTotal = now.getHours() * 60 + now.getMinutes();
-
-      const activeBookings = appState.bookings.filter(b => b.status === 'Disetujui');
-
-      const relevantBookings = activeBookings.filter(b => {
-        let bDate = (String(b.tanggal || '')).split('T')[0];
-        if (bDate !== todayStr && bDate !== tomorrowStr) return false;
-
-        let startH = 8, startM = 0, endH = 17, endM = 59;
-        const jamString = String(b.jam || '');
-        const parts = jamString.split(' - ');
-        if (parts.length >= 2) {
-          const startHM = parts[0].trim().split(':');
-          startH = parseInt(startHM[0], 10) || 8;
-          startM = parseInt(startHM[1], 10) || 0;
-
-          const endHM = parts[1].replace(/WIB/gi, '').trim().split(':');
-          endH = parseInt(endHM[0], 10) || 17;
-          endM = parseInt(endHM[1], 10) || 59;
-        }
-
-        const startMinTotal = startH * 60 + startM;
-        const endMinTotal = endH * 60 + endM;
-
-        if (bDate === todayStr) {
-          return currentMinTotal <= endMinTotal;
-        }
-        return true;
-      });
-
+      const container = document.getElementById('notifListContainer');
       const badge = document.getElementById('notifBadge');
       const bellIcon = document.getElementById('bellIcon');
-      const container = document.getElementById('notifListContainer');
+      if (!container) return;
 
       let reminderHTML = '';
       let reminderCount = 0;
 
-      if (relevantBookings.length > 0) {
-        reminderCount += relevantBookings.length;
-        relevantBookings.forEach(b => {
-          let dStr = (String(b.tanggal || '')).split('T')[0];
-          let startH = 8, startM = 0, endH = 17, endM = 59;
-          const parts = String(b.jam || '').split(' - ');
-          if (parts.length >= 2) {
+      appState.bookings.forEach(b => {
+        if (b.status === 'Disetujui') {
+          let bDateStr = (String(b.tanggal || '')).split('T')[0];
+          if (!bDateStr) return;
+
+          let startH = 8, startM = 0;
+          const jamString = String(b.jam || '');
+          const parts = jamString.split(' - ');
+          if (parts.length >= 1) {
             const startHM = parts[0].trim().split(':');
             startH = parseInt(startHM[0], 10) || 8;
             startM = parseInt(startHM[1], 10) || 0;
-            const endHM = parts[1].replace(/WIB/gi, '').trim().split(':');
-            endH = parseInt(endHM[0], 10) || 17;
-            endM = parseInt(endHM[1], 10) || 59;
           }
-          const startMinTotal = startH * 60 + startM;
-          const endMinTotal = endH * 60 + endM;
 
-          let statusBadgeClass = 'bg-amber-600 text-white';
-          let statusTextLabel = 'Pengingat H-1 (Gmail)';
+          const bookingStartDateTime = new Date(bDateStr + 'T' + String(startH).padStart(2, '0') + ':' + String(startM).padStart(2, '0') + ':00');
+          const diffMs = bookingStartDateTime - now;
+          const diffHours = diffMs / (1000 * 60 * 60);
 
-          if (dStr === todayStr) {
-            if (currentMinTotal >= startMinTotal && currentMinTotal <= endMinTotal) {
-              statusBadgeClass = 'bg-red-600 text-white live-pulse';
-              statusTextLabel = 'Sedang Berlangsung (Gmail)';
-            } else if (startMinTotal - currentMinTotal <= 180 && currentMinTotal < startMinTotal) {
-              statusBadgeClass = 'bg-orange-500 text-white live-pulse';
-              statusTextLabel = 'Pengingat 3 Jam Lagi (Gmail)';
-            }
+          if (diffHours > 0 && diffHours <= 26) {
+            reminderCount++;
+            const isTomorrow = diffHours > 3 ? 'Reminder H-1 (Besok)' : 'Reminder (3 Jam Lagi)';
+            reminderHTML += `
+              <div class="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 p-3 rounded-2xl space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-bold text-amber-700 dark:text-amber-300 uppercase">${isTomorrow}</span>
+                  <span class="text-[10px] font-mono text-slate-500">${b.jam}</span>
+                </div>
+                <div class="font-bold text-slate-900 dark:text-white text-xs">${b.kegiatan}</div>
+                <div class="text-[11px] text-slate-600 dark:text-slate-300">Ruangan: <b>${b.ruangan}</b></div>
+                <div class="text-[10px] text-slate-400">Terkirim ke Gmail: ${b.email}</div>
+              </div>`;
           }
-          
-          reminderHTML += `
-            <div class="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 p-3 rounded-2xl space-y-1 animate-fade-in">
-              <div class="flex items-center justify-between">
-                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded ${statusBadgeClass} uppercase tracking-wider"><i class="fa-solid fa-envelope mr-1"></i> ${statusTextLabel}</span>
-                <span class="text-[10px] font-bold text-slate-500">${b.jam}</span>
-              </div>
-              <div class="font-bold text-slate-900 dark:text-white text-xs">${b.kegiatan}</div>
-              <div class="text-[11px] text-slate-600 dark:text-slate-300">Ruangan: <b>${b.ruangan}</b></div>
-              <div class="text-[10px] text-slate-400">Terkirim ke Gmail: ${b.email}</div>
-            </div>`;
-        });
-      }
+        }
+      });
 
       if (!notifRenderedOnce) {
         if (reminderCount > 0) {
@@ -1834,11 +1989,6 @@
         }
         notifRenderedOnce = true;
       }
-    }
-
-    function toggleNotificationDropdown() {
-      const dropdown = document.getElementById('notifDropdown');
-      if (dropdown) dropdown.classList.toggle('hidden');
     }
 
     async function syncDataFromDatabase() {
@@ -2884,9 +3034,10 @@
       const pass = document.getElementById('newAdminPassword').value.trim();
       const isSuper = document.getElementById('newAdminLevel').value === 'super';
       const unit = document.getElementById('newAdminUnit').value.trim();
+      const youtubeUrl = document.getElementById('newAdminYoutube').value.trim();
 
       const newSecret = generateRandomBase32Secret();
-      const adminObj = { username, name, pass, unit: isSuper ? 'Semua Dinas' : unit, isSuper, secret: newSecret };
+      const adminObj = { username, name, pass, unit: isSuper ? 'Semua Dinas' : unit, isSuper, secret: newSecret, youtubeUrl };
 
       if (editKey) {
         const acc = appState.adminAccounts.find(a => a.username === editKey);
@@ -2896,6 +3047,7 @@
           acc.pass = pass;
           acc.unit = adminObj.unit;
           acc.isSuper = isSuper;
+          acc.youtubeUrl = youtubeUrl;
           if (!acc.secret) acc.secret = newSecret;
         }
       } else {
@@ -2908,7 +3060,7 @@
       }
 
       saveLocalCache();
-      showToast('Menyimpan akun admin & kunci TOTP ke database...', 'info');
+      showToast('Menyimpan akun admin & tautan YouTube ke database...', 'info');
       const res = await sendDataToDatabase('saveAdmin', { admin: adminObj });
       if (res && res.admins && Array.isArray(res.admins)) {
         appState.adminAccounts = res.admins;
