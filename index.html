@@ -2749,13 +2749,11 @@
           }
         }
 
-        // Robust YouTube URL Parser for Embed & Autoplay
         function parseYoutubeEmbedUrl(rawUrl) {
           if (!rawUrl || typeof rawUrl !== 'string') return '';
           let cleanUrl = rawUrl.trim();
           let videoId = '';
 
-          // If iframe HTML snippet is pasted
           if (cleanUrl.includes('<iframe')) {
             const srcMatch = cleanUrl.match(/src="([^"]+)"/);
             if (srcMatch && srcMatch[1]) {
@@ -2769,12 +2767,19 @@
             videoId = cleanUrl.split('youtu.be/')[1].split('?')[0].split('/')[0];
           } else if (cleanUrl.includes('watch?v=')) {
             videoId = cleanUrl.split('watch?v=')[1].split('&')[0];
+          } else if (cleanUrl.includes('live/')) {
+            videoId = cleanUrl.split('live/')[1].split('?')[0].split('/')[0];
           } else if (cleanUrl.length === 11 && !cleanUrl.includes(' ')) {
             videoId = cleanUrl;
           }
 
           if (videoId) {
-            return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&enablejsapi=1&playsinline=1&control=1`;
+            return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&enablejsapi=1&playsinline=1&controls=1`;
+          }
+          
+          if (!cleanUrl.includes('autoplay=1')) {
+            const separator = cleanUrl.includes('?') ? '&' : '?';
+            return `${cleanUrl}${separator}autoplay=1&mute=1&enablejsapi=1&playsinline=1&controls=1`;
           }
           return cleanUrl;
         }
