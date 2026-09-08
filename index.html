@@ -659,7 +659,7 @@
                     <th class="p-3 sm:p-4">Ruangan</th>
                     <th class="p-3 sm:p-4">Jadwal</th>
                     <th class="p-3 sm:p-4">Status</th>
-                    <th class="p-3 sm:p-4 pr-5 text-center">Aksi</th>
+                    <th class="p-3 sm:p-4 pr-5 text-center">Aksi & Link YouTube Kiosk</th>
                   </tr>
                 </thead>
                 <tbody id="adminPendingTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-xs text-slate-700 dark:text-slate-300"></tbody>
@@ -2561,6 +2561,8 @@
           ? 'px-3 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-400 border border-slate-200 dark:border-slate-700 font-bold rounded-xl text-[11px] opacity-40 cursor-not-allowed pointer-events-none' 
           : 'px-3 py-1.5 bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 text-rose-700 dark:text-rose-300 font-bold rounded-xl text-[11px] transition cursor-pointer border border-rose-200 dark:border-rose-800';
 
+        const currentYoutubeUrl = item.youtubeUrl || '';
+
         tbody.innerHTML += `
           <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
             <td class="p-4 pl-5">
@@ -2576,12 +2578,20 @@
             </td>
             <td class="p-4">${getStatusBadge(item)}</td>
             <td class="p-4 pr-5 text-center">
-              <div class="inline-flex items-center space-x-1.5">
-                <button onclick="openPdfModal('${pdfUrl}', '${item.id}')" title="Lihat Berkas PDF" class="px-2.5 py-1.5 bg-blue-50 dark:bg-blue-950/50 ${pdfBtnDisabled} text-blue-700 dark:text-blue-300 font-bold rounded-xl text-[11px] transition inline-flex items-center border border-blue-200 dark:border-blue-800 cursor-pointer">
-                  <i class="fa-solid fa-file-pdf mr-1 text-xs text-rose-500"></i> PDF
-                </button>
-                <button ${disabledBtnAttr} onclick="updateBookingStatusInCloud('${item.id}', 'Disetujui')" class="${setujuiBtnClass}">Setujui</button>
-                <button ${disabledBtnAttr} onclick="updateBookingStatusInCloud('${item.id}', 'Ditolak')" class="${tolakBtnClass}">Tolak</button>
+              <div class="flex flex-col space-y-2 items-center">
+                <div class="flex items-center space-x-1.5">
+                  <button onclick="openPdfModal('${pdfUrl}', '${item.id}')" title="Lihat Berkas PDF" class="px-2.5 py-1.5 bg-blue-50 dark:bg-blue-950/50 ${pdfBtnDisabled} text-blue-700 dark:text-blue-300 font-bold rounded-xl text-[11px] transition inline-flex items-center border border-blue-200 dark:border-blue-800 cursor-pointer">
+                    <i class="fa-solid fa-file-pdf mr-1 text-xs text-rose-500"></i> PDF
+                  </button>
+                  <button ${disabledBtnAttr} onclick="updateBookingStatusInCloud('${item.id}', 'Disetujui')" class="${setujuiBtnClass}">Setujui</button>
+                  <button ${disabledBtnAttr} onclick="updateBookingStatusInCloud('${item.id}', 'Ditolak')" class="${tolakBtnClass}">Tolak</button>
+                </div>
+                <div class="flex items-center space-x-1 w-full max-w-[240px]">
+                  <input type="text" id="yt-input-${item.id}" value="${currentYoutubeUrl}" placeholder="URL YouTube Live..." class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] rounded-lg px-2 py-1 outline-none text-slate-800 dark:text-slate-200">
+                  <button onclick="saveBookingYoutubeUrl('${item.id}')" class="px-2.5 py-1 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg text-[10px] transition cursor-pointer shrink-0" title="Simpan Link YouTube ke Kiosk TV">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                  </button>
+                </div>
               </div>
             </td>
           </tr>
@@ -2589,111 +2599,265 @@
       });
     }
 
-    let activePdfViewerUrl = '';
-    let activePdfDownloadUrl = '';
+    async function saveBookingYoutubeUrl(bookingId) {
+      const inputEl = document.getElementById(`yt-input-${bookingId}`);
+      if (!inputEl) return;
+      const ytUrl = inputEl.value.trim();
 
-    function openPdfModal(url, bookingId) {
-      if (!url || url === '#') {
-        showToast('Berkas PDF tidak tersedia untuk peminjaman ini.', 'warning');
-        return;
+      const bookingItem = appState.bookings.find(b => b.id === bookingId);
+      if (bookingItem) {
+        bookingItem.youtubeUrl = ytUrl;
+        saveLocalCache();
+        showToast(`Link YouTube live stream untuk peminjaman ${bookingId} berhasil disimpan dan terintegrasi ke Kiosk TV!`, 'success');
+        await sendDataToDatabase('updateBookingYoutube', { id: bookingId, youtubeUrl: ytUrl });
+        renderKioskDisplay();
+      }
+    }
+<!-- ... existing code ... --->
+    function renderKioskDisplay() {
+      const container = document.getElementById('kioskRoomsContainer');
+      const tickerEl = document.getElementById('kioskUpcomingTicker');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const filterSelect = document.getElementById('kioskUnitFilter');
+      const selectedUnit = filterSelect ? filterSelect.value : 'Semua';
+
+      let roomsToDisplay = appState.rooms;
+      if (selectedUnit && selectedUnit !== 'Semua') {
+        roomsToDisplay = appState.rooms.filter(r => (r.unit || 'Umum').toLowerCase() === selectedUnit.toLowerCase());
       }
 
-      if (appState.currentAdmin && !appState.currentAdmin.isSuper) {
-        const bookingItem = appState.bookings.find(b => b.id === bookingId);
-        if (bookingItem) {
-          const adminUnit = (appState.currentAdmin.unit || '').trim().toLowerCase();
-          const bookingUnit = (bookingItem.unit || '').trim().toLowerCase();
-          const targetRoom = appState.rooms.find(r => r.name === bookingItem.ruangan);
-          const roomUnit = targetRoom ? (targetRoom.unit || '').trim().toLowerCase() : '';
+      const now = new Date();
+      const todayStr = now.toISOString().split('T')[0];
+      const currentMin = now.getHours() * 60 + now.getMinutes();
 
-          const hasAccess = bookingUnit.includes(adminUnit) || adminUnit.includes(bookingUnit) ||
-                            roomUnit.includes(adminUnit) || adminUnit.includes(roomUnit);
-          
-          if (!hasAccess) {
-            showToast(`Akses Ditolak: Folder instansi "${bookingItem.unit}" hanya dapat diakses oleh admin instansi terkait atau Super Admin.`, 'error');
-            return;
+      document.getElementById('kioskClock').innerText = now.toLocaleTimeString('id-ID', { hour12: false }) + ' WIB';
+      document.getElementById('kioskDate').innerText = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+      let upcomingAgendasText = [];
+      const isSingleRoom = roomsToDisplay.length === 1;
+
+      if (isSingleRoom) {
+        container.className = "grid grid-cols-1 gap-6 max-w-5xl mx-auto w-full";
+      } else {
+        container.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6";
+      }
+
+      roomsToDisplay.forEach(room => {
+        const todayBookings = appState.bookings.filter(b => {
+          let bDate = (String(b.tanggal || '')).split('T')[0];
+          return (b.ruangan || '').trim().toLowerCase() === (room.name || '').trim().toLowerCase() && bDate === todayStr && b.status === 'Disetujui';
+        });
+
+        const roomBookingsWithRating = appState.bookings.filter(b => (b.ruangan || '').trim().toLowerCase() === (room.name || '').trim().toLowerCase() && b.rating);
+        let avgRating = 0;
+        if (roomBookingsWithRating.length > 0) {
+          const totalStar = roomBookingsWithRating.reduce((acc, curr) => acc + (curr.rating || 0), 0);
+          avgRating = (totalStar / roomBookingsWithRating.length).toFixed(1);
+        }
+
+        let ratingHtml = '';
+        if (roomBookingsWithRating.length > 0) {
+          let starsHtml = '';
+          const fullStars = Math.floor(avgRating);
+          for (let s = 1; s <= 5; s++) {
+            starsHtml += s <= fullStars ? '<i class="fa-solid fa-star text-amber-400 text-[10px]"></i>' : '<i class="fa-regular fa-star text-slate-500 text-[10px]"></i>';
           }
-        }
-      }
-
-      let formattedUrl = url;
-      activePdfDownloadUrl = url;
-
-      if (formattedUrl.startsWith('data:application/pdf') || formattedUrl.startsWith('data:pdf')) {
-        try {
-          const base64Parts = formattedUrl.split(',');
-          const contentType = (base64Parts[0].match(/:(.*?);/) || [])[1] || 'application/pdf';
-          const byteCharacters = atob(base64Parts[1]);
-          const byteNumbers = new Array(byteCharacters.length);
-          for (let i = 0; i < byteCharacters.length; i++) {
-            byteNumbers[i] = byteCharacters.charCodeAt(i);
-          }
-          const byteArray = new Uint8Array(byteNumbers);
-          const blob = new Blob([byteArray], { type: contentType });
-          formattedUrl = URL.createObjectURL(blob);
-          activePdfDownloadUrl = formattedUrl;
-        } catch (e) {
-          console.error("Gagal mengonversi Base64 ke Blob PDF:", e);
-        }
-      } 
-      else if (formattedUrl.includes('drive.google.com')) {
-        const driveIdMatch = formattedUrl.match(/\/d\/([a-zA-Z0-9_-]+)/) || formattedUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-        if (driveIdMatch && driveIdMatch[1]) {
-          formattedUrl = `https://drive.google.com/file/d/${driveIdMatch[1]}/preview`;
-          activePdfDownloadUrl = `https://drive.google.com/uc?export=download&id=${driveIdMatch[1]}`;
-        }
-      }
-
-      activePdfViewerUrl = formattedUrl;
-
-      let modal = document.getElementById('pdfViewerModal');
-      if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'pdfViewerModal';
-        modal.className = 'fixed inset-0 z-50 bg-slate-950/70 modal-blur flex items-center justify-center p-3 sm:p-4 animate-fade-in';
-        modal.innerHTML = `
-          <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-4xl w-full p-5 sm:p-6 shadow-2xl relative space-y-4 my-auto h-[85vh] flex flex-col">
-            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3 flex-wrap gap-2">
+          ratingHtml = `
+            <div class="bg-slate-950/80 border border-slate-800 p-3 rounded-2xl flex items-center justify-between text-xs">
               <div class="flex items-center space-x-2">
-                <div class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-xs"><i class="fa-solid fa-file-pdf"></i></div>
-                <div>
-                  <h3 id="pdfModalTitle" class="text-sm sm:text-base font-black text-slate-900 dark:text-white">Pratinjau Berkas PDF</h3>
-                  <p class="text-[10px] text-slate-400">Google Drive Folder Instansi & Viewer Tersinkronisasi</p>
+                <span class="text-amber-400 font-black text-base">${avgRating}</span>
+                <div class="flex space-x-0.5">${starsHtml}</div>
+              </div>
+              <span class="text-xs text-slate-400 font-semibold">(${roomBookingsWithRating.length} Ulasan Fasilitas)</span>
+            </div>`;
+        } else {
+          ratingHtml = `
+            <div class="bg-slate-950/80 border border-slate-800 p-3 rounded-2xl flex items-center justify-between text-xs text-slate-400">
+              <span><i class="fa-regular fa-star mr-1.5 text-slate-500"></i> Belum ada ulasan fasilitas</span>
+              <span class="text-xs">-</span>
+            </div>`;
+        }
+
+        let agendaHtml = '';
+        let activeYoutubeUrl = '';
+
+        if (todayBookings.length === 0) {
+          agendaHtml = `
+            <div class="text-center py-8 bg-slate-950/60 rounded-2xl border border-slate-800 space-y-2">
+              <div class="w-12 h-12 bg-emerald-950/50 text-emerald-400 rounded-2xl mx-auto flex items-center justify-center text-xl"><i class="fa-solid fa-circle-check"></i></div>
+              <h4 class="font-bold text-sm text-emerald-300">Ruangan Kosong & Tersedia Sepanjang Hari Ini</h4>
+              <p class="text-xs text-slate-400">Tidak ada jadwal rapat yang terdaftar untuk tanggal ini.</p>
+            </div>`;
+        } else {
+          todayBookings.forEach(b => {
+            if (b.youtubeUrl && b.youtubeUrl.trim() !== '') {
+              activeYoutubeUrl = b.youtubeUrl.trim();
+            }
+
+            let startH = 8, startM = 0, endH = 17, endM = 0;
+            const parts = String(b.jam || '').split(' - ');
+            if (parts.length >= 2) {
+              const startHM = parts[0].trim().split(':');
+              startH = parseInt(startHM[0], 10) || 8;
+              startM = parseInt(startHM[1], 10) || 0;
+              const endHM = parts[1].replace(/WIB/gi, '').trim().split(':');
+              endH = parseInt(endHM[0], 10) || 17;
+              endM = parseInt(endHM[1], 10) || 59;
+            }
+            const startMin = startH * 60 + startM;
+            const endMin = endH * 60 + endM;
+
+            let statusBadgeKiosk = '';
+            let cardBgKiosk = 'bg-slate-900 border-slate-800';
+
+            if (currentMin >= startMin && currentMin <= endMin) {
+              statusBadgeKiosk = `<span class="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full live-pulse inline-flex items-center"><span class="w-2 h-2 rounded-full bg-white mr-1.5 live-pulse"></span> Berlangsung</span>`;
+              cardBgKiosk = 'bg-gradient-to-br from-slate-900 via-slate-900 to-rose-950/60 border-rose-500/60 shadow-xl calendar-glow-ongoing-red';
+            } else if (currentMin < startMin) {
+              statusBadgeKiosk = `<span class="bg-amber-600 text-white text-xs font-bold px-3 py-1 rounded-full live-pulse inline-flex items-center"><span class="w-2 h-2 rounded-full bg-white mr-1.5 live-pulse"></span> Segera</span>`;
+              cardBgKiosk = 'bg-gradient-to-br from-slate-900 via-slate-900 to-amber-950/60 border-amber-500/60 shadow-xl calendar-glow-ongoing';
+            } else {
+              statusBadgeKiosk = `<span class="bg-slate-700 text-slate-300 text-xs font-semibold px-3 py-1 rounded-full">Selesai</span>`;
+            }
+
+            upcomingAgendasText.push(`${room.name}: ${b.kegiatan} (${b.jam})`);
+
+            agendaHtml += `
+              <div class="${cardBgKiosk} border rounded-2xl p-4 space-y-2 transition-all">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-mono font-bold text-blue-400"><i class="fa-solid fa-clock mr-1"></i> ${b.jam}</span>
+                  ${statusBadgeKiosk}
+                </div>
+                <div class="font-bold text-white text-sm">${b.kegiatan}</div>
+                <div class="text-xs text-slate-300 flex items-center justify-between">
+                  <span><i class="fa-solid fa-user-tie text-slate-400 mr-1"></i> ${b.pemohon} (${b.unit})</span>
+                  <span class="text-xs text-slate-400"><i class="fa-solid fa-users mr-1"></i> ${b.peserta} Orang</span>
+                </div>
+              </div>`;
+          });
+        }
+
+        if (!activeYoutubeUrl) {
+          const matchedAdmin = appState.adminAccounts.find(a => (a.unit || '').trim().toLowerCase() === (room.unit || '').trim().toLowerCase() && a.youtubeUrl);
+          if (matchedAdmin && matchedAdmin.youtubeUrl) {
+            activeYoutubeUrl = matchedAdmin.youtubeUrl;
+          } else {
+            const superAdminAcc = appState.adminAccounts.find(a => a.isSuper && a.youtubeUrl);
+            if (superAdminAcc) activeYoutubeUrl = superAdminAcc.youtubeUrl;
+          }
+        }
+
+        if (activeYoutubeUrl && activeYoutubeUrl.includes('watch?v=')) {
+          const vId = activeYoutubeUrl.split('watch?v=')[1].split('&')[0];
+          activeYoutubeUrl = `https://www.youtube.com/embed/${vId}`;
+        }
+
+        let mediaStreamContentHtml = '';
+        if (activeYoutubeUrl && activeYoutubeUrl.trim() !== '') {
+          mediaStreamContentHtml = `
+            <div class="rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 h-56 sm:h-64 relative shadow-inner">
+              <iframe src="${activeYoutubeUrl}" class="w-full h-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>`;
+        } else {
+          mediaStreamContentHtml = `
+            <div class="rounded-2xl border border-slate-800 bg-slate-950/80 h-56 sm:h-64 flex flex-col items-center justify-center p-6 text-center space-y-2 shadow-inner">
+              <div class="w-12 h-12 bg-slate-900 text-slate-400 rounded-2xl flex items-center justify-center text-xl"><i class="fa-solid fa-video-slash"></i></div>
+              <h4 class="font-bold text-xs text-slate-300">Siaran Langsung Tidak Tersedia</h4>
+              <p class="text-[11px] text-slate-500 max-w-xs">Belum ada tautan YouTube live stream yang ditautkan untuk agenda / ruangan ini.</p>
+            </div>`;
+        }
+
+        let mediaStreamContentHtmlSmall = '';
+        if (activeYoutubeUrl && activeYoutubeUrl.trim() !== '') {
+          mediaStreamContentHtmlSmall = `
+            <div class="rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 h-36 relative shadow-inner">
+              <iframe src="${activeYoutubeUrl}" class="w-full h-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>`;
+        } else {
+          mediaStreamContentHtmlSmall = `
+            <div class="rounded-2xl border border-slate-800 bg-slate-950/80 h-36 flex flex-col items-center justify-center p-3 text-center space-y-1 shadow-inner">
+              <div class="w-9 h-9 bg-slate-900 text-slate-400 rounded-xl flex items-center justify-center text-sm"><i class="fa-solid fa-video-slash"></i></div>
+              <p class="text-[10px] text-slate-400 font-medium">Siaran Langsung Tidak Tersedia</p>
+            </div>`;
+        }
+
+        if (isSingleRoom) {
+          const firstPhoto = (room.images && room.images.length > 0) ? room.images[0] : 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80';
+          const featuresListHtml = (room.features || []).map(f => `<span class="bg-slate-950 border border-slate-800 text-slate-300 px-3 py-1 rounded-xl text-xs font-semibold inline-flex items-center"><i class="fa-solid fa-check text-emerald-400 mr-1.5"></i> ${f}</span>`).join('');
+
+          container.innerHTML += `
+            <div class="bg-slate-900/95 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl backdrop-blur-md">
+              <div class="flex flex-col md:flex-row items-start md:items-center justify-between border-b border-slate-800 pb-5 gap-4">
+                <div class="flex items-center space-x-4">
+                  <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-slate-800 shrink-0 border border-slate-700 shadow-md">
+                    <img src="${firstPhoto}" alt="${room.name}" class="w-full h-full object-cover">
+                  </div>
+                  <div>
+                    <span class="text-xs font-bold text-blue-400 uppercase tracking-widest">${room.unit || 'Umum'}</span>
+                    <h2 class="text-2xl sm:text-3xl font-black text-white">${room.name}</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">${room.description || 'Ruangan rapat utama instansi.'}</p>
+                  </div>
+                </div>
+                <div class="flex items-center space-x-3 shrink-0">
+                  <div class="bg-blue-950/80 border border-blue-900 px-4 py-2.5 rounded-2xl text-center">
+                    <span class="text-[10px] text-blue-300 font-bold block uppercase">Kapasitas Maksimal</span>
+                    <span class="text-lg font-black text-white"><i class="fa-solid fa-users mr-1 text-blue-400"></i> ${room.capacity}</span>
+                  </div>
                 </div>
               </div>
-              <div class="flex items-center space-x-2 flex-wrap">
-                <button onclick="openPdfPrintTab()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition flex items-center cursor-pointer shadow-md">
-                  <i class="fa-solid fa-print mr-2 text-xs"></i> Cetak / Buka PDF
-                </button>
-                <a id="pdfDownloadLink" href="#" download="Berkas-Peminjaman.pdf" target="_blank" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition flex items-center cursor-pointer shadow-md">
-                  <i class="fa-solid fa-download mr-2 text-xs"></i> Unduh PDF
-                </a>
-                <button onclick="closePdfModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-xmark"></i></button>
-              </div>
-            </div>
-            <div class="flex-grow bg-slate-100 dark:bg-slate-800 rounded-2xl overflow-hidden relative shadow-inner">
-              <iframe id="pdfIframe" src="" class="w-full h-full border-0" allow="autoplay"></iframe>
-            </div>
-          </div>`;
-        document.body.appendChild(modal);
-      }
-      document.getElementById('pdfModalTitle').innerText = `Pratinjau Berkas PDF (${bookingId})`;
-      document.getElementById('pdfIframe').src = formattedUrl;
-      const dlBtn = document.getElementById('pdfDownloadLink');
-      if (dlBtn) {
-        dlBtn.href = activePdfDownloadUrl;
-        dlBtn.download = `Berkas-Peminjaman-${bookingId}.pdf`;
-      }
-      modal.classList.remove('hidden');
-    }
 
-    function openPdfPrintTab() {
-      if (activePdfViewerUrl) {
-        const newWin = window.open(activePdfViewerUrl, '_blank');
-        if (newWin) {
-          newWin.focus();
+              <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <div class="lg:col-span-7 space-y-4">
+                  <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider"><i class="fa-solid fa-calendar-day mr-2 text-blue-400"></i> Daftar Agenda / Rapat Hari Ini</h3>
+                    <span class="text-xs text-slate-400 font-medium">Total: ${todayBookings.length} Agenda</span>
+                  </div>
+                  <div class="space-y-3 max-h-[360px] overflow-y-auto pr-1">${agendaHtml}</div>
+                  ${ratingHtml}
+                </div>
+
+                <div class="lg:col-span-5 space-y-4">
+                  <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider"><i class="fa-solid fa-video mr-2 text-emerald-400"></i> Siaran Langsung / Live Stream Kiosk</h3>
+                  ${mediaStreamContentHtml}
+                  <div class="bg-slate-950/80 border border-slate-800 rounded-2xl p-3.5 space-y-2">
+                    <div class="text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1">Fasilitas Tersedia:</div>
+                    <div class="flex flex-wrap gap-1.5">${featuresListHtml}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="border-t border-slate-800 pt-4 flex items-center justify-between text-xs text-slate-400">
+                <span>Pengelola: <b class="text-white">${room.unit || 'Umum'}</b></span>
+                <span class="text-emerald-400 font-bold flex items-center"><span class="w-2 h-2 rounded-full bg-emerald-500 mr-1.5 live-pulse"></span> Mode Kiosk TV - Tampilan Layar Penuh</span>
+              </div>
+            </div>`;
         } else {
-          showToast('Popup diblokir oleh browser. Izinkan popup untuk membuka pratinjau.', 'warning');
+          container.innerHTML += `
+            <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-xl backdrop-blur-md flex flex-col justify-between">
+              <div class="space-y-3">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <h3 class="text-base font-black text-white">${room.name}</h3>
+                  <span class="text-xs bg-blue-950 text-blue-300 font-bold px-3 py-1 rounded-full border border-blue-900">${room.capacity}</span>
+                </div>
+                ${ratingHtml}
+                <div class="space-y-2 max-h-48 overflow-y-auto pr-1">${agendaHtml}</div>
+                ${mediaStreamContentHtmlSmall}
+              </div>
+              <div class="pt-3 border-t border-slate-800 text-xs text-slate-400 flex justify-between">
+                <span>Pengelola: ${room.unit || 'Umum'}</span>
+                <span class="text-emerald-400 font-bold">Kiosk TV Aktif</span>
+              </div>
+            </div>`;
+        }
+      });
+
+      if (tickerEl) {
+        if (upcomingAgendasText.length > 0) {
+          tickerEl.innerText = upcomingAgendasText.join("  ✦  ");
+        } else {
+          tickerEl.innerText = "Tidak ada agenda rapat berikutnya yang dijadwalkan segera hari ini. Semua ruangan dalam kondisi siap pakai.";
         }
       }
     }
