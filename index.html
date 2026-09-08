@@ -1824,7 +1824,7 @@
         if (ytEmbedUrl && ytEmbedUrl.trim() !== '') {
           mediaStreamContentHtmlSmall = `
             <div class="rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 h-36 relative shadow-inner">
-              <iframe src="${ytEmbedUrl}" class="w-full h-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+              <iframe src="${activeYoutubeUrl}" class="w-full h-full border-0 absolute inset-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
             </div>`;
         } else {
           mediaStreamContentHtmlSmall = `
@@ -2754,6 +2754,7 @@
           let cleanUrl = rawUrl.trim();
           let videoId = '';
 
+          // Jika user menyalin seluruh tag iframe
           if (cleanUrl.includes('<iframe')) {
             const srcMatch = cleanUrl.match(/src="([^"]+)"/);
             if (srcMatch && srcMatch[1]) {
@@ -2761,22 +2762,25 @@
             }
           }
 
+          // Ekstraksi Video ID dari berbagai format URL YouTube
           if (cleanUrl.includes('youtube.com/embed/')) {
             videoId = cleanUrl.split('youtube.com/embed/')[1].split('?')[0].split('/')[0];
           } else if (cleanUrl.includes('youtu.be/')) {
             videoId = cleanUrl.split('youtu.be/')[1].split('?')[0].split('/')[0];
           } else if (cleanUrl.includes('watch?v=')) {
-            videoId = cleanUrl.split('watch?v=')[1].split('&')[0];
+            videoId = cleanUrl.split('watch?v=').pop().split('&')[0];
           } else if (cleanUrl.includes('live/')) {
             videoId = cleanUrl.split('live/')[1].split('?')[0].split('/')[0];
           } else if (cleanUrl.length === 11 && !cleanUrl.includes(' ')) {
-            videoId = cleanUrl;
+            videoId = cleanUrl; // Jika user langsung memasukkan 11 karakter ID video
           }
 
+          // Jika Video ID berhasil didapatkan, susun URL embed dengan autoplay & mute wajib
           if (videoId) {
             return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&enablejsapi=1&playsinline=1&controls=1`;
           }
           
+          // Jika berupa URL web biasa, pastikan parameter autoplay & mute ditambahkan
           if (!cleanUrl.includes('autoplay=1')) {
             const separator = cleanUrl.includes('?') ? '&' : '?';
             return `${cleanUrl}${separator}autoplay=1&mute=1&enablejsapi=1&playsinline=1&controls=1`;
